@@ -1,19 +1,23 @@
 from mesa.visualization import SolaraViz, make_plot_component, make_space_component
 from model import GameOfLifeModel
 
+
 def cell_portrayal(agent):
-    if agent is None: return
-    
-    # 
+    if agent is None:
+        return
+
+    #
     x, y = agent.pos
     is_alive = agent.model.cell_layer.data[x, y]
-    
+
     return {
-        # If alive Black, If dead White 
+        # If alive Black, If dead White
         "color": "black" if is_alive else "white",
-        "size": 50,   # 50 fills the cell completely
-        "marker": "s", #square shape
+        "size": 50,  # 50 fills the cell completely
+        "marker": "s",  # square shape
     }
+
+
 propertylayer_portrayal = {
     "cell_layer": {
         "color": "Cyan",
@@ -50,10 +54,7 @@ model_params = {
 }
 
 gol = GameOfLifeModel()
-layer_viz = make_space_component(
-    agent_portrayal=cell_portrayal, 
-    draw_grid=False
-)
+layer_viz = make_space_component(agent_portrayal=cell_portrayal, draw_grid=False)
 
 TotalAlivePlot = make_plot_component("Cells alive")
 
