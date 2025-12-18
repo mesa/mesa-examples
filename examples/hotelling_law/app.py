@@ -123,13 +123,20 @@ def SpaceDrawer(model):
     jitter_amount = 0.3  # Jitter for visual separation
 
     for agent in model.agents:
+        if (
+            not hasattr(agent, "cell")
+            or agent.cell is None
+            or agent.cell.coordinate is None
+        ):
+            continue
+
+        pos = agent.cell.coordinate
         portrayal = agent_portrayal(agent)
 
-        # Track store agents for cell coloring
         if isinstance(agent, StoreAgent):
-            if agent.pos not in cell_store_contents:
-                cell_store_contents[agent.pos] = []
-            cell_store_contents[agent.pos].append(portrayal)
+            if pos not in cell_store_contents:
+                cell_store_contents[pos] = []
+            cell_store_contents[pos].append(portrayal)
 
     # Color cells based on store occupancy
     for pos, stores in cell_store_contents.items():
@@ -138,7 +145,7 @@ def SpaceDrawer(model):
         for i, store in enumerate(stores):
             # Calculate rectangle position and size for
             # each store's portion of the cell
-            rect_x = pos[0] + (i * width)
+            rect_x = pos[0] + (i * width)           
             rect_y = pos[1]
             rect = patches.Rectangle(
                 (rect_x, rect_y),
@@ -151,10 +158,20 @@ def SpaceDrawer(model):
             ax.add_patch(rect)
 
     # Jittered scatter plot for all agents
+  # Jittered scatter plot for all agents
     for agent in model.agents:
+        if (
+            not hasattr(agent, "cell")
+            or agent.cell is None
+            or agent.cell.coordinate is None
+        ):
+            continue
+
         portrayal = agent_portrayal(agent)
-        jitter_x = np.random.uniform(-jitter_amount, jitter_amount) + agent.pos[0] + 0.5
-        jitter_y = np.random.uniform(-jitter_amount, jitter_amount) + agent.pos[1] + 0.5
+        pos = agent.cell.coordinate
+
+        jitter_x = np.random.uniform(-jitter_amount, jitter_amount) + pos[0] + 0.5
+        jitter_y = np.random.uniform(-jitter_amount, jitter_amount) + pos[1] + 0.5
 
         ax.scatter(
             jitter_x,
