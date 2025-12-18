@@ -145,7 +145,7 @@ def SpaceDrawer(model):
         for i, store in enumerate(stores):
             # Calculate rectangle position and size for
             # each store's portion of the cell
-            rect_x = pos[0] + (i * width)           
+            rect_x = pos[0] + (i * width)
             rect_y = pos[1]
             rect = patches.Rectangle(
                 (rect_x, rect_y),
@@ -158,7 +158,7 @@ def SpaceDrawer(model):
             ax.add_patch(rect)
 
     # Jittered scatter plot for all agents
-  # Jittered scatter plot for all agents
+    # Jittered scatter plot for all agents
     for agent in model.agents:
         if (
             not hasattr(agent, "cell")
