@@ -1,5 +1,4 @@
 from agents import Person
-
 from mesa import Model
 from mesa.datacollection import DataCollector
 from mesa.space import MultiGrid

@@ -1,11 +1,10 @@
 import solara
-from model import IdeologyModel
-
 from mesa.experimental.solara_viz import (
     SolaraViz,
     make_plot_component,
     make_space_component,
 )
+from model import IdeologyModel
 
 
 def agent_portrayal(agent):
