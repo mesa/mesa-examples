@@ -1,8 +1,7 @@
 import mesa
-from mesa import Model
-from mesa.datacollection import DataCollector
-from mesa.discrete_space import OrthogonalVonNeumannGrid, OrthogonalMooreGrid
 from agent import Person
+from mesa import Model
+from mesa.discrete_space import OrthogonalMooreGrid, OrthogonalVonNeumannGrid
 
 
 class RumorMillModel(Model):
@@ -10,7 +9,15 @@ class RumorMillModel(Model):
     Model simulating rumor spread through a population on a grid.
     """
 
-    def __init__(self, width=10, height=10, know_rumor_ratio=0.01, rumor_spread_chance=0.5, eight_neightborhood=False, seed=None):
+    def __init__(
+        self,
+        width=10,
+        height=10,
+        know_rumor_ratio=0.01,
+        rumor_spread_chance=0.5,
+        eight_neightborhood=False,
+        seed=None,
+    ):
         """
         Initialize the Rumor Mill model.
 
@@ -29,13 +36,19 @@ class RumorMillModel(Model):
 
         # Create grid with appropriate neighborhood type
         if eight_neightborhood:
-            self.grid = OrthogonalMooreGrid((width, height), random=self.random)  # 8 neighbors
+            self.grid = OrthogonalMooreGrid(
+                (width, height), random=self.random
+            )  # 8 neighbors
         else:
-            self.grid = OrthogonalVonNeumannGrid((width, height), random=self.random)  # 4 neighbors
+            self.grid = OrthogonalVonNeumannGrid(
+                (width, height), random=self.random
+            )  # 4 neighbors
 
         # Determine initial rumor knowers and assign colors
         num_initial_rumor_knowers = int(self.number_of_agents * self.know_rumor_ratio)
-        colors = ["red"] * num_initial_rumor_knowers + ["blue"] * (self.number_of_agents - num_initial_rumor_knowers)
+        colors = ["red"] * num_initial_rumor_knowers + ["blue"] * (
+            self.number_of_agents - num_initial_rumor_knowers
+        )
         self.random.shuffle(colors)  # Randomize which agents start with rumor
 
         # Create all agents and place them on grid cells
@@ -49,7 +62,7 @@ class RumorMillModel(Model):
 
         # Set initial rumor knowledge for agents with red color
         for agent in self.agents:
-            if (agent.color == "red"):
+            if agent.color == "red":
                 agent.knows_rumor = True
                 agent.times_heard = 1
                 agent.newly_learned = True  # They learned it initially
@@ -76,15 +89,24 @@ class RumorMillModel(Model):
     def compute_percentage_knowing_rumor(self):
         """Calculate percentage of agents who know the rumor."""
         agents_knowing = sum(1 for agent in self.agents if agent.knows_rumor)
-        return (agents_knowing / self.number_of_agents) * 100 if self.number_of_agents > 0 else 0
+        return (
+            (agents_knowing / self.number_of_agents) * 100
+            if self.number_of_agents > 0
+            else 0
+        )
 
     def compute_new_rumor_times_heard(self):
         """Calculate total times rumor was heard this step (whether learned or not)."""
-        total_heard_this_step = sum(agent.times_heard_this_step for agent in self.agents)
+        total_heard_this_step = sum(
+            agent.times_heard_this_step for agent in self.agents
+        )
         return total_heard_this_step
-        
 
     def compute_new_people_ratio_knowing_rumor(self):
         """Calculate percentage of new people who learned the rumor this step."""
         new_knowers = sum(1 for agent in self.agents if agent.newly_learned)
-        return (new_knowers / self.number_of_agents) * 100 if self.number_of_agents > 0 else 0
+        return (
+            (new_knowers / self.number_of_agents) * 100
+            if self.number_of_agents > 0
+            else 0
+        )

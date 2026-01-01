@@ -1,7 +1,8 @@
 """
 Visualization interface for the Rumor Mill model using Mesa's SolaraViz.
 """
-from mesa.visualization import SolaraViz, make_plot_component, SpaceRenderer
+
+from mesa.visualization import SolaraViz, SpaceRenderer, make_plot_component
 from mesa.visualization.components import AgentPortrayalStyle
 from model import RumorMillModel
 
@@ -42,7 +43,13 @@ model_params = {
 }
 
 # Create initial model instance
-rumor_model = RumorMillModel(width=10, height=10, know_rumor_ratio=0.3, rumor_spread_chance=0.5, eight_neightborhood=False)
+rumor_model = RumorMillModel(
+    width=10,
+    height=10,
+    know_rumor_ratio=0.3,
+    rumor_spread_chance=0.5,
+    eight_neightborhood=False,
+)
 
 # Create grid renderer to visualize agents on the grid
 renderer = SpaceRenderer(model=rumor_model, backend="matplotlib").render(
@@ -51,13 +58,16 @@ renderer = SpaceRenderer(model=rumor_model, backend="matplotlib").render(
 
 # Create plot components to track metrics over time
 rumor_spread_plot = make_plot_component(
-    "Percentage_Knowing_Rumor", page=1  # Track percentage who know rumor
+    "Percentage_Knowing_Rumor",
+    page=1,  # Track percentage who know rumor
 )
 times_heard_plot = make_plot_component(
-    "Times_Heard_Rumor_Per_Step", page=1  # Track total times rumor was heard this step
+    "Times_Heard_Rumor_Per_Step",
+    page=1,  # Track total times rumor was heard this step
 )
 new_learners_percentage_plot = make_plot_component(
-    "New_People_Knowing_Rumor", page=1  # Track percentage of new learners per step
+    "New_People_Knowing_Rumor",
+    page=1,  # Track percentage of new learners per step
 )
 
 # Create the visualization page with all components

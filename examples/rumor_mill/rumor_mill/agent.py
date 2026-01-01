@@ -1,4 +1,4 @@
-"""The following code was adapted from the Rumor Mill model included in Netlogo
+r"""The following code was adapted from the Rumor Mill model included in Netlogo
 Model information can be found at:
 https://www.netlogoweb.org/launch#https://www.netlogoweb.org/assets/modelslib/Sample%20Models/Social%20Science/Rumor%20Mill.nlogox
 Accessed on: November 2, 2017
@@ -7,6 +7,7 @@ Author of NetLogo code:
     Center for Connected Learning and Computer-Based Modeling,
     Northwestern University, Evanston, IL.
 """
+
 from mesa.discrete_space import CellAgent
 
 
@@ -34,22 +35,25 @@ class Person(CellAgent):
         self.rumor_spread_chance = rumor_spread_chance
         self.color = color if color is not None else self.random.choice(["red", "blue"])
 
-
     def step(self):
         """
         Agent behavior each step: if knows rumor, tell a random neighbor.
         """
         if self.knows_rumor:
             # Get all neighbors in the cell's neighborhood (excluding self)
-            neighbors = [agent for agent in self.cell.neighborhood.agents if agent != self]
+            neighbors = [
+                agent for agent in self.cell.neighborhood.agents if agent != self
+            ]
             if neighbors:
                 # Randomly select one neighbor to tell
                 neighbor = self.random.choice(neighbors)
                 # Attempt to spread rumor with probability rumor_spread_chance
-                if not neighbor.knows_rumor and self.random.random() < self.rumor_spread_chance:
+                if (
+                    not neighbor.knows_rumor
+                    and self.random.random() < self.rumor_spread_chance
+                ):
                     neighbor.knows_rumor = True
                     neighbor.newly_learned = True  # Mark that they just learned it
                 # Increment times heard counters (even if already knew)
                 neighbor.times_heard += 1
                 neighbor.times_heard_this_step += 1
-    
