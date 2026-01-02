@@ -1,0 +1,17 @@
+[project]
+name = "week4-projectile-attack"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "mesa>=3.3.1",
+    "typing>=3.10.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "black>=25.12.0",
+    "pre-commit>=4.5.1",
+    "ruff>=0.14.10",
+]
