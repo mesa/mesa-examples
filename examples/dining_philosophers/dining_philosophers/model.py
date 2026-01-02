@@ -45,8 +45,17 @@ class DiningPhilosophersModel(mesa.Model):
             "Thinking": lambda m: len(
                 [p for p in m.philosophers if p.state == State.THINKING]
             ),
-            "Avg Wait Time": lambda m: (sum(p.total_wait_time for p in m.philosophers) / sum(p.eating_count for p in m.philosophers)) if sum(p.eating_count for p in m.philosophers) > 0 else 0,
-            "Throughput": lambda m: (sum(p.total_eaten for p in m.philosophers) / m.steps) if m.steps > 0 else 0,
+            "Avg Wait Time": lambda m: (
+                sum(p.total_wait_time for p in m.philosophers)
+                / sum(p.eating_count for p in m.philosophers)
+            )
+            if sum(p.eating_count for p in m.philosophers) > 0
+            else 0,
+            "Throughput": lambda m: (
+                sum(p.total_eaten for p in m.philosophers) / m.steps
+            )
+            if m.steps > 0
+            else 0,
         }
 
         # Add reporters for individual philosopher's consumption
@@ -54,7 +63,7 @@ class DiningPhilosophersModel(mesa.Model):
         for i in range(10):
             # i-th philosopher has node_id = i * 2
             p_id = i * 2
-            
+
             # Use default argument in lambda to capture the current value of p_id
             model_reporters[f"P{i}"] = lambda m, pid=p_id: (
                 next((p.total_eaten for p in m.philosophers if p.position == pid), 0)

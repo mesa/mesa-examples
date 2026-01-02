@@ -1,6 +1,6 @@
 # Dining Philosophers Model
 
-![Dining Philosophers Visualization](dining_philosophers.gif)
+![Dining Philosophers Screenshot](dining_philosophers_screenshot.png)
 
 This is a Mesa implementation of the classic [Dining Philosophers Problem](https://en.wikipedia.org/wiki/Dining_philosophers_problem). It demonstrates agent resource contention, deadlock scenarios, and different resolution strategies.
 
@@ -31,8 +31,6 @@ This model implements three strategies for fork acquisition:
     *   **Consequence**: Prevents deadlock and improves fairness, reducing variance in wait times.
 
 ## Visualization
-
-![Screenshot](screenshot.png)
 
 The Solara-based visualization includes:
 *   **Dining Table**: An animated SVG showing philosophers (Thinking 🤔, Hungry 🤤, Eating 🍝) and forks (Green=Free, Red=Used).

@@ -1,5 +1,6 @@
-import mesa
 from enum import Enum, auto
+
+import mesa
 
 
 class State(Enum):
@@ -39,20 +40,23 @@ class PhilosopherAgent(mesa.Agent):
     def step(self):
         self.ticks_since_state_change += 1
 
-        if self.state == State.THINKING:
-            if self.random.random() < self.model.hungry_chance:
-                self.state = State.HUNGRY
-                self.ticks_since_state_change = 0
+        if (
+            self.state == State.THINKING
+            and self.random.random() < self.model.hungry_chance
+        ):
+            self.state = State.HUNGRY
+            self.ticks_since_state_change = 0
 
         elif self.state == State.HUNGRY:
             self.try_to_eat()
 
-        elif self.state == State.EATING:
-            if self.random.random() < self.model.full_chance:
-                self.put_down_forks()
-                self.state = State.THINKING
-                self.total_eaten += 1
-                self.ticks_since_state_change = 0
+        elif (
+            self.state == State.EATING and self.random.random() < self.model.full_chance
+        ):
+            self.put_down_forks()
+            self.state = State.THINKING
+            self.total_eaten += 1
+            self.ticks_since_state_change = 0
 
     def put_down_forks(self):
         neighbors = self.model.grid.get_neighbors(self.pos, include_center=False)
@@ -116,9 +120,13 @@ class PhilosopherAgent(mesa.Agent):
         # Check neighbors
         left_p_pos = (self.position - 2) % self.model.num_nodes
         right_p_pos = (self.position + 2) % self.model.num_nodes
-        
-        neighbors_p = [p for p in self.model.philosophers if p.position in (left_p_pos, right_p_pos)]
-        
+
+        neighbors_p = [
+            p
+            for p in self.model.philosophers
+            if p.position in (left_p_pos, right_p_pos)
+        ]
+
         should_yield = False
         for p in neighbors_p:
             if p.state == State.HUNGRY:
@@ -129,9 +137,9 @@ class PhilosopherAgent(mesa.Agent):
                 # Rule: Yield if wait time is same but neighbor has lower ID (break ties)
                 elif p.ticks_since_state_change == self.ticks_since_state_change:
                     if p.position < self.position:
-                         should_yield = True
-                         break
-        
+                        should_yield = True
+                        break
+
         if should_yield:
             return
 
