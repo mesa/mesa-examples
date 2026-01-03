@@ -30,7 +30,7 @@ Key distinction: Agents can **hear** the rumor multiple times, but only **learn*
 ## Installation
 
 ```bash
-pip install mesa
+pip install mesa[rec]
 ```
 
 ## Running the Model
