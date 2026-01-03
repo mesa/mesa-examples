@@ -1,5 +1,5 @@
 import mesa
-from agent import Person
+from rumor_mill.agent import Person
 from mesa import Model
 from mesa.discrete_space import OrthogonalMooreGrid, OrthogonalVonNeumannGrid
 
