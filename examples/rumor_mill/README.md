@@ -41,11 +41,6 @@ Launch the interactive visualization:
 solara run app.py
 ```
 
-or
-
-```bash
-mesa runserver app.py
-```
 
 This opens a web interface where you can:
 - Adjust parameters with sliders
