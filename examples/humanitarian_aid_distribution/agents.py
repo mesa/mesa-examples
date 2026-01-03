@@ -277,9 +277,11 @@ class Truck(mesa.Agent):
         # 2. TARGET VALIDATION
         if self.target:
             # Check if target is removed from model OR has no position (Dead)
-            if (not self.target.model) or (self.target.pos is None):
-                self.target = None
-            elif self.target.claimed_by != self:
+            if (
+                (not self.target.model)
+                or (self.target.pos is None)
+                or self.target.claimed_by != self
+            ):
                 self.target = None
 
         # 3. TARGET SELECTION
