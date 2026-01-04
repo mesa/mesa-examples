@@ -1,3 +1,5 @@
+from typing import Optional
+
 import mesa
 
 
@@ -36,7 +38,7 @@ class Beneficiary(mesa.Agent):
         self.critical_days_threshold = critical_days_threshold
         self.is_critical = False
         self.days_critical = 0
-        self.claimed_by = None
+        self.claimed_by: Truck | None = None
         self.state = "wandering"  # Initial state
 
     # Needs Thresholds
@@ -275,14 +277,13 @@ class Truck(mesa.Agent):
             return
 
         # 2. TARGET VALIDATION
-        if self.target:
-            # Check if target is removed from model OR has no position (Dead)
-            if (
-                (not self.target.model)
-                or (self.target.pos is None)
-                or self.target.claimed_by != self
-            ):
-                self.target = None
+        # Check if target is removed from model OR has no position (Dead)
+        if self.target and (
+            (not self.target.model)
+            or (self.target.pos is None)
+            or (self.target.claimed_by != self)
+        ):
+            self.target = None
 
         # 3. TARGET SELECTION
         if not self.target:
