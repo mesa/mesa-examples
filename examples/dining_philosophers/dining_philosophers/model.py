@@ -46,16 +46,18 @@ class DiningPhilosophersModel(mesa.Model):
                 [p for p in m.philosophers if p.state == State.THINKING]
             ),
             "Avg Wait Time": lambda m: (
-                sum(p.total_wait_time for p in m.philosophers)
-                / sum(p.eating_count for p in m.philosophers)
-            )
-            if sum(p.eating_count for p in m.philosophers) > 0
-            else 0,
+                (
+                    sum(p.total_wait_time for p in m.philosophers)
+                    / sum(p.eating_count for p in m.philosophers)
+                )
+                if sum(p.eating_count for p in m.philosophers) > 0
+                else 0
+            ),
             "Throughput": lambda m: (
-                sum(p.total_eaten for p in m.philosophers) / m.steps
-            )
-            if m.steps > 0
-            else 0,
+                (sum(p.total_eaten for p in m.philosophers) / m.steps)
+                if m.steps > 0
+                else 0
+            ),
         }
 
         # Add reporters for individual philosopher's consumption
@@ -72,6 +74,5 @@ class DiningPhilosophersModel(mesa.Model):
         self.datacollector = mesa.DataCollector(model_reporters=model_reporters)
 
     def step(self):
-        self.steps += 1
         self.philosophers.shuffle_do("step")
         self.datacollector.collect(self)
