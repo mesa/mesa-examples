@@ -31,7 +31,7 @@ You can see the available models at [setup.cfg](https://github.com/mesa/mesa-exa
 Table of Contents
 =================
 
-* [Grid Spacce Examples](#grid-space-examples)
+* [Grid Space Examples](#grid-space-examples)
 * [Continuous Space Examples](#continuous-space-examples)
 * [Network Examples](#network-examples)
 * [Visualization Examples](#visualization-examples)
@@ -78,6 +78,12 @@ This is the same [Boltzmann Wealth](https://github.com/mesa/mesa-examples/tree/m
 ### [Ant System for Traveling Salesman Problem](https://github.com/mesa/mesa-examples/tree/main/examples/aco_tsp)
 
 This is based on Dorigo's Ant System "Swarm Intelligence" algorithm for generating solutions for the Traveling Salesman Problem.
+
+### [Dining Philosophers Model](https://github.com/mesa/mesa-examples/tree/main/examples/dining_philosophers)
+
+A classic synchronization problem demonstrating resource contention, deadlock, and starvation on a network graph.
+
+
 
 ## Visualization Examples
 

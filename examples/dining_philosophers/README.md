@@ -50,7 +50,7 @@ The Solara-based visualization includes:
 
 1.  Install dependencies:
     ```bash
-    pip install -r requirements.txt
+    pip install mesa[rec]
     ```
 
 2.  Run the app:
