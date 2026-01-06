@@ -1,9 +1,7 @@
-from typing import Optional
-
-import mesa
+from mesa.discrete_space import CellAgent
 
 
-class Beneficiary(mesa.Agent):
+class Beneficiary(CellAgent):
     """
     Simulates a person with dynamic needs (water and food).
 
@@ -20,17 +18,21 @@ class Beneficiary(mesa.Agent):
     - Desperate (>90): Critical need, ignoring safety/distance to find help immediately.
     """
 
-    def __init__(self, model, water_decay=2, food_decay=1, critical_days_threshold=5):
+    def __init__(
+        self, model, cell, water_decay=2, food_decay=1, critical_days_threshold=5
+    ):
         """
         Create a new Beneficiary agent.
 
         Args:
             model: The Mesa model instance.
+            cell: The cell the agent starts in.
             water_decay (float): Amount water urgency increases per step.
             food_decay (float): Amount food urgency increases per step.
             critical_days_threshold (int): Days before death when critical.
         """
         super().__init__(model)
+        self.cell = cell
         self.water_urgency = 0
         self.food_urgency = 0
         self.water_decay = water_decay
@@ -50,7 +52,7 @@ class Beneficiary(mesa.Agent):
         """
         Moves the agent one step closer to the target position.
         """
-        current_x, current_y = self.pos
+        current_x, current_y = self.cell.coordinate
         target_x, target_y = target_pos
 
         next_x, next_y = current_x, current_y
@@ -67,7 +69,7 @@ class Beneficiary(mesa.Agent):
             next_y -= 1
 
         # Verify the spot is valid (Mesa grids handle this, but good practice)
-        self.model.grid.move_agent(self, (next_x, next_y))
+        self.cell = self.model.grid[(next_x, next_y)]
 
     def step(self):
         """
@@ -111,7 +113,6 @@ class Beneficiary(mesa.Agent):
 
         # Death Check
         if self.state == "dead":
-            self.model.grid.remove_agent(self)
             self.remove()
             return  # Stop executing if dead
 
@@ -121,7 +122,7 @@ class Beneficiary(mesa.Agent):
             # Ignore all costs, go to nearest truck or depot immediately
             found_truck = self.find_nearest_truck(radius=None)  # Infinite radius
             if found_truck:
-                self.move_towards(found_truck.pos)
+                self.move_towards(found_truck.cell.coordinate)
             else:
                 self.move_towards((0, 0))
 
@@ -129,7 +130,7 @@ class Beneficiary(mesa.Agent):
             # Prioritize over other activities
             found_truck = self.find_nearest_truck(radius=8)  # Reasonable search radius
             if found_truck:
-                self.move_towards(found_truck.pos)
+                self.move_towards(found_truck.cell.coordinate)
             else:
                 self.move_towards((0, 0))
 
@@ -137,7 +138,7 @@ class Beneficiary(mesa.Agent):
             # Seek help when convenient (only if very close)
             found_truck = self.find_nearest_truck(radius=4)  # Small radius
             if found_truck:
-                self.move_towards(found_truck.pos)
+                self.move_towards(found_truck.cell.coordinate)
             else:
                 self.wander()
 
@@ -147,9 +148,7 @@ class Beneficiary(mesa.Agent):
 
     def wander(self):
         """Move randomly to simulate local activity"""
-        neighborhood = self.model.grid.get_neighborhood(self.pos, moore=True)
-        choice = self.random.choice(neighborhood)
-        self.model.grid.move_agent(self, choice)
+        self.cell = self.cell.neighborhood.select_random_cell()
 
     def find_nearest_truck(self, radius=None):
         """
@@ -161,29 +160,30 @@ class Beneficiary(mesa.Agent):
         trucks = []
 
         if radius is not None:
-            neighbors = self.model.grid.get_neighbors(
-                self.pos, moore=True, include_center=False, radius=radius
-            )
-            trucks = [a for a in neighbors if isinstance(a, Truck)]
-        else:
-            # Fallback to scanning all agents for global search (radius=None)
             trucks = [
                 a
-                for a in self.model.agents
-                if isinstance(a, Truck) and a.pos is not None
+                for a in self.cell.get_neighborhood(
+                    radius=radius, include_center=False
+                ).agents
+                if isinstance(a, Truck)
             ]
+        else:
+            # Use global agent list for infinite range
+            trucks = [a for a in self.model.grid.agents if isinstance(a, Truck)]
 
         if not trucks:
             return None
 
         # Helper to calculate Manhattan distance
         def get_dist(t):
-            return abs(self.pos[0] - t.pos[0]) + abs(self.pos[1] - t.pos[1])
+            my_x, my_y = self.cell.coordinate
+            t_x, t_y = t.cell.coordinate
+            return abs(my_x - t_x) + abs(my_y - t_y)
 
         return min(trucks, key=get_dist)
 
 
-class Truck(mesa.Agent):
+class Truck(CellAgent):
     """
     A delivery agent that distributes supplies to Beneficiaries.
 
@@ -197,8 +197,9 @@ class Truck(mesa.Agent):
     - Refills at the Depot (0,0) when empty.
     """
 
-    def __init__(self, model):
+    def __init__(self, model, cell):
         super().__init__(model)
+        self.cell = cell
         self.supplies = 100  # Current amount of resources carried
         self.delivery_rate = 10  # Max resources delivered per step
         self.target = None  # Current Beneficiary agent being targeted
@@ -233,7 +234,7 @@ class Truck(mesa.Agent):
         """
         Moves the agent one step closer to the target position.
         """
-        current_x, current_y = self.pos
+        current_x, current_y = self.cell.coordinate
         target_x, target_y = target_pos
 
         next_x, next_y = current_x, current_y
@@ -246,10 +247,10 @@ class Truck(mesa.Agent):
         elif current_y > target_y:
             next_y -= 1
 
-        self.model.grid.move_agent(self, (next_x, next_y))
+        self.cell = self.model.grid[(next_x, next_y)]
 
     def get_distance(self, pos):
-        x1, y1 = self.pos
+        x1, y1 = self.cell.coordinate
         x2, y2 = pos
         return abs(x1 - x2) + abs(y1 - y2)
 
@@ -270,7 +271,8 @@ class Truck(mesa.Agent):
                 self.target.claimed_by = None
                 self.target = None
 
-            if self.pos == (0, 0):
+            # Check Property Layer instead of Hardcoded Coordinate
+            if self.cell.is_depot:
                 self.supplies = 50
             else:
                 self.move_towards((0, 0))
@@ -279,22 +281,18 @@ class Truck(mesa.Agent):
         # 2. TARGET VALIDATION
         # Check if target is removed from model OR has no position (Dead)
         if self.target and (
-            (not self.target.model)
-            or (self.target.pos is None)
-            or (self.target.claimed_by != self)
+            (self.target.cell is None) or (self.target.claimed_by != self)
         ):
             self.target = None
 
         # 3. TARGET SELECTION
         if not self.target:
-            all_agents = self.model.agents
+            # Filter from global living agents
             possible_victims = [
                 a
-                for a in all_agents
-                # Check pos is not None to ensure we don't pick dead agents
+                for a in self.model.grid.agents
                 if isinstance(a, Beneficiary)
                 and (a.claimed_by is None)
-                and (a.pos is not None)
                 # Explicitly ignore comfort state
                 and a.state != "wandering"
             ]
@@ -315,7 +313,7 @@ class Truck(mesa.Agent):
                     # Use a score that considers BOTH urgency and distance
                     # so we don't ignore a dying neighbor for a dying stranger far away.
                     def survival_score(a):
-                        dist = self.get_distance(a.pos)
+                        dist = self.get_distance(a.cell.coordinate)
                         max_urgency = max(a.water_urgency, a.food_urgency)
                         # We square urgency so it remains the dominant factor,
                         # but distance still acts as a tie-breaker.
@@ -326,9 +324,8 @@ class Truck(mesa.Agent):
                 elif non_critical_targets:
                     # TIER 2: LOGISTICS / EFFICIENCY
                     # Goal: Maximize value per mile.
-                    # Metric: Total Urgency / Distance
                     def logistics_score(a):
-                        dist = self.get_distance(a.pos)
+                        dist = self.get_distance(a.cell.coordinate)
                         total_urgency = a.water_urgency + a.food_urgency
                         return total_urgency / (dist + 1)
 
@@ -338,27 +335,28 @@ class Truck(mesa.Agent):
                 if self.target:
                     self.target.claimed_by = self
             else:
-                neighborhood = self.model.grid.get_neighborhood(self.pos, moore=True)
-                self.model.grid.move_agent(self, self.random.choice(neighborhood))
+                self.cell = self.cell.neighborhood.select_random_cell()
                 return
 
         # 4. ACTION
         if self.target:
             # DOUBLE CHECK: Ensure target didn't die between validation and action
-            if self.target.pos is None:
+            if self.target.cell is None:
                 self.target = None
                 return
 
-            if self.pos == self.target.pos:
-                amount_given = self.distribute_aid(
-                    self.target, amount=min(self.supplies, self.delivery_rate)
-                )
+            if self.cell == self.target.cell:
+                # Context-Aware Check: Ensure target is physically in the cell's agent list
+                if self.target in self.cell.agents:
+                    amount_given = self.distribute_aid(
+                        self.target, amount=min(self.supplies, self.delivery_rate)
+                    )
 
-                self.supplies -= amount_given
-                self.target.days_critical = (
-                    0  # Reset critical clock on any help received
-                )
-                self.target.claimed_by = None
-                self.target = None
+                    self.supplies -= amount_given
+                    self.target.days_critical = (
+                        0  # Reset critical clock on any help received
+                    )
+                    self.target.claimed_by = None
+                    self.target = None
             else:
-                self.move_towards(self.target.pos)
+                self.move_towards(self.target.cell.coordinate)

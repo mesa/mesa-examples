@@ -1,7 +1,7 @@
-from agents import Beneficiary, Truck
+from humanitarian_aid_distribution.agents import Beneficiary, Truck
+from humanitarian_aid_distribution.model import HumanitarianModel
 from mesa.visualization import SolaraViz, SpaceRenderer, make_plot_component
 from mesa.visualization.components import AgentPortrayalStyle
-from model import HumanitarianModel
 
 
 def agent_portrayal(agent):
@@ -31,6 +31,8 @@ def agent_portrayal(agent):
     portrayal_marker = "o"
     portrayal_zorder = 0
 
+    x, y = agent.cell.coordinate
+
     if isinstance(agent, Beneficiary):
         # Color coding based on behavioral regime
         if agent.state == "desperate":
@@ -48,7 +50,6 @@ def agent_portrayal(agent):
         portrayal_color = "blue"
         portrayal_marker = "s"  # Square
         portrayal_size = 70
-        portrayal_size = 70
         portrayal_zorder = (
             1  # Draw on top of beneficiaries so trucks are always visible
         )
@@ -58,6 +59,8 @@ def agent_portrayal(agent):
         marker=portrayal_marker,
         size=portrayal_size,
         zorder=portrayal_zorder,
+        x=x,
+        y=y,
     )
 
 

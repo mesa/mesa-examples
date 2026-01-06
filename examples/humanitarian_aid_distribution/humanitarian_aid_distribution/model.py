@@ -1,5 +1,7 @@
 import mesa
-from agents import Beneficiary, Truck
+from mesa.discrete_space import OrthogonalMooreGrid
+
+from .agents import Beneficiary, Truck
 
 
 class HumanitarianModel(mesa.Model):
@@ -14,7 +16,7 @@ class HumanitarianModel(mesa.Model):
     Attributes:
         num_beneficiaries (int): Number of civilian agents with needs.
         num_trucks (int): Number of aid trucks.
-        grid (mesa.space.MultiGrid): Spatial environment.
+        grid (mesa.discrete_space.OrthogonalMooreGrid): Spatial environment.
     """
 
     def __init__(
@@ -41,22 +43,22 @@ class HumanitarianModel(mesa.Model):
 
         self.num_beneficiaries = num_beneficiaries
         self.num_trucks = num_trucks
-        self.grid = mesa.space.MultiGrid(width, height, torus=False)
         self.critical_days_threshold = critical_days_threshold
 
-        # 1. Create and Place Beneficiaries
-        for _ in range(self.num_beneficiaries):
-            a = Beneficiary(self, critical_days_threshold=self.critical_days_threshold)
-            x = self.random.randrange(self.grid.width)
-            y = self.random.randrange(self.grid.height)
-            self.grid.place_agent(a, (x, y))
+        # 1. Create Grid
+        self.grid = OrthogonalMooreGrid(
+            (width, height), torus=False, random=self.random, capacity=None
+        )
 
-        # 2. Create and Place Trucks
-        for _ in range(self.num_trucks):
-            a = Truck(self)
-            self.grid.place_agent(a, (0, 0))
+        # 2. Setup Property Layer for the Depot
+        self.grid.create_property_layer("is_depot", default_value=False, dtype=bool)
+        self.grid[(0, 0)].is_depot = True  # Set the depot location
 
-        # 3. Setup Data Collection
+        # 3. Create Agents
+        self.create_agents()
+
+        # 4. Setup Data Collection
+        # We use model.grid.agents to ensure we only count active agents
         self.datacollector = mesa.DataCollector(
             model_reporters={
                 "Avg Urgency": self.get_average_urgency,
@@ -65,6 +67,29 @@ class HumanitarianModel(mesa.Model):
             }
         )
         self.running = True
+
+    def create_agents(self):
+        """
+        Create and place agents using high-level grid methods.
+        """
+        random_cells = self.random.choices(
+            list(self.grid.all_cells), k=self.num_beneficiaries
+        )
+
+        Beneficiary.create_agents(
+            self,
+            n=self.num_beneficiaries,
+            cell=random_cells,
+            critical_days_threshold=self.critical_days_threshold,
+        )
+
+        depot_cell = self.grid[(0, 0)]
+
+        Truck.create_agents(
+            self,
+            n=self.num_trucks,
+            cell=depot_cell,
+        )
 
     def step(self):
         """
@@ -88,7 +113,7 @@ class HumanitarianModel(mesa.Model):
         Returns:
             float: The average urgency (water + food) or 0 if no beneficiaries.
         """
-        beneficiaries = [a for a in model.agents if isinstance(a, Beneficiary)]
+        beneficiaries = [a for a in model.grid.agents if isinstance(a, Beneficiary)]
         if not beneficiaries:
             return 0
         total = sum(a.water_urgency + a.food_urgency for a in beneficiaries)
@@ -97,7 +122,9 @@ class HumanitarianModel(mesa.Model):
     @staticmethod
     def get_total_deaths(model):
         """Measures System Failure (Cumulative)"""
-        current_count = len([a for a in model.agents if isinstance(a, Beneficiary)])
+        current_count = len(
+            [a for a in model.grid.agents if isinstance(a, Beneficiary)]
+        )
         return model.num_beneficiaries - current_count
 
     @staticmethod
@@ -105,5 +132,5 @@ class HumanitarianModel(mesa.Model):
         """Measures Immediate Danger"""
         # Adapted to use is_critical flag since state is 'seeking' or 'wandering'
         return sum(
-            1 for a in model.agents if isinstance(a, Beneficiary) and a.is_critical
+            1 for a in model.grid.agents if isinstance(a, Beneficiary) and a.is_critical
         )

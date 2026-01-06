@@ -93,11 +93,21 @@ This will launch a browser-based visualization where you can:
       among multiple objectives for humanitarian aid delivery using expert
       preferences. Production and Operations Management, 23(6), 978-989.
 
-## Other References used:
-[Reference_PDF](https://drive.google.com/file/d/1GEL3gbCl9TCnQ5MOtMaB3LQ32o59oCr_/view?usp=drive_link)
+## Other References used/Further Reading:
+    - Maslow, A. H. (1943). *A Theory of Human Motivation*
+    - Hull, C. L. (1943). *Principles of Behavior*
+    - Cannon, W. B. (1932). *The Wisdom of the Body*
+    - Simon, H. A. (1956). *Rational Choice and the Structure of the Environment*
+    - Brooks, R. A. (1986). *A Robust Layered Control System*
+    - Iserson, K. V., & Moskop, J. C. (2007). *Triage in Medicine*
+    - von Neumann, J., & Morgenstern, O. (1944). *Theory of Games and Economic Behavior.*
+    - Jevons, W. S. (1871). *The Theory of Political Economy.*
+    - Morgan, C. (2012). *The Adaptive Significance of Behavioral Flexibility.*
+    - (An, 2012; Jager & Janssen, 2012 – Consumat II)
 
-This pdf contains :
-- Other Relevant papers/resources used for building the model
+[Explanatory_PDF](https://drive.google.com/file/d/1tRr_av9T23YsfrpjeThkUierQSEfr9tM/view?usp=sharing)
+
+This PDF contains :
 - Explanation of the part of the theory implemented from these papers along with snippets from code that follow the theory
 - Modification (if any) in the theory to implement this code
 
