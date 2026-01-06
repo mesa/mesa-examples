@@ -67,6 +67,9 @@ This project is an agent-based model implemented using the Mesa framework in Pyt
 ### [Humanitarian Aid Distribution Model](https://github.com/mesa/mesa-examples/tree/main/examples/humanitarian_aid_distribution)
 
 This model simulates a humanitarian aid distribution scenario using a needs-based behavioral architecture. Beneficiaries have dynamic needs (water, food) and trucks distribute aid using a hybrid triage system.
+### [Rumor Mill Model](https://github.com/mesa/mesa-examples/tree/main/examples/rumor_mill)
+
+A simple agent-based simulation showing how rumors spread through a population based on the spread chance and initial knowing percentage, implemented with the Mesa framework and adapted from NetLogo [Rumor mill](https://www.netlogoweb.org/launch#https://www.netlogoweb.org/assets/modelslib/Sample%20Models/Social%20Science/Rumor%20Mill.nlogox).
 
 
 ## Continuous Space Examples
