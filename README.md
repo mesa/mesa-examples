@@ -64,6 +64,10 @@ Simple cellular automata of a fire spreading through a forest of cells on a grid
 
 This project is an agent-based model implemented using the Mesa framework in Python. It simulates market dynamics based on Hotelling's Law, exploring the behavior of stores in a competitive market environment. Stores adjust their prices and locations if it's increases market share to maximize revenue, providing insights into the effects of competition and customer behavior on market outcomes.
 
+### [Humanitarian Aid Distribution Model](https://github.com/mesa/mesa-examples/tree/main/examples/humanitarian_aid_distribution)
+
+This model simulates a humanitarian aid distribution scenario using a needs-based behavioral architecture. Beneficiaries have dynamic needs (water, food) and trucks distribute aid using a hybrid triage system.
+
 
 ## Continuous Space Examples
 _No user examples available yet._
