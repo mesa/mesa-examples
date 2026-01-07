@@ -192,7 +192,7 @@ class ConsumerAgent(CellAgent):
         # The base Agent class attempts to set self.pos = None during __init__.
         # We can simply pass here, as position is now managed by the Grid/Cell.
         pass
-        
+
     def determine_preferred_store(self):
         stores = self.model.agents_by_type[StoreAgent]
 
