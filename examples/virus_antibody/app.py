@@ -1,13 +1,6 @@
-import os
-import sys
 import weakref
 
-from agents import AntibodyAgent, VirusAgent
 from matplotlib.markers import MarkerStyle
-from model import VirusAntibodyModel
-
-sys.path.insert(0, os.path.abspath("../../../mesa"))
-
 from mesa.experimental.devs import ABMSimulator
 from mesa.visualization import (
     Slider,
@@ -15,6 +8,8 @@ from mesa.visualization import (
     make_plot_component,
     make_space_component,
 )
+from virus_antibody.agents import AntibodyAgent, VirusAgent
+from virus_antibody.model import VirusAntibodyModel
 
 # Style and portrayals
 MARKER_CACHE = {}
