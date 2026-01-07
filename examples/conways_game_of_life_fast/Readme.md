@@ -1,5 +1,5 @@
 ## Conway's Game of Life (Fast)
-This example demonstrates a fast and efficient implementation of Conway's Game of Life using the [`PropertyLayer`](https://github.com/projectmesa/mesa/pull/1898) from the Mesa framework.
+This example demonstrates a fast and efficient implementation of Conway's Game of Life using the [`PropertyLayer`](https://github.com/mesa/mesa/pull/1898) from the Mesa framework.
 
 ![GoL_fast_screenshot.png](GoL_fast_screenshot.png)
 
@@ -12,11 +12,11 @@ Conway's [Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) i
 - **Toroidal:** The grid wraps around at the edges, creating a seamless, continuous surface.
 
 #### Performance
-The model is benchmarked in https://github.com/projectmesa/mesa/pull/1898#issuecomment-1849000346 to be about 100x faster over a traditional implementation.
+The model is benchmarked in https://github.com/mesa/mesa/pull/1898#issuecomment-1849000346 to be about 100x faster over a traditional implementation.
 
-![runtime_comparison](https://github.com/projectmesa/mesa/assets/15776622/d30232c6-e23b-499b-8698-14695a95e627)
+![runtime_comparison](https://github.com/mesa/mesa/assets/15776622/d30232c6-e23b-499b-8698-14695a95e627)
 
-- Benchmark code: [benchmark_gol.zip](https://github.com/projectmesa/mesa/files/13628343/benchmark_gol.zip)
+- Benchmark code: [benchmark_gol.zip](https://github.com/mesa/mesa/files/13628343/benchmark_gol.zip)
 
 ### Getting Started
 #### Prerequisites
@@ -53,4 +53,4 @@ This example provides a fast approach to modeling cellular automata using Mesa's
 
 ### Future work
 Add visualisation of the `PropertyLayer` in SolaraViz. See:
-- https://github.com/projectmesa/mesa/issues/2138
+- https://github.com/mesa/mesa/issues/2138

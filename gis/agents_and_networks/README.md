@@ -5,7 +5,7 @@ Agents and Networks Model
 
 ## Summary
 
-This is an implementation of the [GMU-Social Model](https://github.com/abmgis/abmgis/blob/master/Chapter08-Networks/Models/GMU-Social/README.md) in Python, using [Mesa](https://github.com/projectmesa/mesa) and [Mesa-Geo](https://github.com/projectmesa/mesa-geo).
+This is an implementation of the [GMU-Social Model](https://github.com/abmgis/abmgis/blob/master/Chapter08-Networks/Models/GMU-Social/README.md) in Python, using [Mesa](https://github.com/mesa/mesa) and [Mesa-Geo](https://github.com/mesa/mesa-geo).
 
 In this model, buildings are randomly assigned to agents as their home and work places, and the buildings' nearest road vertices are used as their entrances. Agents' commute routes can be found as the shortest path between entrances of their home and work places. These commute routes are segmented according to agents' walking speed. In this way, the movements of agents are constrained on the road network.
 

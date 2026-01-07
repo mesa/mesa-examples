@@ -14,9 +14,9 @@ Contributions can a full model or it could one of the following to an existing m
 No contribution is too small. Although, contributions can be too big, so let's
 discuss via `Matrix`_ OR via `an issue`_.
 
-.. _`Mesa discussions`: https://github.com/projectmesa/mesa/discussions
+.. _`Mesa discussions`: https://github.com/mesa/mesa/discussions
 .. _`Matrix`: https://matrix.to/#/#project-mesa:matrix.org`
-.. _`an issue` : https://github.com/projectmesa/mesa-examples/issues
+.. _`an issue` : https://github.com/mesa/mesa-examples/issues
 
 **To submit a contribution**
 
@@ -36,7 +36,7 @@ discuss via `Matrix`_ OR via `an issue`_.
 - Format your commit message as per `Tim Pope's guideline`_.
 
 .. _`Clone your repository` : https://help.github.com/articles/cloning-a-repository/
-.. _`GH Actions build` : https://github.com/projectmesa/mesa/actions/workflows/build_lint.yml
+.. _`GH Actions build` : https://github.com/mesa/mesa/actions/workflows/build_lint.yml
 .. _`Create a pull request` : https://help.github.com/articles/creating-a-pull-request/
 .. _`pre-commit` : https://github.com/pre-commit/pre-commit
 .. _`black` : https://github.com/psf/black
@@ -83,4 +83,4 @@ Licensing
 
 The license of this project is located in `LICENSE`_.  By submitting a contribution to this project, you are agreeing that your contribution will be released under the terms of this license.
 
-.. _`LICENSE` : https://github.com/projectmesa/mesa-examples/blob/main/LICENSE
+.. _`LICENSE` : https://github.com/mesa/mesa-examples/blob/main/LICENSE

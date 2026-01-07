@@ -4,7 +4,7 @@
 
 ## Summary
 
-This is an implementation of the [Rainfall Model](https://github.com/abmgis/abmgis/tree/master/Chapter06-IntegratingABMandGIS/Models/Rainfall) in Python, using [Mesa](https://github.com/projectmesa/mesa) and [Mesa-Geo](https://github.com/projectmesa/mesa-geo). Inspired by the NetLogo [Grand Canyon model](http://ccl.northwestern.edu/netlogo/models/GrandCanyon), this is an example of how a digital elevation model (DEM) can be used to create an artificial world.
+This is an implementation of the [Rainfall Model](https://github.com/abmgis/abmgis/tree/master/Chapter06-IntegratingABMandGIS/Models/Rainfall) in Python, using [Mesa](https://github.com/mesa/mesa) and [Mesa-Geo](https://github.com/mesa/mesa-geo). Inspired by the NetLogo [Grand Canyon model](http://ccl.northwestern.edu/netlogo/models/GrandCanyon), this is an example of how a digital elevation model (DEM) can be used to create an artificial world.
 
 ### GeoSpace
 

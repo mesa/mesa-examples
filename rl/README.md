@@ -17,7 +17,7 @@ This repository demonstrates various applications of reinforcement learning (RL)
 #TODO: Update this -- do release?
 
    ```bash
-   pip install -U -e git+https://github.com/projectmesa/mesa-examples@mesa-2.x#egg=mesa-models
+   pip install -U -e git+https://github.com/mesa/mesa-examples@mesa-2.x#egg=mesa-models
    ```
 
 3. **Install RLlib for Multi-Agent Training**
@@ -64,6 +64,6 @@ Here's a refined version of your contribution guide:
 
 ## Contribution Guide
 
-We welcome contributions to our project! A great way to get started is by implementing the remaining examples listed in the [Mesa-Examples](https://github.com/projectmesa/mesa-examples) repository with reinforcement learning (RL).
+We welcome contributions to our project! A great way to get started is by implementing the remaining examples listed in the [Mesa-Examples](https://github.com/mesa/mesa-examples) repository with reinforcement learning (RL).
 
 Additionally, if you have your own Mesa environments that you think would benefit from RL integration, we encourage you to share them with us. Simply start an issue on our GitHub repository with your suggestion, and we can collaborate on bringing it to life!

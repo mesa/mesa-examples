@@ -1,6 +1,6 @@
 # Collaborative Survival: Wolf-Sheep Predation Model
 
-This project demonstrates the use of the RLlib library to implement Multi-Agent Reinforcement Learning (MARL) in the classic Wolf-Sheep predation problem. The environment details can be found on the Mesa project's GitHub repository [here](https://github.com/projectmesa/mesa-examples/tree/main/examples/wolf_sheep).
+This project demonstrates the use of the RLlib library to implement Multi-Agent Reinforcement Learning (MARL) in the classic Wolf-Sheep predation problem. The environment details can be found on the Mesa project's GitHub repository [here](https://github.com/mesa/mesa-examples/tree/main/examples/wolf_sheep).
 
 ## Key Features
 

@@ -55,6 +55,6 @@ jobs:
     - name: Install dependencies
       run: |
         pip install .[test]
-        pip install -U git+https://github.com/projectmesa/mesa@main#egg=mesa[network]
+        pip install -U git+https://github.com/mesa/mesa@main#egg=mesa[network]
     - name: Test with pytest
       run: pytest -rA -Werror -Wdefault::FutureWarning test_examples.py
