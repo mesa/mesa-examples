@@ -1,5 +1,2 @@
 mesa
-scipysolara
-matplotlib
-networkx
-altair
+scipy

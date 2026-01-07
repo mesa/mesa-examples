@@ -9,16 +9,9 @@ This project is an agent-based model implemented using the Mesa framework in Pyt
 Hotelling's Law is an economic theory that predicts competitors in a market will end up in a state of minimum differentiation, often referred to as the "principle of minimum differentiation" or "Hotelling's linear city model". This model explores how businesses choose their location in relation to competitors and how this affects pricing and consumer choice.
 
 ## Installation
-
-To run this simulation, you will need Python 3.x and the following Python libraries:
-
-- mesa
-- scipy
-
-You can install all required libraries by running:
-
+To run this example, install Mesa with recommended dependencies:
 ```bash
-pip install -r requirements.txt
+pip install "mesa[rec]"
 ```
 
 ## Project Structure
