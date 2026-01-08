@@ -24,8 +24,8 @@ class Ant(CellAgent):
     def step(self):
         """
         Agent Life Cycle:
-        1. SENSE: Check current cell and neighbors.
-        2. DECIDE: Switch state if needed (found food/home).
+        1. SENSE: Check neighbors.
+        2. DECIDE: Switch state if needed.
         3. ACT: Move and deposit pheromones.
         """
 
@@ -37,14 +37,11 @@ class Ant(CellAgent):
 
     def _step_foraging(self):
         # 1. Check if we found food
-        # Accessing property layer value at current cell
         if self.cell.food > 0:
             self._pickup_food()
             return
 
-        # 2. Drop "Home" pheromone (so we can find our way back)
-        # As ants move away from home, they leave a trail.
-        # Since many ants start at home, this naturally forms a gradient.
+        # 2. Drop "Home" pheromone
         current_val = self.cell.pheromone_home
         self.cell.pheromone_home = min(current_val + 1.0, 10.0)
 
@@ -58,14 +55,12 @@ class Ant(CellAgent):
             self._drop_food()
             return
 
-        # 2. Drop "Food" pheromone (marking the successful trail for others)
-        # We increase the 'pheromone_food' at current cell
+        # 2. Drop "Food" pheromone
         current_val = self.cell.pheromone_food
-        # Cap it so it doesn't explode to infinity
         self.cell.pheromone_food = min(current_val + 2.0, 10.0)
 
         # 3. Move
-        # Look for Home Pheromone (diffused from nest)
+        # Look for Home Pheromone
         self._move_towards_gradient("pheromone_home", randomness=0.1)
 
     def _pickup_food(self):
@@ -73,12 +68,10 @@ class Ant(CellAgent):
         self.cell.food -= 1
         self.carrying_food = True
         self.state = AntState.RETURNING
-        # U-turn! Don't just continue forward, turn around roughly
-        # On a hex grid implementation, we just rely on gradient next step.
 
     def _drop_food(self):
         """Interact with environment to drop food."""
-        # Simple Model: Infinite storage at home, or we could increment 'collected_food' counter
+        # Infinite storage at home
         self.carrying_food = False
         self.state = AntState.FORAGING
 

@@ -56,6 +56,10 @@ A very fast performance optimized version of Conway's Game of Life using the Mes
 
 Conway's game of life on a hexagonal grid.
 
+### [Hexagonal Ant Foraging Model](https://github.com/mesa/mesa-examples/tree/main/examples/hex_ant)
+
+A simulation of ant foraging behavior on a hexagonal grid using pheromone trails and property layers.
+
 ### [Forest Fire Model](https://github.com/mesa/mesa-examples/tree/main/examples/forest_fire)
 
 Simple cellular automata of a fire spreading through a forest of cells on a grid, based on the NetLogo [Fire](http://ccl.northwestern.edu/netlogo/models/Fire) model.

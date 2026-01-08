@@ -25,27 +25,26 @@ class AntForaging(mesa.Model):
         # We use a HexGrid with torus wrapping for a seamless infinite world feel
         self.grid = HexGrid((width, height), torus=True, random=self.random)
 
-        # --- Environment Setup using PropertyLayers ---
-        # These are much faster than agent-based environment properties because
-        # they use numpy arrays ensuring O(1) access and vectorized operations.
+        # Environment Setup using PropertyLayers
+        # Use numpy arrays for efficient O(1) access
 
-        # 1. Food Pheromone (Red): Dropped by ants carrying food, leading OTHERS to food.
+        # 1. Food Pheromone (Red): Leads ants to food.
         self.grid.create_property_layer(
             "pheromone_food", default_value=0.0, dtype=float
         )
 
-        # 2. Home Pheromone (Blue): Dropped by foraging ants, leading ALL ants back home.
+        # 2. Home Pheromone (Blue): Leads ants home.
         self.grid.create_property_layer(
             "pheromone_home", default_value=0.0, dtype=float
         )
 
-        # 3. Food Source (Green): The actual food piling.
+        # 3. Food Source (Green): Food location quantities.
         self.grid.create_property_layer("food", default_value=0, dtype=int)
 
-        # 4. Obstacles (Black): Just for fun, some walls.
+        # 4. Obstacles (Black).
         self.grid.create_property_layer("obstacles", default_value=0, dtype=int)
 
-        # 5. Home (White): The actual nest location.
+        # 5. Home (White): Nest location.
         self.grid.create_property_layer("home", default_value=0, dtype=int)
 
         self._init_environment()
@@ -53,15 +52,15 @@ class AntForaging(mesa.Model):
 
     def _init_environment(self):
         """Setup initial food clusters and the central nest."""
-        # 1. Create the Nest in the center
+        # Create the Nest in the center
         center = (self.grid.width // 2, self.grid.height // 2)
-        # We also manually spike the 'home' pheromone at the nest so ants can find it initially
+        # Spike the 'home' pheromone at the nest so ants can find it initially
         self.grid.pheromone_home.data[center] = 1.0
         # Mark the home location
         self.grid.home.data[center] = 1
 
-        # 2. Scatter some Food Sources
-        # We'll create 3 big clusters of food
+        # Scatter some Food Sources
+        # Create 3 big clusters of food
         for _ in range(3):
             # Pick a random spot
             cx = self.random.randint(0, self.grid.width - 1)
@@ -81,7 +80,7 @@ class AntForaging(mesa.Model):
         center = (self.grid.width // 2, self.grid.height // 2)
         center_cell = self.grid[center]
 
-        from agent import Ant
+        from .agent import Ant
 
         for _ in range(num_ants):
             ant = Ant(self)
@@ -90,8 +89,8 @@ class AntForaging(mesa.Model):
 
     def step(self):
         """Advance the model by one step."""
-        # 1. Environment Dynamics (The cool part!)
-        # Pheromones need to diffuse (spread out) and evaporate (fade away).
+        # 1. Environment Dynamics
+        # Pheromones diffuse and evaporate.
         self._update_pheromone_layer("pheromone_food")
         self._update_pheromone_layer("pheromone_home")
 
@@ -100,23 +99,13 @@ class AntForaging(mesa.Model):
 
     def _update_pheromone_layer(self, layer_name):
         """
-        Apply diffusion and evaporation to a pheromone layer.
-        Using numpy operations for speed.
+        Apply evaporation to a pheromone layer.
         """
         layer = getattr(self.grid, layer_name)
 
-        # Evaporation: Everything decays by a factor
-        # layer.data *= (1 - self.evaporation_rate)
-        # We can use modify_cells for valid cells (though data access is faster usually)
-        # But let's stick to the official API potential
+        # Evaporation
         np_layer = layer.data
         np_layer *= 1.0 - self.evaporation_rate
 
-        # Diffusion: This is tricky on a HexGrid without a convolution matrix.
-        # For a simple heuristic, we can blur the array.
-        # But 'scipy.ndimage.gaussian_filter' is standard for this.
-        # Or simpler: just let it stay for now, diffusion is expensive to code perfectly on Hex
-        # without external libraries like scipy. Let's rely on agents spreading it for now
-        # to keep dependencies low, or use a simple box blur if we really need it.
-        # Let's add simple clamp to 0
+        # Clamp to 0 to prevent negative values
         np_layer[np_layer < 0.001] = 0
