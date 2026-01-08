@@ -64,6 +64,9 @@ Simple cellular automata of a fire spreading through a forest of cells on a grid
 
 This project is an agent-based model implemented using the Mesa framework in Python. It simulates market dynamics based on Hotelling's Law, exploring the behavior of stores in a competitive market environment. Stores adjust their prices and locations if it's increases market share to maximize revenue, providing insights into the effects of competition and customer behavior on market outcomes.
 
+### [Emperor's Dilemma](https://github.com/mesa/mesa-examples/tree/main/examples/emperor_dilemma)
+
+This project simulates how unpopular norms can dominate a society even when the vast majority of individuals privately reject them. It demonstrates the "illusion of consensus" where agents, driven by a fear of appearing disloyal, not only comply with a rule they hate but also aggressively enforce it on their neighbors. This phenomenon creates a "trap" of False Enforcement, where the loudest defenders of a norm are often its secret opponents.
 ### [Humanitarian Aid Distribution Model](https://github.com/mesa/mesa-examples/tree/main/examples/humanitarian_aid_distribution)
 
 This model simulates a humanitarian aid distribution scenario using a needs-based behavioral architecture. Beneficiaries have dynamic needs (water, food) and trucks distribute aid using a hybrid triage system.

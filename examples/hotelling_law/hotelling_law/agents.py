@@ -23,6 +23,19 @@ class StoreAgent(CellAgent):
         # / differential (Premium)
         self.cell = cell
 
+    @property
+    def pos(self):
+        # Return the coordinate from the cell if it exists
+        if hasattr(self, "cell") and self.cell is not None:
+            return self.cell.coordinate
+        return None
+
+    @pos.setter
+    def pos(self, new_pos):
+        # The base Agent class attempts to set self.pos = None during __init__.
+        # We can simply pass here, as position is now managed by the Grid/Cell.
+        pass
+
     def estimate_market_share(self, new_position=None):
         position = new_position if new_position else self.cell
         nearby_consumers = position.get_neighborhood(radius=8).agents
@@ -166,6 +179,19 @@ class ConsumerAgent(CellAgent):
         self.preferred_store = None
         self.cell = cell
         self.preference = consumer_preferences
+
+    @property
+    def pos(self):
+        # Return the coordinate from the cell if it exists
+        if hasattr(self, "cell") and self.cell is not None:
+            return self.cell.coordinate
+        return None
+
+    @pos.setter
+    def pos(self, new_pos):
+        # The base Agent class attempts to set self.pos = None during __init__.
+        # We can simply pass here, as position is now managed by the Grid/Cell.
+        pass
 
     def determine_preferred_store(self):
         stores = self.model.agents_by_type[StoreAgent]
