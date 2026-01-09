@@ -2,9 +2,8 @@ from mesa.visualization import SolaraViz
 from mesa.visualization.components.matplotlib_components import (
     make_mpl_space_component,
 )
-
-from minesweeper.model import MinesweeperModel
 from minesweeper.agents import MineCell
+from minesweeper.model import MinesweeperModel
 
 mine_layer_portrayal = {
     "mine": {
@@ -16,6 +15,7 @@ mine_layer_portrayal = {
     }
 }
 
+
 def agent_portrayal(agent: MineCell):
     if agent.revealed:
         if agent.cell.mine:
@@ -26,7 +26,7 @@ def agent_portrayal(agent: MineCell):
             }
         else:
             return {
-                "marker": "$%d$" % agent.neighbor_mines
+                "marker": f"${agent.neighbor_mines}$"
                 if agent.neighbor_mines > 0
                 else "s",
                 "color": "lightgray",
@@ -38,6 +38,7 @@ def agent_portrayal(agent: MineCell):
             "color": "green",
             "size": 80,
         }
+
 
 model_params = {
     "seed": {
