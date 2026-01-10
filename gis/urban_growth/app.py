@@ -31,10 +31,13 @@ model_params = {
 }
 
 model = UrbanGrowth()
+map_component = make_geospace_component(cell_portrayal, zoom=12.1)
+
+# explicitly pass components=
 page = SolaraViz(
     model,
-    [
-        make_geospace_component(cell_portrayal, zoom=12.1),
+    components=[
+        map_component,
         make_plot_component(["Percentage Urbanized"]),
         make_plot_urbanized,
     ],
