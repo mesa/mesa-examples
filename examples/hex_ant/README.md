@@ -13,7 +13,7 @@ A simple agent-based model simulating ant foraging behavior on a hexagonal grid.
 To install the dependencies for this example, run:
 
 ```bash
-pip install -e .[rec]
+pip install mesa[rec]
 ```
 
 ## How to Run
