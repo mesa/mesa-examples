@@ -111,7 +111,7 @@ class Rainfall(mesa.Model):
             "water_level_normalized",
         )
 
-        if self.time >= self.num_steps:
+        if self.steps >= self.num_steps:
             self.running = False
         if not self.running and self.export_data:
             self.export_water_level_to_file()
