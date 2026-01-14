@@ -54,8 +54,8 @@ class DiningPhilosophersModel(mesa.Model):
                 else 0
             ),
             "Throughput": lambda m: (
-                (sum(p.total_eaten for p in m.philosophers) / m.steps)
-                if m.steps > 0
+                (sum(p.total_eaten for p in m.philosophers) / m.time)
+                if m.time > 0
                 else 0
             ),
         }
