@@ -1,7 +1,7 @@
 import numpy as np
-from mesa import Model
+from mesa import Agent, Model
 from mesa.datacollection import DataCollector
-from mesa.space import PropertyLayer
+from mesa.space import PropertyLayer, SingleGrid
 from scipy.signal import convolve2d
 
 
@@ -10,9 +10,20 @@ class GameOfLifeModel(Model):
     def __init__(self, width=10, height=10, alive_fraction=0.2):
         super().__init__()
         # Initialize the property layer for cell states
-        self.cell_layer = PropertyLayer("cells", width, height, False, dtype=bool)
-        # Randomly set cells to alive
-        self.cell_layer.data = np.random.choice([True, False], size=(width, height), p=[alive_fraction, 1 - alive_fraction])
+
+        self.grid = SingleGrid(width, height, torus=True)
+
+
+        self.cell_layer = PropertyLayer("cell_layer", width, height, False, dtype=bool)
+        self.cell_layer.data = np.random.choice(
+            [True, False],
+            size=(width, height),
+            p=[alive_fraction, 1 - alive_fraction]
+        )
+
+        for _, (x, y) in self.grid.coord_iter():
+            dummy = Agent(self)
+            self.grid.place_agent(dummy, (x, y))
 
         # Metrics and datacollector
         self.cells = width * height
