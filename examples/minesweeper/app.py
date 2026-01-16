@@ -1,51 +1,49 @@
-from mesa.visualization import SolaraViz
-from mesa.visualization.components.matplotlib_components import (
-    make_mpl_space_component,
-)
+import solara
+from mesa.visualization import SolaraViz, make_space_component
 from minesweeper.agents import MineCell
 from minesweeper.model import MinesweeperModel
 
-mine_layer_portrayal = {
-    "mine": {
-        "color": "black",
-        "alpha": 0.8,
-        "colorbar": False,
-        "vmin": 0,
-        "vmax": 1,
-    }
-}
-
 
 def agent_portrayal(agent: MineCell):
-    if agent.revealed:
-        if agent.cell.mine:
-            return {
-                "marker": "X",
-                "color": "red",
-                "size": 80,
-            }
-        else:
-            return {
-                "marker": f"${agent.neighbor_mines}$"
-                if agent.neighbor_mines > 0
-                else "s",
-                "color": "lightgray",
-                "size": 80,
-            }
-    else:
+    if not agent.revealed:
         return {
-            "marker": "s",
             "color": "green",
-            "size": 80,
+            "size": 40,
         }
+
+    if agent.cell.mine:
+        return {
+            "color": "red",
+            "size": 40,
+        }
+
+    if agent.neighbor_mines > 0:
+        return {
+            "color": "lightgray",
+            "text": str(agent.neighbor_mines),
+            "size": 40,
+        }
+
+    return {
+        "color": "lightgray",
+        "size": 40,
+    }
+
+
+def on_cell_click(agent: MineCell):
+    agent.model.reveal_cell(agent.cell)
+
+
+@solara.component
+def GameStatus(model):
+    if model.win:
+        solara.Markdown("## You Win!")
+    elif model.game_over:
+        solara.Markdown("## Game Over")
 
 
 model_params = {
-    "seed": {
-        "type": "InputText",
-        "value": 42,
-        "label": "Seed",
-    },
+    "seed": 42,
     "mine_density": {
         "type": "SliderFloat",
         "value": 0.15,
@@ -59,7 +57,7 @@ model_params = {
         "value": 10,
         "label": "Width",
         "min": 5,
-        "max": 40,
+        "max": 30,
         "step": 1,
     },
     "height": {
@@ -67,30 +65,25 @@ model_params = {
         "value": 10,
         "label": "Height",
         "min": 5,
-        "max": 40,
+        "max": 30,
         "step": 1,
     },
 }
 
+
 model = MinesweeperModel()
 
-
-def post_process(ax):
-    ax.set_aspect("equal")
-    ax.set_xticks([])
-    ax.set_yticks([])
-
-
-minesweeper_space = make_mpl_space_component(
+space = make_space_component(
     agent_portrayal=agent_portrayal,
-    propertylayer_portrayal=mine_layer_portrayal,
-    post_process=post_process,
-    draw_grid=True,
+    on_click=on_cell_click,
 )
 
 page = SolaraViz(
     model,
-    components=[minesweeper_space],
+    components=[
+        space,
+        GameStatus,
+    ],
     model_params=model_params,
-    name="Minesweeper (Discrete Space Model)",
+    name="Minesweeper",
 )

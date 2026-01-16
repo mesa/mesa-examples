@@ -5,8 +5,6 @@ from .agents import MineCell
 
 
 class MinesweeperModel(Model):
-    """Discrete-space Minesweeper model."""
-
     def __init__(
         self,
         width=10,
@@ -19,19 +17,25 @@ class MinesweeperModel(Model):
         self.width = width
         self.height = height
         self.mine_density = mine_density
+
         self.game_over = False
+        self.win = False
 
         # Grid
         self.grid = OrthogonalMooreGrid(
-            (width, height), torus=False, random=self.random
+            (width, height),
+            torus=False,
+            random=self.random,
         )
 
         # Mine layer
         self.mine_layer = PropertyLayer(
-            "mine", (width, height), default_value=False, dtype=bool
+            "mine",
+            (width, height),
+            default_value=False,
+            dtype=bool,
         )
 
-        # Random mine placement
         self.mine_layer.data = self.rng.choice(
             [True, False],
             size=(width, height),
@@ -40,7 +44,7 @@ class MinesweeperModel(Model):
 
         self.grid.add_property_layer(self.mine_layer)
 
-        # Create cell agents
+        # One agent per cell
         MineCell.create_agents(
             model=self,
             n=width * height,
@@ -49,17 +53,12 @@ class MinesweeperModel(Model):
 
         self._count_neighbor_mines()
 
-    # Game logic
-
     def _count_neighbor_mines(self):
         for cell in self.grid.all_cells:
             agent = cell.agents[0]
-
             if cell.mine:
                 continue
-
-            neighbors = cell.neighborhood
-            agent.neighbor_mines = sum(n.mine for n in neighbors)
+            agent.neighbor_mines = sum(n.mine for n in cell.neighborhood)
 
     def reveal_cell(self, cell):
         if self.game_over:
@@ -72,14 +71,32 @@ class MinesweeperModel(Model):
 
         agent.reveal()
 
+        # Mine clicked
         if cell.mine:
             self.game_over = True
+            self._reveal_all_mines()
             return
 
+        # Flood fill
         if agent.neighbor_mines == 0:
-            for n in cell.neighborhood:
-                self.reveal_cell(n)
+            for neighbor in cell.neighborhood:
+                self.reveal_cell(neighbor)
+
+        self._check_win()
+
+    def _reveal_all_mines(self):
+        for cell in self.grid.all_cells:
+            if cell.mine:
+                cell.agents[0].revealed = True
+
+    def _check_win(self):
+        for cell in self.grid.all_cells:
+            agent = cell.agents[0]
+            if not cell.mine and not agent.revealed:
+                return
+        self.win = True
+        self.game_over = True
 
     def step(self):
-        """Player-driven game → no automatic stepping."""
+        # Player-driven game
         pass

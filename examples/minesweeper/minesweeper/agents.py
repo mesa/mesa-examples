@@ -2,8 +2,6 @@ from mesa.discrete_space import CellAgent
 
 
 class MineCell(CellAgent):
-    """A single Minesweeper cell."""
-
     def __init__(self, model, cell):
         super().__init__(model)
         self.cell = cell
