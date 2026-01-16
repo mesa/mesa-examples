@@ -1,34 +1,23 @@
 from mesa import Model
+from mesa.datacollection import DataCollector
 from mesa.discrete_space import OrthogonalMooreGrid, PropertyLayer
 
 from .agents import MineCell
 
 
 class MinesweeperModel(Model):
-    def __init__(
-        self,
-        width=10,
-        height=10,
-        mine_density=0.15,
-        seed=42,
-    ):
+    def __init__(self, width=10, height=10, mine_density=0.15, seed=42):
         super().__init__(seed=seed)
 
-        self.width = width
-        self.height = height
-        self.mine_density = mine_density
-
         self.game_over = False
-        self.win = False
+        self.frontier = set()
 
-        # Grid
         self.grid = OrthogonalMooreGrid(
             (width, height),
             torus=False,
             random=self.random,
         )
 
-        # Mine layer
         self.mine_layer = PropertyLayer(
             "mine",
             (width, height),
@@ -44,59 +33,59 @@ class MinesweeperModel(Model):
 
         self.grid.add_property_layer(self.mine_layer)
 
-        # One agent per cell
         MineCell.create_agents(
             model=self,
             n=width * height,
             cell=self.grid.all_cells.cells,
         )
 
-        self._count_neighbor_mines()
-
-    def _count_neighbor_mines(self):
         for cell in self.grid.all_cells:
-            agent = cell.agents[0]
-            if cell.mine:
-                continue
-            agent.neighbor_mines = sum(n.mine for n in cell.neighborhood)
+            cell.agents[0].neighbor_mines = sum(n.mine for n in cell.neighborhood)
 
-    def reveal_cell(self, cell):
+        safe = [c for c in self.grid.all_cells if not c.mine]
+        self.frontier |= set(self.random.sample(safe, k=5))
+
+        self.datacollector = DataCollector(
+            model_reporters={
+                "Revealed": lambda m: sum(a.revealed for a in m.agents),
+                "Frontier": lambda m: len(m.frontier),
+            }
+        )
+
+        self.datacollector.collect(self)
+
+    def step(self):
         if self.game_over:
             return
 
-        agent = cell.agents[0]
-
-        if agent.revealed or agent.flagged:
-            return
-
-        agent.reveal()
-
-        # Mine clicked
-        if cell.mine:
-            self.game_over = True
-            self._reveal_all_mines()
-            return
-
-        # Flood fill
-        if agent.neighbor_mines == 0:
-            for neighbor in cell.neighborhood:
-                self.reveal_cell(neighbor)
-
-        self._check_win()
-
-    def _reveal_all_mines(self):
-        for cell in self.grid.all_cells:
-            if cell.mine:
-                cell.agents[0].revealed = True
-
-    def _check_win(self):
-        for cell in self.grid.all_cells:
-            agent = cell.agents[0]
-            if not cell.mine and not agent.revealed:
+        if not self.frontier:
+            hidden_safe = [
+                c
+                for c in self.grid.all_cells
+                if not c.mine and not c.agents[0].revealed
+            ]
+            if not hidden_safe:
                 return
-        self.win = True
-        self.game_over = True
+            self.frontier.add(self.random.choice(hidden_safe))
 
-    def step(self):
-        # Player-driven game
-        pass
+        next_frontier = set()
+
+        for cell in self.frontier:
+            agent = cell.agents[0]
+
+            if agent.revealed:
+                continue
+
+            agent.revealed = True
+
+            if cell.mine:
+                self.game_over = True
+                return
+
+            if agent.neighbor_mines == 0:
+                for n in cell.neighborhood:
+                    if not n.agents[0].revealed:
+                        next_frontier.add(n)
+
+        self.frontier = next_frontier
+        self.datacollector.collect(self)
