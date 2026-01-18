@@ -33,6 +33,11 @@ rl_example = [
     "mesa",
     "tensorboard"
 ]
+surrogate = [
+    "scikit-learn",
+    "scipy",
+    "pandas",
+]
 
 [tool.ruff]
 extend-include = ["*.ipynb"]
