@@ -11,10 +11,10 @@ LOADING_DOCKS = [(0, 0, 0), (0, 2, 0), (0, 4, 0), (0, 6, 0), (0, 8, 0)]
 AXIS_LIMITS = {"x": (0, 22), "y": (0, 20), "z": (0, 5)}
 
 model_params = {
-    "seed": {
+    "rng": {
         "type": "InputText",
         "value": 42,
-        "label": "Random Seed",
+        "label": "Random number generator",
     },
 }
 

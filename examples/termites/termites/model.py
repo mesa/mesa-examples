@@ -8,7 +8,7 @@ class TermiteModel(Model):
     """A simulation that shows behavior of termite agents gathering wood chips into piles."""
 
     def __init__(
-        self, num_termites=100, width=100, height=100, wood_chip_density=0.1, seed=42
+        self, num_termites=100, width=100, height=100, wood_chip_density=0.1, rng=42
     ):
         """Initialize the model.
 
@@ -17,9 +17,9 @@ class TermiteModel(Model):
             width: Grid width.
             height: Grid heights.
             wood_chip_density: Density of wood chips in the grid.
-            seed : Random seed for reproducibility.
+            rng : Random number generator for reproducibility.
         """
-        super().__init__(seed=seed)
+        super().__init__(rng=42)
         self.num_termites = num_termites
         self.wood_chip_density = wood_chip_density
 
