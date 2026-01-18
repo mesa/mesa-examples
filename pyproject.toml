@@ -35,8 +35,6 @@ rl_example = [
 ]
 surrogate = [
     "scikit-learn",
-    "scipy",
-    "pandas",
 ]
 
 [tool.ruff]

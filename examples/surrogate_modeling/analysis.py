@@ -31,7 +31,7 @@ def sample_parameters(param_space, n_samples, seed=None):
     return output
 
 
-param_space = {"N": (10, 100), "width": (10, 30), "height": (10, 30)}
+param_space = {"n": (10, 100), "width": (10, 30), "height": (10, 30)}
 param_names = list(param_space.keys())
 samples = sample_parameters(param_space, n_samples=30, seed=42)
 
@@ -52,7 +52,7 @@ surrogate = RandomForestRegressor(n_estimators=100, random_state=42)
 surrogate.fit(X, y)
 print("Surrogate model trained.")
 
-test_params = {"N": 65, "width": 22, "height": 22}
+test_params = {"n": 65, "width": 22, "height": 22}
 X_test = np.array([[test_params[p] for p in param_names]])
 prediction = surrogate.predict(X_test)[0]
 
