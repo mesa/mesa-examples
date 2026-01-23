@@ -6,5 +6,6 @@ def main():
     for _ in range(20):
         model.step()
 
+
 if __name__ == "__main__":
     main()
