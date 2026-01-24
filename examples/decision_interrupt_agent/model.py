@@ -14,7 +14,6 @@ class DecisionModel(Model):
     def __init__(self, n_agents: int = 5):
         super().__init__()
 
-       
         self.my_agents = [DecisionAgent(self) for _ in range(n_agents)]
 
         self.next_arrest_time = 3
@@ -32,7 +31,6 @@ class DecisionModel(Model):
         """
         Advance the model by one step.
         """
-      
 
         if self.time == self.next_arrest_time:
             self.arrest_someone()
