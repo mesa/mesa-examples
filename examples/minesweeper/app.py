@@ -3,25 +3,38 @@ from mesa.visualization.components.matplotlib_components import (
     make_mpl_plot_component,
     make_mpl_space_component,
 )
+from mesa.visualization.components.portrayal_components import AgentPortrayalStyle
 from minesweeper.agents import MineCell
 from minesweeper.model import MinesweeperModel
 
 
 def agent_portrayal(agent: MineCell):
     if not agent.revealed:
-        return {"marker": "s", "color": "green", "size": 80}
+        return AgentPortrayalStyle(
+            marker="s",
+            color="green",
+            size=80,
+        )
 
     if agent.cell.mine:
-        return {"marker": "X", "color": "red", "size": 80}
+        return AgentPortrayalStyle(
+            marker="X",
+            color="red",
+            size=80,
+        )
 
     if agent.neighbor_mines > 0:
-        return {
-            "marker": f"${agent.neighbor_mines}$",
-            "color": "black",
-            "size": 80,
-        }
+        return AgentPortrayalStyle(
+            marker=f"${agent.neighbor_mines}$",
+            color="black",
+            size=80,
+        )
 
-    return {"marker": "s", "color": "lightgray", "size": 80}
+    return AgentPortrayalStyle(
+        marker="s",
+        color="lightgray",
+        size=80,
+    )
 
 
 model_params = {

@@ -17,7 +17,7 @@ In this example, Minesweeper is implemented as a **cellular process** that revea
 ### Key features
 
 - **Step-based dynamics:**
-  The model evolves in discrete steps, revealing cells gradually using a frontier-based propagation mechanism.
+  The model works step by step, revealing nearby cells as it expands.
 
 - **One agent per cell:**
   Each grid cell is represented by a `MineCell` agent that stores its revealed state and number of neighboring mines.
