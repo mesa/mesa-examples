@@ -31,6 +31,7 @@ class DecisionModel(Model):
         """
         Advance the model by one step.
         """
+        super().step() 
 
         if self.time == self.next_arrest_time:
             self.arrest_someone()
