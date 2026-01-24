@@ -6,7 +6,10 @@ from __future__ import annotations
 
 import math
 
-from agents import ResultText, Shell, Tank, Target, Wall
+try:
+    from .agents import ResultText, Shell, Tank, Target, Wall
+except ImportError:
+    from agents import ResultText, Shell, Tank, Target, Wall
 from mesa import Model
 from mesa.discrete_space import OrthogonalMooreGrid
 
@@ -50,6 +53,7 @@ class TankGameModel(Model):
         self.failed = False
         self.max_shots = 5
         self.shots_fired = 0
+        self.time = 0.0
 
         # Fixed wall configuration (no UI control)
         self.wall_position = 17
@@ -205,6 +209,7 @@ class TankGameModel(Model):
 
     def step(self) -> None:
         # Model step logic
+        self.time += 1.0
         if not self.running:
             return
         # 1) If target gone, stop running (but still decay explosions)

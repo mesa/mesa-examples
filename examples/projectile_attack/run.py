@@ -7,10 +7,18 @@ from __future__ import annotations
 from typing import Any
 
 import solara
-from agents import ResultText, Shell, Tank, Target, Wall
+
+try:
+    from .agents import ResultText, Shell, Tank, Target, Wall
+except ImportError:
+    from agents import ResultText, Shell, Tank, Target, Wall
 from mesa.visualization import SolaraViz, SpaceRenderer
 from mesa.visualization.components import AgentPortrayalStyle, PropertyLayerStyle
-from model import TankGameModel
+
+try:
+    from .model import TankGameModel
+except ImportError:
+    from model import TankGameModel
 
 
 def agent_portrayal(agent: Any) -> AgentPortrayalStyle:
