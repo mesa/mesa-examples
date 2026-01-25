@@ -18,12 +18,10 @@ class Tree(mesa.Agent):
 
         # Spread fire (8-neighborhood)
         neighbors = self.model.grid.get_neighbors(
-            self.pos,
-            moore=True,
-            include_center=False)
-        
-        for n in neighbors:
+            self.pos, moore=True, include_center=False
+        )
 
+        for n in neighbors:
             if n.condition != "Fine":
                 continue
             # Calculate wind bias
@@ -38,4 +36,3 @@ class Tree(mesa.Agent):
 
         # After spreading fire, this tree burns out
         self.condition = "Burned Out"
-

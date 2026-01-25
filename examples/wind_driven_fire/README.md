@@ -15,16 +15,16 @@ Fire spreads probabilistically between neighboring trees, with ignition probabil
 
 ### Fire Spread Rule
 
-At each time step, trees that are *On Fire* attempt to ignite their neighbors (Moore neighborhood).  
+At each time step, trees that are *On Fire* attempt to ignite their neighbors (Moore neighborhood).
 The ignition probability is modified by wind alignment:
 
 $$
 p = p_{\text{spread}} \cdot \left( 1 + s \cdot \cos(\theta) \right)
 $$
 where:
-- $ p_{\text{spread}} $ is the baseline spread probability  
-- $  s $  is wind strength  
-- $  \theta $  is the angle between the wind direction and the neighbor direction  
+- $ p_{\text{spread}} $ is the baseline spread probability
+- $  s $  is wind strength
+- $  \theta $  is the angle between the wind direction and the neighbor direction
 After spreading fire, burning trees transition to *Burned Out*.
 
 
@@ -32,12 +32,12 @@ After spreading fire, burning trees transition to *Burned Out*.
 
 Wind is represented as a **global vector field** defined by:
 
-- **Wind direction (degrees)** using the meteorological convention (wind coming *from*)  
-- **Wind strength**, controlling the magnitude of directional bias  
+- **Wind direction (degrees)** using the meteorological convention (wind coming *from*)
+- **Wind strength**, controlling the magnitude of directional bias
 
 ### Fire-Head–Based Rate of Spread
 
-- **Head Distance (Downwind)**: The **fire head** is defined as the furthest burned cell projected onto the wind axis.  
+- **Head Distance (Downwind)**: The **fire head** is defined as the furthest burned cell projected onto the wind axis.
 Fire-head distance is measured relative to the ignition reference point:
 
 $$
