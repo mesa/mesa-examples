@@ -29,12 +29,12 @@ def infected_draw(agent):
 model = GeoSir()
 page = SolaraViz(
     model,
-    [
+    name="Basic agent-based SIR model",
+    model_params=model_params,
+    components=[
         make_geospace_component(infected_draw, zoom=12),
         make_plot_component(["infected", "susceptible", "recovered", "dead"]),
     ],
-    name="Basic agent-based SIR model",
-    model_params=model_params,
 )
 
 page  # noqa

@@ -34,13 +34,13 @@ def schelling_draw(agent):
 model = GeoSchellingPoints()
 page = SolaraViz(
     model,
-    [
+    name="GeoSchellingPoints",
+    model_params=model_params,
+    components=[
         make_geospace_component(schelling_draw, zoom=4),
         make_plot_component(["happy", "unhappy"]),
         make_plot_happiness,
     ],
-    model_params=model_params,
-    name="GeoSchellingPoints",
 )
 
 page  # noqa

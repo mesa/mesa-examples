@@ -53,14 +53,14 @@ if __name__ == "__main__":
     model = AgentsAndNetworks()
     page = SolaraViz(
         model,
-        [
+        name="Agents and Networks",
+        model_params=model_params,
+        components=[
             make_geospace_component(agent_draw, zoom=campus_params[campus]["zoom"]),
             make_plot_clock,
             make_plot_component(["status_home", "status_work", "status_traveling"]),
             make_plot_component(["friendship_home", "friendship_work"]),
         ],
-        name="Agents and Networks",
-        model_params=model_params,
     )
 
     page  # noqa
