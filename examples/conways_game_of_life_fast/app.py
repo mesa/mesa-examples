@@ -34,9 +34,24 @@ model_params = {
         "max": 1,
         "step": 0.01,
     },
+    "randomize_new_cells": {  # New parameter for manual adjustment
+        "type": "SliderFloat",
+        "value": 0.05,  # The initial probability of reviving new cells
+        "label": "New Cells Randomization",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+    },
 }
 
-gol = GameOfLifeModel()
+
+gol = GameOfLifeModel(
+    width=model_params["width"]["value"],
+    height=model_params["height"]["value"],
+    alive_fraction=model_params["alive_fraction"]["value"],
+    randomize_new_cells=model_params["randomize_new_cells"]["value"],
+)
+
 
 layer_viz = make_space_component(propertylayer_portrayal=propertylayer_portrayal)
 TotalAlivePlot = make_plot_component("Cells alive")
