@@ -131,8 +131,15 @@ model = TankGameModel()
 
 renderer = SpaceRenderer(model, backend="matplotlib")
 renderer.draw_structure()
-renderer.draw_agents(agent_portrayal)
-renderer.draw_propertylayer(propertylayer_portrayal)
+if hasattr(renderer, "setup_agents"):
+    renderer.setup_agents(agent_portrayal).draw_agents()
+else:
+    renderer.draw_agents(agent_portrayal)
+
+if hasattr(renderer, "setup_propertylayer"):
+    renderer.setup_propertylayer(propertylayer_portrayal).draw_propertylayer()
+else:
+    renderer.draw_propertylayer(propertylayer_portrayal)
 
 page = SolaraViz(
     model,

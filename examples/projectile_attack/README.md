@@ -23,14 +23,14 @@ projectile_attack/
 ├─ pyproject.toml
 ├─ agents.py
 ├─ model.py
-└─ run.py
+└─ app.py
 ```
 - `agents.py`: defines Tank, Shell, Target, Wall.
 - `model.py`: builds the Mesa model, grid, wall, trajectories, firing mechanics, and win/lose state.
 - `run.py`: Solara UI for controls, rendering the grid and overlays, and user interactions.
 
 ## 5. Running the GAME
-- From the project root: `solara run run.py`
+- From the project root: `solara run app.py`
 - First, click the "Pause" button on the left to start the simulation. One simulation can be regarded as one game. In one game, you have five chances to fire the cannonball. Hitting the target is considered a success in this game, otherwise it is a failure. After the game ends, you can click the "Reset" button on the left to reset and start the next game.
 - For each launch, you can adjust sliders (angle, power), then press Fire. If the "Fire" button is gray and unclickable, remember to click the "Reloading" button beside it.
 - You can also make the target move to increase the difficulty.

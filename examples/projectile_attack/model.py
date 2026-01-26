@@ -208,16 +208,11 @@ class TankGameModel(Model):
         )
 
     def step(self) -> None:
-        # Model step logic
-        self.time += 1.0
-        if not self.running:
-            return
-        # 1) If target gone, stop running (but still decay explosions)
-        if not self.target_exists:
+        if self.running and not self.target_exists:
             self.running = False
-            return
-
-        # 2) Step agents in random order
-        self.agents.shuffle_do("step")
-
+        if self.running:
+            self.agents.shuffle_do("step")
+        prev_time = self.time
         super().step()
+        if self.time == prev_time:
+            self.time = prev_time + 1.0
