@@ -98,7 +98,7 @@ class WarehouseModel(mesa.Model):
             agent_list = self.agents_by_type[InventoryAgent].to_list()
 
             if robot.status == "open":  # Assign a task to the robot
-                item = self.random.choice(agents)
+                item = self.random.choice(agent_list)
                 if item.quantity > 0:
                     robot.initiate_task(item)
                     robot.status = "inventory"
