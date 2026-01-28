@@ -60,7 +60,7 @@ class DeffuantWeisbuchModel(Model):
         """
         agent_list = self.agents.to_list()
         for _ in range(self.n):
-            agent_a, agent_b = self.random.sample(agents, 2)
+            agent_a, agent_b = self.random.sample(agent_list, 2)
             self.attempted_interactions += 1
 
             if abs(agent_a.opinion - agent_b.opinion) < self.epsilon:
