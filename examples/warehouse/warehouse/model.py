@@ -95,8 +95,10 @@ class WarehouseModel(mesa.Model):
     def step(self):
         """Advance the model by one step."""
         for robot in self.agents_by_type[type(self.RobotAgent)]:
+            agents = self.agents_by_type[InventoryAgent].to_list()
+
             if robot.status == "open":  # Assign a task to the robot
-                item = self.random.choice(self.agents_by_type[InventoryAgent])
+                item = self.random.choice(agents)
                 if item.quantity > 0:
                     robot.initiate_task(item)
                     robot.status = "inventory"
