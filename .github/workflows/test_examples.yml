@@ -27,7 +27,7 @@ jobs:
   #   - name: Install dependencies
   #     run: pip install mesa[network] pytest
   #   - name: Test with pytest
-  #     run: pytest -rA -Werror test_examples.py
+  #     run: pytest -rA -Werror -Wdefault::PendingDeprecationWarning test_examples.py
 
   build-pre:
     runs-on: ubuntu-latest
@@ -42,7 +42,7 @@ jobs:
         pip install mesa[network] --pre
         pip install .[test]
     - name: Test with pytest
-      run: pytest -rA -Werror -Wdefault::FutureWarning test_examples.py
+      run: pytest -rA -Werror -Wdefault::PendingDeprecationWarning test_examples.py
 
   build-main:
     runs-on: ubuntu-latest
@@ -57,4 +57,4 @@ jobs:
         pip install .[test]
         pip install -U git+https://github.com/mesa/mesa@main#egg=mesa[network]
     - name: Test with pytest
-      run: pytest -rA -Werror -Wdefault::FutureWarning test_examples.py
+      run: pytest -rA -Werror -Wdefault::PendingDeprecationWarning test_examples.py
