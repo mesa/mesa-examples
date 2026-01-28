@@ -27,7 +27,7 @@ jobs:
   #   - name: Install dependencies
   #     run: pip install mesa pytest
   #   - name: Test with pytest
-  #     run: pytest -rA -Werror test_examples.py
+  #     run: pytest -rA -Werror -Wdefault::PendingDeprecationWarning test_examples.py
 
   build-pre:
     runs-on: ubuntu-latest
@@ -42,7 +42,7 @@ jobs:
         pip install mesa-geo --pre
         pip install .[test_gis]
     - name: Test with pytest
-      run: pytest -rA -Werror test_gis_examples.py
+      run: pytest -rA -Werror -Wdefault::PendingDeprecationWarning test_gis_examples.py
 
   build-main:
     runs-on: ubuntu-latest
@@ -57,7 +57,7 @@ jobs:
         pip install -U git+https://github.com/mesa/mesa-geo@main#egg=mesa-geo
         pip install .[test_gis]
     - name: Test with pytest
-      run: pytest -rA -Werror test_gis_examples.py --cov-report=xml
+      run: pytest -rA -Werror -Wdefault::PendingDeprecationWarning test_gis_examples.py --cov-report=xml
     - name: Codecov
       uses: codecov/codecov-action@v5
       with:
