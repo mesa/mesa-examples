@@ -33,9 +33,6 @@ rl_example = [
     "mesa",
     "tensorboard"
 ]
-surrogate = [
-    "scikit-learn",
-]
 
 [tool.ruff]
 extend-include = ["*.ipynb"]

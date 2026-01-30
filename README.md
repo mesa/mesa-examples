@@ -136,3 +136,7 @@ This folder contains an implementation of El Farol restaurant model. Agents (res
 ### [Schelling Model with Caching and Replay](https://github.com/mesa/mesa-examples/tree/main/examples/caching_and_replay)
 
 This example applies caching on the Mesa [Schelling](https://github.com/mesa/mesa-examples/tree/main/examples/schelling) example. It enables a simulation run to be "cached" or in other words recorded. The recorded simulation run is persisted on the local file system and can be replayed at any later point.
+
+### [Surrogate Modeling](examples/surrogate_modeling)
+
+This example demonstrates how to integrate Mesa with machine learning libraries like Scikit-learn to create a "surrogate model" (or emulator). It showcases a high-performance workflow for parameter exploration, including Latin Hypercube Sampling (LHS) and Random Forest regression, to approximate complex model behavior without the computational overhead of full simulations.

@@ -17,7 +17,7 @@ This approach is particularly beneficial for calibration, sensitivity analysis, 
 This example requires the `latest` version of Mesa and additional machine learning dependencies:
 
 ```bash
-pip install mesa scikit-learn scipy pandas
+pip install mesa scikit-learn
 
 ```
 
