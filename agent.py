@@ -2,7 +2,6 @@ from mesa import Agent
 
 
 class GamblingAgent(Agent):
-
     def __init__(self, model, skill, wealth, bet_size):
         super().__init__(model)
         self.skill = skill

@@ -3,8 +3,9 @@ import os
 import mesa
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import ChartModule
-from model import BoltzmannWealthModelRL
 from stable_baselines3 import PPO
+
+from model import BoltzmannWealthModelRL
 
 
 # Modify the MoneyModel class to take actions from the RL model

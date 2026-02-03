@@ -3,6 +3,7 @@ from mesa.visualization.user_param import Slider
 
 from model.model import LuckVsSkillModel
 
+
 def post_process_lines(ax):
     ax.set_xlabel("Simulation Step")
     ax.set_ylabel("Average True Skill")

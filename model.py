@@ -5,8 +5,6 @@ from .agent import GamblingAgent
 
 
 class LuckVsSkillModel(Model):
-
-
     def __init__(
         self,
         num_agents=200,
@@ -45,7 +43,6 @@ class LuckVsSkillModel(Model):
             agent.step()
 
         self.datacollector.collect(self)
-
 
     def top_10_skill(self):
         agents = sorted(self.agents, key=lambda a: a.wealth)
