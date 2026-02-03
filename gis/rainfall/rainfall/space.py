@@ -14,11 +14,10 @@ class LakeCell(mg.Cell):
 
     def __init__(
         self,
-        model,
-        pos: mesa.space.Coordinate | None = None,
-        indices: mesa.space.Coordinate | None = None,
+        model: mesa.Model | None = None,
+        **kwargs: dict,
     ):
-        super().__init__(model, pos, indices)
+        super().__init__(model, **kwargs)
         self.elevation = None
         self.water_level = None
         self.water_level_normalized = None
