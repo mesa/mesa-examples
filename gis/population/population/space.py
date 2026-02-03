@@ -14,11 +14,10 @@ class UgandaCell(Cell):
 
     def __init__(
         self,
-        model,
-        pos: mesa.space.Coordinate | None = None,
-        indices: mesa.space.Coordinate | None = None,
+        model: mesa.Model | None = None,
+        **kwargs: dict,
     ):
-        super().__init__(model, pos, indices)
+        super().__init__(model, **kwargs)
         self.population = None
 
     def step(self):
