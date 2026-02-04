@@ -24,12 +24,14 @@ class DiscAgent(ContinuousSpaceAgent):
         self,
         model,
         space,
+        devs_model,
         id,
         initial_position,
         initial_direction,
     ):
         super().__init__(space, model)
         self.id = id
+        self.devs_model = devs_model
         self.position = initial_position
         self.trajectory_init_pos = initial_position
         self.trajectory_init_pos_time = float(self.model.steps)
@@ -199,7 +201,7 @@ class DiscAgent(ContinuousSpaceAgent):
             return None
         abs_collision_time = initial_time + rel_collision_time
         # No collisions earlier than the simulator's current time
-        if abs_collision_time < self.model.devs.time:
+        if abs_collision_time < self.devs_model.time:
             return None
         return abs_collision_time
 

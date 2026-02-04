@@ -24,7 +24,7 @@ class DiscModel(Model):
         space_width=100,
         space_height=75,
     ):
-        super().__init__(seed=seed)
+        super().__init__(rng=seed)
         self.n_discs = n_discs
         self.disc_radius = disc_radius
         self.disc_speed = disc_speed
@@ -44,7 +44,8 @@ class DiscModel(Model):
         # We link the simulator to a dummy model. Linking it to our actual model
         # would change the behavior of the time steps and make visualization
         # harder.
-        self.devs.setup(Model())
+        self.dummy_model = Model()
+        self.devs.setup(self.dummy_model)
 
         # Create the agents
         # -----------------
@@ -64,6 +65,7 @@ class DiscModel(Model):
             self,
             self.n_discs,
             self.space,
+            self.dummy_model,
             list(range(n_discs)),
             initial_position=disc_positions,
             initial_direction=disc_directions,
