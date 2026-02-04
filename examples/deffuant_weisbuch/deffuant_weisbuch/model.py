@@ -58,7 +58,7 @@ class DeffuantWeisbuchModel(Model):
         less than the confidence threshold, both agents update opinion values
         symmetrically.
         """
-        agent_list = self.agents.to_list()
+        agent_list = list(self.agents)
         for _ in range(self.n):
             agent_a, agent_b = self.random.sample(agent_list, 2)
             self.attempted_interactions += 1
