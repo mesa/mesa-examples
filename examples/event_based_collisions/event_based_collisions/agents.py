@@ -11,6 +11,12 @@ from typing import Any
 import numpy as np
 from mesa.experimental.continuous_space import ContinuousSpaceAgent
 
+# A disc always has a speed of 1.0! If the model is mandating a different disc
+# speed, it instead uses a different time scale to simulate the same effect.
+# This is done to avoid compounding inaccuracies in floating point math across
+# models with different disc speed settings.
+DISC_SPEED = 1.0
+
 
 class Border(Enum):
     RIGHT = 1
@@ -46,12 +52,12 @@ class DiscAgent(ContinuousSpaceAgent):
         Doesn't consider collisions, only the current trajectory!"""
         time_since_trajectory_init_pos = time - self.trajectory_init_pos_time
         x_pos = self.trajectory_init_pos[0] + (
-            self.model.disc_speed
+            DISC_SPEED
             * time_since_trajectory_init_pos
             * math.cos(self.trajectory_direction)
         )
         y_pos = self.trajectory_init_pos[1] + (
-            self.model.disc_speed
+            DISC_SPEED
             * time_since_trajectory_init_pos
             * math.sin(self.trajectory_direction)
         )
@@ -75,8 +81,8 @@ class DiscAgent(ContinuousSpaceAgent):
             This dict is to be used as parameters by the discrete event simulator when
             it calls `resolve_border_collision`.
         """
-        x_speed = self.model.disc_speed * math.cos(self.trajectory_direction)
-        y_speed = self.model.disc_speed * math.sin(self.trajectory_direction)
+        x_speed = DISC_SPEED * math.cos(self.trajectory_direction)
+        y_speed = DISC_SPEED * math.sin(self.trajectory_direction)
 
         # Determine earliest border collision
         min_border_collision_time = float("inf")
@@ -148,10 +154,10 @@ class DiscAgent(ContinuousSpaceAgent):
         (Only considering the trajectories they have right now, disregarding other
         collisions.)
         """
-        self_x_speed = self.model.disc_speed * math.cos(self.trajectory_direction)
-        self_y_speed = self.model.disc_speed * math.sin(self.trajectory_direction)
-        other_x_speed = self.model.disc_speed * math.cos(other.trajectory_direction)
-        other_y_speed = self.model.disc_speed * math.sin(other.trajectory_direction)
+        self_x_speed = DISC_SPEED * math.cos(self.trajectory_direction)
+        self_y_speed = DISC_SPEED * math.sin(self.trajectory_direction)
+        other_x_speed = DISC_SPEED * math.cos(other.trajectory_direction)
+        other_y_speed = DISC_SPEED * math.sin(other.trajectory_direction)
         rel_x_speed = self_x_speed - other_x_speed
         rel_y_speed = self_y_speed - other_y_speed
 
@@ -205,10 +211,10 @@ class DiscAgent(ContinuousSpaceAgent):
             return None
         return abs_collision_time
 
-    def update_position(self):
+    def update_position(self, normalized_time):
         # All collisions have to be resolved at this point already.
         # Just update your current position at this time based on your trajectory.
-        self.position = np.array(self.position_at_time(float(self.model.steps)))
+        self.position = np.array(self.position_at_time(normalized_time))
 
     def schedule_next_collisions(
         self,

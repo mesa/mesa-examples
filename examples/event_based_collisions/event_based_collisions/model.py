@@ -27,7 +27,12 @@ class DiscModel(Model):
         super().__init__(rng=seed)
         self.n_discs = n_discs
         self.disc_radius = disc_radius
-        self.disc_speed = disc_speed
+        # To ensure equal results in simulations with a very high amount of
+        # timesteps, disc_speed is NOT used in floating point math, where
+        # compounding inaccuracies can cause diverging model states. Instead, we
+        # only adjust the time scale when sampling the discs' positions, which
+        # is not affected by compounding inaccuracies.
+        self.speed_multiplier = disc_speed
         self.space_width = space_width
         self.space_height = space_height
 
@@ -75,8 +80,9 @@ class DiscModel(Model):
             disc.schedule_next_collisions()
 
     def step(self):
+        normalized_time = self.steps * self.speed_multiplier
         # Resolve all collisions during the time step (only changes trajectories)
-        self.devs.run_until(self.steps)
+        self.devs.run_until(normalized_time)
         # Have all agents update their position at this point in time, based on
         # their trajectories.
-        self.agents.do("update_position")
+        self.agents.do("update_position", normalized_time)
