@@ -1,5 +1,7 @@
 """Schelling segregation model."""
 
+from contextlib import suppress
+
 import mesa
 from mesa.discrete_space import CellAgent, OrthogonalMooreGrid
 
@@ -25,11 +27,9 @@ class SchellingAgent(CellAgent):
 
         # If unhappy, move:
         if similar < self.model.homophily:
-            try:
+            with suppress(IndexError):
+                # Try to move; if no empty cells, agent stays in place
                 self.cell = self.model.grid.select_random_empty_cell()
-            except IndexError:
-                # No empty cells available, stay in place
-                pass
         else:
             self.model.happy += 1
 

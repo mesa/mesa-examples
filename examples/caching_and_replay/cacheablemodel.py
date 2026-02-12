@@ -1,7 +1,7 @@
 import random
 from pathlib import Path
 
-import dill  # Explicitly import dill for serialization
+import dill
 from mesa.discrete_space import OrthogonalMooreGrid
 from mesa_replay import CacheableModel, CacheState
 from model import Schelling, SchellingAgent
@@ -97,11 +97,11 @@ class CacheableSchelling(CacheableModel):
             else:
                 super().__setattr__(key, value)
 
-            if hasattr(self, "_cache_state") and was_running and not value:
-                if self._cache_state == CacheState.RECORD and not self.run_finished:
-                    if self.verbose:
-                        print(f"Finalizing cache at step {self.step_count}...")
-                    self.finish_run()
+            if (hasattr(self, "_cache_state") and was_running and not value
+                and self._cache_state == CacheState.RECORD and not self.run_finished):
+                if self.verbose:
+                    print(f"Finalizing cache at step {self.step_count}...")
+                self.finish_run()
         else:
             super().__setattr__(key, value)
 
@@ -167,7 +167,7 @@ class CacheableSchelling(CacheableModel):
         """
         if self.verbose:
             print(f"Restoring state at step {self.step_count}")
-        state_dict = dill.loads(state)
+        state_dict = dill.loads(state)  # noqa: S301
 
         # Restore basic attributes first
         for k, v in state_dict.items():

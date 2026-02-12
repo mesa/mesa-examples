@@ -91,12 +91,4 @@ model = Schelling()
 space_component = make_space_component(agent_portrayal)
 happy_chart = make_plot_component("happy")
 
-# Create the Solara visualization page
-# page = SolaraViz(
-#     model,
-#     components=[space_component, happy_chart,  get_happy_agents],
-#     model_params=model_params,
-#     name="Schelling Segregation Model",
-# )
 
-# page  # noqa
