@@ -26,7 +26,7 @@ model = LuckVsSkillModel()
 
 model_params = {
     "num_agents": 200,
-    "alpha": Slider("Skill impact (α)", 0.05, 0.0, 0.2, 0.01),
+    "alpha": Slider("Skill impact (α)", 0.05, 0.0, 0.2, 0.01),  # noqa: RUF001
     "initial_wealth": 100,
     "bet_size": 1,
 }
