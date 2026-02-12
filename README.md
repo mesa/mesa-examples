@@ -79,6 +79,9 @@ This model simulates a humanitarian aid distribution scenario using a needs-base
 A simple agent-based simulation showing how rumors spread through a population based on the spread chance and initial knowing percentage, implemented with the Mesa framework and adapted from NetLogo [Rumor mill](https://www.netlogoweb.org/launch#https://www.netlogoweb.org/assets/modelslib/Sample%20Models/Social%20Science/Rumor%20Mill.nlogox).
 
 
+### [Painted Desert Challenge Model](https://github.com/mesa/mesa-examples/tree/main/examples/painted_desert)
+An extension of the classic Termites model where agents sort multiple colors of wood chips into distinct piles. It demonstrates emergent self-organization and decentralized decision-making as simple local rules lead to global patterns of order.
+
 ## Continuous Space Examples
 _No user examples available yet._
 
