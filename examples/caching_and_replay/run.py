@@ -3,13 +3,14 @@
 Extends the standard Schelling visualization to record and replay simulations.
 """
 
+from pathlib import Path
+
 import solara
+from cacheablemodel import CacheableSchelling
 from mesa.visualization import SolaraViz, make_plot_component, make_space_component
 from mesa.visualization.utils import update_counter
-from cacheablemodel import CacheableSchelling
-from server import agent_portrayal, get_happy_agents, model_params
 from mesa_replay import CacheState
-from pathlib import Path
+from server import agent_portrayal, get_happy_agents, model_params
 
 # Add replay parameter to model params
 model_params["replay"] = {
@@ -27,18 +28,18 @@ model_params["cache_file_path"] = {
 @solara.component
 def get_cache_file_status(model):
     """Display cache status and instructions."""
-    
+
     update_counter.get()
-    
+
     cache_file = Path(model.cache_file_path)
     exists = cache_file.exists() and cache_file.is_file()
-    
+
     if model._cache_state == CacheState.REPLAY:
-        max_step = len(model.cache) - 1 if hasattr(model, 'cache') else 'unknown'
+        max_step = len(model.cache) - 1 if hasattr(model, "cache") else "unknown"
         instructions = f"Replaying cached simulation (steps 0-{max_step})  \n"
     elif model._cache_state == CacheState.RECORD:
         instructions = "Recording simulation  \n"
-    
+
     file_size = ""
     if exists:
         size_bytes = cache_file.stat().st_size
@@ -48,7 +49,7 @@ def get_cache_file_status(model):
             file_size = f" ({size_bytes / 1024:.1f} KB)"
         else:
             file_size = f" ({size_bytes / (1024 * 1024):.1f} MB)"
-    
+
     solara.Markdown(
         f"\n \n"
         f"---  \n"

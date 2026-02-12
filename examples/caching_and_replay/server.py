@@ -4,8 +4,7 @@ Standard visualization for the Schelling segregation model.
 """
 
 import solara
-
-from mesa.visualization import SolaraViz, make_plot_component, make_space_component
+from mesa.visualization import make_plot_component, make_space_component
 from mesa.visualization.components import AgentPortrayalStyle
 from mesa.visualization.utils import update_counter
 from model import Schelling
@@ -15,23 +14,23 @@ from model import Schelling
 def get_happy_agents(model):
     """Display count and percentage of happy agents."""
     update_counter.get()
-    
+
     total_agents = len(model.agents)
     happy_count = 0
     current_step = 0
-    if hasattr(model, 'datacollector') and model.datacollector.model_vars:
+    if hasattr(model, "datacollector") and model.datacollector.model_vars:
         try:
             data = model.datacollector.get_model_vars_dataframe()
             if not data.empty:
                 current_step = len(data)
-                if current_step > 0 and 'happy' in data.columns:
-                    happy_count = int(data['happy'].iloc[-1])
+                if current_step > 0 and "happy" in data.columns:
+                    happy_count = int(data["happy"].iloc[-1])
         except (IndexError, KeyError):
             pass
-    
+
     if total_agents > 0:
         happy_percentage = (happy_count / total_agents) * 100
-        
+
         solara.Markdown(
             f"**Happy agents:** {happy_count} / {total_agents} "
             f"({happy_percentage:.1f}%)"
