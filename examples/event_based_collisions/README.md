@@ -10,7 +10,7 @@ Instead of detecting disc collisions each time step when they happen, collisions
 This ensures that collisions are always accurately resolved, even when the discs are very fast compared to the step interval.
 Other approaches to collision detection would fail in this scenario:
 Discs could pass through each other if they only collide between time steps.
-Overall, this is a playful demonstration of the **DEVSimulator**, which allows for event-based simulation on a non-discrete timeline.
+Overall, this is a playful demonstration of Mesa's ability to do event-based simulation on a non-discrete timeline.
 
 
 ## Running the simulation
@@ -37,6 +37,3 @@ You can't actually modify the timestep interval, but you can modify the global s
 3. Turn the disc speed up to 10 and reset the simulation.
 4. Now let the simulation run only 10 time steps.
 5. Compare the result with your screenshot. It should be exactly the same!
-
-
-

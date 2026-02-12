@@ -1,15 +1,17 @@
 """
-A colliding disc Mesa agent using Mesa's DEVSimulator.
+A colliding disc Mesa agent using discrete event scheduling on a continuous
+timeline.
 """
 
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
 from enum import Enum
-from typing import Any
 
 import numpy as np
-from mesa.experimental.continuous_space import ContinuousSpaceAgent
+from mesa import Model
+from mesa.experimental.continuous_space import ContinuousSpace, ContinuousSpaceAgent
 
 # A disc always has a speed of 1.0! If the model is mandating a different disc
 # speed, it instead uses a different time scale to simulate the same effect.
@@ -28,26 +30,34 @@ class Border(Enum):
 class DiscAgent(ContinuousSpaceAgent):
     def __init__(
         self,
-        model,
-        space,
-        devs_model,
-        id,
-        initial_position,
-        initial_direction,
+        model: Model,
+        space: ContinuousSpace,
+        time_model: Model,
+        id: int,
+        initial_position: tuple[float, float],
+        initial_direction: float,
     ):
         super().__init__(space, model)
+        self.time_model = time_model
         self.id = id
-        self.devs_model = devs_model
-        self.position = initial_position
+        self.position = np.array(initial_position)
         self.trajectory_init_pos = initial_position
-        self.trajectory_init_pos_time = float(self.model.steps)
+        self.trajectory_init_pos_time = float(self.time_model.time)
         self.trajectory_direction = initial_direction
         self.trajectory_id = 0
         """The trajectory id is changed every time the trajectory changes and
         hence allows the detection of collision events that are no longer valid."""
+        self.collision_events = set()
+        """Stores all future collision events of this disc agent that haven't been
+        resolved yet.
+
+        Maintaining this set of events is only necessary because Mesa uses weak
+        references for the callbacks in its event queue. Meaning that if we don't
+        maintain references to these objects ourselves, Python's garbage collector
+        may delete the objects before the events happen, cancelling the events."""
 
     def position_at_time(self, time: float) -> tuple[float, float]:
-        """Determine the disc's position at the given time with it's current trajectory.
+        """Determine the disc's position at the given time with its current trajectory.
 
         Doesn't consider collisions, only the current trajectory!"""
         time_since_trajectory_init_pos = time - self.trajectory_init_pos_time
@@ -65,7 +75,7 @@ class DiscAgent(ContinuousSpaceAgent):
 
     def earliest_border_collision(
         self, exempt_border: Border | None = None
-    ) -> dict[str, Any]:
+    ) -> BorderCollisionEvent:
         """Determine the next border the disc will collide with.
 
         Parameters
@@ -77,16 +87,17 @@ class DiscAgent(ContinuousSpaceAgent):
 
         Returns
         -------
-        dict
-            This dict is to be used as parameters by the discrete event simulator when
-            it calls `resolve_border_collision`.
+        BorderCollisionEvent
+            To resolve te next border collision, this event's `resolve_collision`
+            function should be called by the model at the time specified by the event's
+            `collision_time` attribute.
         """
         x_speed = DISC_SPEED * math.cos(self.trajectory_direction)
         y_speed = DISC_SPEED * math.sin(self.trajectory_direction)
 
         # Determine earliest border collision
         min_border_collision_time = float("inf")
-        border_collision_kwargs = None
+        border_collision_event = None
         if exempt_border != Border.RIGHT and x_speed > 0:
             collision_time = self.trajectory_init_pos_time + (
                 (
@@ -98,24 +109,26 @@ class DiscAgent(ContinuousSpaceAgent):
             )
             if collision_time < min_border_collision_time:
                 min_border_collision_time = collision_time
-                border_collision_kwargs = {
-                    "trajectory_id": self.trajectory_id,
-                    "border": Border.RIGHT,
-                    "collision_loc": self.position_at_time(collision_time),
-                    "collision_time": collision_time,
-                }
+                border_collision_event = BorderCollisionEvent(
+                    disc=self,
+                    trajectory_id=self.trajectory_id,
+                    border=Border.RIGHT,
+                    collision_loc=self.position_at_time(collision_time),
+                    collision_time=collision_time,
+                )
         if exempt_border != Border.LEFT and x_speed < 0:
             collision_time = self.trajectory_init_pos_time + (
                 (self.trajectory_init_pos[0] - self.model.disc_radius) / -x_speed
             )
             if collision_time < min_border_collision_time:
                 min_border_collision_time = collision_time
-                border_collision_kwargs = {
-                    "trajectory_id": self.trajectory_id,
-                    "border": Border.LEFT,
-                    "collision_loc": self.position_at_time(collision_time),
-                    "collision_time": collision_time,
-                }
+                border_collision_event = BorderCollisionEvent(
+                    disc=self,
+                    trajectory_id=self.trajectory_id,
+                    border=Border.LEFT,
+                    collision_loc=self.position_at_time(collision_time),
+                    collision_time=collision_time,
+                )
         if exempt_border != Border.TOP and y_speed > 0:
             collision_time = self.trajectory_init_pos_time + (
                 (
@@ -127,26 +140,28 @@ class DiscAgent(ContinuousSpaceAgent):
             )
             if collision_time < min_border_collision_time:
                 min_border_collision_time = collision_time
-                border_collision_kwargs = {
-                    "trajectory_id": self.trajectory_id,
-                    "border": Border.TOP,
-                    "collision_loc": self.position_at_time(collision_time),
-                    "collision_time": collision_time,
-                }
+                border_collision_event = BorderCollisionEvent(
+                    disc=self,
+                    trajectory_id=self.trajectory_id,
+                    border=Border.TOP,
+                    collision_loc=self.position_at_time(collision_time),
+                    collision_time=collision_time,
+                )
         if exempt_border != Border.BOTTOM and y_speed < 0:
             collision_time = self.trajectory_init_pos_time + (
                 (self.trajectory_init_pos[1] - self.model.disc_radius) / -y_speed
             )
             if collision_time < min_border_collision_time:
                 min_border_collision_time = collision_time
-                border_collision_kwargs = {
-                    "trajectory_id": self.trajectory_id,
-                    "border": Border.BOTTOM,
-                    "collision_loc": self.position_at_time(collision_time),
-                    "collision_time": collision_time,
-                }
-        assert border_collision_kwargs is not None
-        return border_collision_kwargs
+                border_collision_event = BorderCollisionEvent(
+                    disc=self,
+                    trajectory_id=self.trajectory_id,
+                    border=Border.BOTTOM,
+                    collision_loc=self.position_at_time(collision_time),
+                    collision_time=collision_time,
+                )
+        assert border_collision_event is not None
+        return border_collision_event
 
     def disc_collision_time(self, other: DiscAgent) -> float | None:
         """Determine if self and the other disc will collide, and if they do, when?
@@ -207,14 +222,9 @@ class DiscAgent(ContinuousSpaceAgent):
             return None
         abs_collision_time = initial_time + rel_collision_time
         # No collisions earlier than the simulator's current time
-        if abs_collision_time < self.devs_model.time:
+        if abs_collision_time < self.time_model.time:
             return None
         return abs_collision_time
-
-    def update_position(self, normalized_time):
-        # All collisions have to be resolved at this point already.
-        # Just update your current position at this time based on your trajectory.
-        self.position = np.array(self.position_at_time(normalized_time))
 
     def schedule_next_collisions(
         self,
@@ -222,11 +232,11 @@ class DiscAgent(ContinuousSpaceAgent):
         exempt_disc: DiscAgent | None = None,
     ):
         # Schedule border collision
-        border_collision_kwargs = self.earliest_border_collision(exempt_border)
-        self.model.devs.schedule_event_absolute(
-            function=self.resolve_border_collision,
-            time=border_collision_kwargs["collision_time"],
-            function_kwargs=border_collision_kwargs,
+        border_collision_event = self.earliest_border_collision(exempt_border)
+        self.collision_events.add(border_collision_event)
+        self.time_model.schedule_event(
+            function=border_collision_event.resolve_collision,
+            at=border_collision_event.collision_time,
         )
 
         # Schedule disc collisions
@@ -235,74 +245,144 @@ class DiscAgent(ContinuousSpaceAgent):
                 continue
             collision_time = self.disc_collision_time(disc)
             if collision_time is not None:
-                self.model.devs.schedule_event_absolute(
-                    function=self.resolve_disc_collision,
-                    time=collision_time,
-                    function_kwargs={
-                        "own_trajectory_id": self.trajectory_id,
-                        "own_collision_loc": self.position_at_time(collision_time),
-                        "other_disc": disc,
-                        "other_trajectory_id": disc.trajectory_id,
-                        "other_collision_loc": disc.position_at_time(collision_time),
-                        "collision_time": collision_time,
-                    },
+                disc_collision_event = DiscCollisionEvent(
+                    own_disc=self,
+                    own_trajectory_id=self.trajectory_id,
+                    own_collision_loc=self.position_at_time(collision_time),
+                    other_disc=disc,
+                    other_trajectory_id=disc.trajectory_id,
+                    other_collision_loc=disc.position_at_time(collision_time),
+                    collision_time=collision_time,
+                )
+                self.collision_events.add(disc_collision_event)
+                self.time_model.schedule_event(
+                    function=disc_collision_event.resolve_collision,
+                    at=collision_time,
                 )
 
-    def resolve_border_collision(
-        self, trajectory_id: int, border: Border, collision_loc, collision_time
-    ):
-        if self.trajectory_id != trajectory_id:
-            # The trajectory has changed; this collision doesn't happen after all
-            return
-        if border == Border.RIGHT:
-            normal_angle = 1.0 * math.pi
-        elif border == Border.TOP:
-            normal_angle = 1.5 * math.pi
-        elif border == Border.LEFT:
-            normal_angle = 0.0 * math.pi
-        else:  # border == Border.BOTTOM:
-            normal_angle = 0.5 * math.pi
-        self.trajectory_init_pos = collision_loc
-        self.trajectory_init_pos_time = collision_time
-        self.trajectory_direction = reflection_angle(
-            self.trajectory_direction, normal_angle
-        )
-        self.trajectory_id += 1
-        self.schedule_next_collisions(exempt_border=border)
+    def update_position(self, normalized_time: float):
+        # All collisions have to be resolved at this point already.
+        # Just update your current position at this time based on your trajectory.
+        self.position = np.array(self.position_at_time(normalized_time))
 
-    def resolve_disc_collision(
-        self,
-        own_trajectory_id: int,
-        own_collision_loc,
-        other_disc,
-        other_trajectory_id: int,
-        other_collision_loc,
-        collision_time,
-    ):
-        if (
-            self.trajectory_id != own_trajectory_id
-            or other_disc.trajectory_id != other_trajectory_id
-        ):
-            # The trajectory has changed; this collision doesn't happen after all
-            return
-        own_normal_angle = angle_towards(other_collision_loc, own_collision_loc)
-        self.trajectory_init_pos = own_collision_loc
-        self.trajectory_init_pos_time = collision_time
-        self.trajectory_direction = reflection_angle(
-            self.trajectory_direction, own_normal_angle
-        )
-        self.trajectory_id += 1
 
-        other_normal_angle = angle_towards(own_collision_loc, other_collision_loc)
-        other_disc.trajectory_init_pos = other_collision_loc
-        other_disc.trajectory_init_pos_time = collision_time
-        other_disc.trajectory_direction = reflection_angle(
-            other_disc.trajectory_direction, other_normal_angle
-        )
-        other_disc.trajectory_id += 1
+@dataclass
+class BorderCollisionEvent:
+    """An event of a disc colliding with a border.
 
-        self.schedule_next_collisions(exempt_disc=other_disc)
-        other_disc.schedule_next_collisions(exempt_disc=self)
+    The `resolve_collision` method has to be called by the event queue at time
+    `collision_time`; then the trajectory of the disc is changed so that it
+    bounces off the border.
+
+    This event becomes invalid if the disc changes its trajectory (by colliding
+    with something else) before `collision_time`. Then, `resolve_collision`
+    simply does nothing.
+    """
+
+    disc: DiscAgent
+    trajectory_id: int
+    border: Border
+    collision_loc: tuple[float, float]
+    collision_time: float
+
+    def resolve_collision(self):
+        try:
+            if self.trajectory_id != self.disc.trajectory_id:
+                # The trajectory has changed; this collision doesn't happen after all
+                return
+            if self.border == Border.RIGHT:
+                normal_angle = 1.0 * math.pi
+            elif self.border == Border.TOP:
+                normal_angle = 1.5 * math.pi
+            elif self.border == Border.LEFT:
+                normal_angle = 0.0 * math.pi
+            else:  # self.border == Border.BOTTOM:
+                normal_angle = 0.5 * math.pi
+            self.disc.trajectory_init_pos = self.collision_loc
+            self.disc.trajectory_init_pos_time = self.collision_time
+            self.disc.trajectory_direction = reflection_angle(
+                self.disc.trajectory_direction, normal_angle
+            )
+            self.disc.trajectory_id += 1
+            self.disc.schedule_next_collisions(exempt_border=self.border)
+        finally:
+            # Dereference event, so that it can be garbage collected
+            self.disc.collision_events.remove(self)
+
+    def __hash__(self) -> int:
+        return hash(
+            (self.trajectory_id, self.border, self.collision_loc, self.collision_time)
+        )
+
+
+@dataclass
+class DiscCollisionEvent:
+    """An event of two discs colliding.
+
+    The `resolve_collision` method has to be called by the event queue at time
+    `collision_time`; then the trajectories of both discs are changed so that
+    they bounce off each other.
+
+    This event becomes invalid if either disc changes its trajectory (by
+    colliding with something else) before `collision_time`. Then,
+    `resolve_collision` simply does nothing.
+    """
+
+    own_disc: DiscAgent
+    own_trajectory_id: int
+    own_collision_loc: tuple[float, float]
+    other_disc: DiscAgent
+    other_trajectory_id: int
+    other_collision_loc: tuple[float, float]
+    collision_time: float
+
+    def resolve_collision(self):
+        try:
+            if (
+                self.own_trajectory_id != self.own_disc.trajectory_id
+                or self.other_trajectory_id != self.other_disc.trajectory_id
+            ):
+                # A trajectory has changed; this collision doesn't happen after all
+                return
+            # Adjust own disc's trajectory
+            own_normal_angle = angle_towards(
+                self.other_collision_loc, self.own_collision_loc
+            )
+            self.own_disc.trajectory_init_pos = self.own_collision_loc
+            self.own_disc.trajectory_init_pos_time = self.collision_time
+            self.own_disc.trajectory_direction = reflection_angle(
+                self.own_disc.trajectory_direction, own_normal_angle
+            )
+            self.own_disc.trajectory_id += 1
+
+            # Adjust other disc's trajectory
+            other_normal_angle = angle_towards(
+                self.own_collision_loc, self.other_collision_loc
+            )
+            self.other_disc.trajectory_init_pos = self.other_collision_loc
+            self.other_disc.trajectory_init_pos_time = self.collision_time
+            self.other_disc.trajectory_direction = reflection_angle(
+                self.other_disc.trajectory_direction, other_normal_angle
+            )
+            self.other_disc.trajectory_id += 1
+
+            # Schedule both discs' next collisions
+            self.own_disc.schedule_next_collisions(exempt_disc=self.other_disc)
+            self.other_disc.schedule_next_collisions(exempt_disc=self.own_disc)
+        finally:
+            # Dereference event, so that it can be garbage collected
+            self.own_disc.collision_events.remove(self)
+
+    def __hash__(self) -> int:
+        return hash(
+            (
+                self.own_trajectory_id,
+                self.own_collision_loc,
+                self.other_trajectory_id,
+                self.other_collision_loc,
+                self.collision_time,
+            )
+        )
 
 
 def reflection_angle(incoming_angle: float, normal_angle: float) -> float:

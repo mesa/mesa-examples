@@ -1,4 +1,4 @@
-mesa[rec]>=3.4
+mesa[rec]>=3.5.0b0
 numpy>=2
-matplotlib>=3.7
-solara>=1.50
+matplotlib>=3.10
+solara>=1.55

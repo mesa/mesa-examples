@@ -9,11 +9,10 @@ from mesa.visualization.components import AgentPortrayalStyle
 
 # Setup model parameters for the visualization interface
 model = DiscModel()
-simulator = model.devs
 
 
 model_params = {
-    "seed": {
+    "rng": {
         "type": "InputText",
         "value": 42,
         "label": "Random Seed",
@@ -57,4 +56,5 @@ page = SolaraViz(
     name="Event Based Collisions",
 )
 
+# This is required to render the visualization in a Jupyter notebook
 page  # noqa
