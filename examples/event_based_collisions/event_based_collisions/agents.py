@@ -88,7 +88,7 @@ class DiscAgent(ContinuousSpaceAgent):
         Returns
         -------
         BorderCollisionEvent
-            To resolve te next border collision, this event's `resolve_collision`
+            To resolve the next border collision, this event's `resolve_collision`
             function should be called by the model at the time specified by the event's
             `collision_time` attribute.
         """

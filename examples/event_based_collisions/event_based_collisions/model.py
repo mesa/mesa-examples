@@ -46,7 +46,7 @@ class DiscModel(Model):
 
         # We use a nested model in our model, which is exclusively responsible
         # for timekeeping and events. This way, we can use custom time scales!
-        # Advancing the vizualization by 1 time step doesn't have to mean that
+        # Advancing the visualization by 1 time step doesn't have to mean that
         # only 1 time unit has passed. We can now cover 10 time units per time
         # step or only 0.1 time units per time step for example.
         self.time_model = Model()
