@@ -1,8 +1,9 @@
 import os
 
-from model import WolfSheepRL
 from ray.rllib.algorithms.ppo import PPOConfig
 from ray.rllib.policy.policy import PolicySpec
+
+from model import WolfSheepRL
 
 
 # Configuration to train the model
