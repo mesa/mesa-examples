@@ -54,7 +54,7 @@ jobs:
         python-version: "3.12"
     - name: Install dependencies
       run: |
-        pip install -U git+https://github.com/mesa/mesa-geo@main#egg=mesa-geo
+        pip install -U "mesa-geo @ git+https://github.com/mesa/mesa-geo@main"
         pip install .[test_gis]
     - name: Test with pytest
       run: pytest -rA -Werror -Wdefault::PendingDeprecationWarning test_gis_examples.py --cov-report=xml

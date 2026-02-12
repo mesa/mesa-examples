@@ -55,6 +55,6 @@ jobs:
     - name: Install dependencies
       run: |
         pip install .[test]
-        pip install -U git+https://github.com/mesa/mesa@main#egg=mesa[network]
+        pip install -U "mesa[network] @ git+https://github.com/mesa/mesa@main"
     - name: Test with pytest
       run: pytest -rA -Werror -Wdefault::PendingDeprecationWarning test_examples.py
