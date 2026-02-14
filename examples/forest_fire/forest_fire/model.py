@@ -1,15 +1,26 @@
+import math
+
 import mesa
 from mesa.discrete_space import OrthogonalMooreGrid
-import math
+
 from .agent import TreeCell
 
 
 class ForestFire(mesa.Model):
     """Simple Forest Fire model."""
 
-    def __init__(self, width=100, height=100, density=0.65, seed=None,
-                 use_prob=False, p_spread=0.5,
-                 wind_enabled=False, wind_dir=0.0, wind_strength=1.0):
+    def __init__(
+        self,
+        width=100,
+        height=100,
+        density=0.65,
+        seed=None,
+        use_prob=False,
+        p_spread=0.5,
+        wind_enabled=False,
+        wind_dir=0.0,
+        wind_strength=1.0,
+    ):
         """Create a new forest fire model.
 
         Args:
@@ -48,7 +59,7 @@ class ForestFire(mesa.Model):
         self.datacollector.collect(self)
 
     def ignite_initial_fire(self):
-            # wind bias on: central ignitian
+        # wind bias on: central ignitian
 
         if getattr(self, "wind_enabled", False):
             cx = self.width // 2
@@ -79,7 +90,7 @@ class ForestFire(mesa.Model):
     def count_type(model, tree_condition):
         """Helper method to count trees in a given condition in a given model."""
         return len(model.agents.select(lambda x: x.condition == tree_condition))
-    
+
     # Wind Mechanisum
 
     def wind_unit_vector(self):
@@ -101,4 +112,3 @@ class ForestFire(mesa.Model):
         dxu, dyu = dx / norm, dy / norm
         align = dxu * wx + dyu * wy  # [-1, 1]
         return max(0.0, 1.0 + (self.wind_strength * align))
-

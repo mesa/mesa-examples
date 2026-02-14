@@ -1,7 +1,7 @@
 # Forest Fire Model Extended with Optional Wind Bias
 This implementation extends the original Mesa Forest Fire model by adding an optional wind-driven fire spread mechanism, while preserving the original deterministic behavior as the default mode.
 
-### New Features 
+### New Features
 This extended version introduces an optional wind bias module with the following capabilities:
 
 1. **default behavior**

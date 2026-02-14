@@ -47,14 +47,15 @@ model_params = {
     "height": 100,
     "width": 100,
     "density": Slider("Tree density", 0.65, 0.01, 1.0, 0.01),
-
-    "use_prob": {"type": "Checkbox", "label": "Use probabilistic spread", "value": False},
+    "use_prob": {
+        "type": "Checkbox",
+        "label": "Use probabilistic spread",
+        "value": False,
+    },
     "p_spread": Slider("Base spread probability", 0.5, 0.0, 1.0, 0.01),
-
     "wind_enabled": {"type": "Checkbox", "label": "Enable wind bias", "value": False},
     "wind_dir": Slider("Wind direction (deg)", 0, 0, 360, 1),
     "wind_strength": Slider("Wind strength", 1.0, 0.0, 2.0, 0.05),
-
 }
 page = SolaraViz(
     model,

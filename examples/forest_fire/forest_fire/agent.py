@@ -36,7 +36,10 @@ class TreeCell(FixedAgent):
                 dy = neighbor.cell.coordinate[1] - self.cell.coordinate[1]
 
                 factor = 1.0
-                if getattr(self.model, "wind_enabled", False) and getattr(self.model, "wind_strength", 0.0) > 0:
+                if (
+                    getattr(self.model, "wind_enabled", False)
+                    and getattr(self.model, "wind_strength", 0.0) > 0
+                ):
                     factor = self.model.wind_biased_multiplier(dx, dy)
 
                 p = self.model.p_spread * factor
