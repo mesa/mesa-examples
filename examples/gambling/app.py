@@ -1,6 +1,5 @@
 from mesa.visualization import SolaraViz, make_plot_component
 from mesa.visualization.user_param import Slider
-
 from model.model import LuckVsSkillModel
 
 

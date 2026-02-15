@@ -7,10 +7,9 @@ from mesa.visualization import (
     make_plot_component,
     make_space_component,
 )
+from model import WolfSheepRL
 from ray import tune
 from ray.rllib.algorithms.algorithm import Algorithm
-
-from model import WolfSheepRL
 
 model_params = {
     "width": 20,

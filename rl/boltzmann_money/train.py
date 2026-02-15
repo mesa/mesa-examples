@@ -1,9 +1,8 @@
 import argparse
 
+from model import NUM_AGENTS, BoltzmannWealthModelRL
 from stable_baselines3 import PPO
 from stable_baselines3.common.callbacks import EvalCallback
-
-from model import NUM_AGENTS, BoltzmannWealthModelRL
 
 
 def rl_model(args):

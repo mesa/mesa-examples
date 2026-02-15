@@ -1,10 +1,9 @@
 import gymnasium as gym
 import mesa
 import numpy as np
+from agent import CitizenRL, CopRL
 from mesa.examples.advanced.epstein_civil_violence.model import EpsteinCivilViolence
 from ray.rllib.env import MultiAgentEnv
-
-from agent import CitizenRL, CopRL
 
 from .utility import create_initial_agents, grid_to_observation
 

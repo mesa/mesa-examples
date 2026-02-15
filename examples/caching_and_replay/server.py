@@ -1,7 +1,6 @@
 """This file was copied over from the original Schelling mesa example."""
 
 import mesa
-
 from model import Schelling
 
 

@@ -1,9 +1,8 @@
 import os
 
+from model import EpsteinCivilViolenceRL
 from ray.rllib.algorithms.ppo import PPOConfig
 from ray.rllib.policy.policy import PolicySpec
-
-from model import EpsteinCivilViolenceRL
 
 
 # Configuration for the PPO algorithm
