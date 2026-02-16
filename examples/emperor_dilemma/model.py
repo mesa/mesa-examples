@@ -30,7 +30,7 @@ class EmperorModel(Model):
             fraction_true_believers (float): Fraction of true believers. Defaults to 0.05.
             k (float): Enforcement cost. Defaults to 0.125.
             homophily (bool): Whether to cluster believers. Defaults to False.
-            seed (int): Random seed. Defaults to None.
+            rng (int): Random seed. Defaults to None.
         """
         super().__init__(rng=rng)
 

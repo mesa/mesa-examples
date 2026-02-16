@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Expose Model Parameters to the UI
 model_params = {
-    "seed": {
+    "rng": {
         "type": "InputText",
         "value": 42,
         "label": "Random Seed",
