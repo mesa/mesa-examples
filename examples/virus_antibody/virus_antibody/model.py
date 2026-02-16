@@ -22,7 +22,7 @@ class VirusAntibodyModel(Model):
     def __init__(
         # General parameters
         self,
-        seed=None,
+        rng=None,
         initial_antibody=20,
         initial_viruses=20,
         width=100,
@@ -51,7 +51,7 @@ class VirusAntibodyModel(Model):
 
         """
 
-        super().__init__(seed=seed)
+        super().__init__(rng=rng)
 
         # Model parameters
         self.initial_antibody = initial_antibody

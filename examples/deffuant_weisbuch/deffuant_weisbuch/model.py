@@ -15,7 +15,7 @@ class DeffuantWeisbuchModel(Model):
     opinion toward each other.
     """
 
-    def __init__(self, n=100, epsilon=0.2, mu=0.5, seed=None):
+    def __init__(self, n=100, epsilon=0.2, mu=0.5, rng=None):
         """Initialize the model.
 
         Args:
@@ -24,7 +24,7 @@ class DeffuantWeisbuchModel(Model):
             mu (float): Convergence rate controlling opinion adjustment.
             seed (int, optional): Random seed for reproducibility
         """
-        super().__init__(seed=seed)
+        super().__init__(rng=rng)
 
         self.n = n
         self.epsilon = epsilon

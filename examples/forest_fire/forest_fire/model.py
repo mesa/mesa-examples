@@ -7,14 +7,14 @@ from .agent import TreeCell
 class ForestFire(mesa.Model):
     """Simple Forest Fire model."""
 
-    def __init__(self, width=100, height=100, density=0.65, seed=None):
+    def __init__(self, width=100, height=100, density=0.65, rng=None):
         """Create a new forest fire model.
 
         Args:
             width, height: The size of the grid to model
             density: What fraction of grid cells have a tree in them.
         """
-        super().__init__(seed=seed)
+        super().__init__(rng=rng)
 
         # Set up model objects
 
