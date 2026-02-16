@@ -36,7 +36,7 @@ class VirusAntibodyModel(Model):
         """Create a new Virus/Antibody  model.
 
         Args:
-            seed: Random seed for reproducibility
+            rng: Random seed for reproducibility
             initial_antibody: Number of Antibodies in the simulation
             initial_viruses: Number of viruses in the simulation
             width: Width of the space

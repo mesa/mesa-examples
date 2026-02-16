@@ -66,7 +66,7 @@ def post_process_space(ax):
 
 
 model_params = {
-    "seed": {
+    "rng": {
         "type": "InputText",
         "value": 42,
         "label": "Random Seed",

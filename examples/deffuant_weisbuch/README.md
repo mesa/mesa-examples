@@ -24,12 +24,12 @@ Depending on parameter values, the model can exhibit:
 
 ## Parameters
 
-| Parameter | Description |
-|---------|------------|
-| `n` | Number of agents in the population |
+| Parameter     | Description |
+|---------------|------------|
+| `n`           | Number of agents in the population |
 | `epsilon (ε)` | Confidence threshold controlling whether agents interact |
-| `mu (μ)` | Convergence rate controlling how strongly opinions are updated |
-| `seed` | Random seed for reproducibility |
+| `mu (μ)`      | Convergence rate controlling how strongly opinions are updated |
+| `rng`         | Random seed for reproducibility |
 
 ---
 
