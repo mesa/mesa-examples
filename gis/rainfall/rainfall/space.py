@@ -67,7 +67,7 @@ class CraterLake(mg.GeoSpace):
 
     def add_raindrop(self, raindrop):
         x, y = raindrop.pos
-        row_ind, col_ind = raindrop.indices
+        row_ind, col_ind = raindrop.rowcol
         if self.is_at_boundary(row_ind, col_ind):
             raindrop.is_at_boundary = True
             self.outflow += 1
