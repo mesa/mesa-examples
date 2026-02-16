@@ -26,16 +26,20 @@ The visualization shows three key elements:
 The images below demonstrate the evolution of pheromone trails over time as agents develop increasingly defined pathways:
 
 ### Early Stage (Step 188)
-![Trail at step 188](activewalker_step_188.png)
+<img width="1154" height="817" alt="image" src="https://github.com/user-attachments/assets/92c3fe7d-49f8-482d-aac3-528b199912ae" />
+
 
 ### Mid Stage (Step 714)
-![Trail at step 714](activewalker_step_714.png)
+<img width="1405" height="877" alt="image" src="https://github.com/user-attachments/assets/62cb1ecc-c50c-48e1-8925-1a30e4c54333" />
+
 
 ### Later Stage (Step 1449)
-![Trail at step 1449](activewalker_step_1449.png)
+<img width="1412" height="813" alt="image" src="https://github.com/user-attachments/assets/a2cb0f11-1883-4f80-9a54-c4e080cec903" />
+
 
 ### Advanced Stage (Step 6219)
-![Trail at step 6219](activewalker_step_6219.png)
+<img width="1198" height="826" alt="image" src="https://github.com/user-attachments/assets/7b329a29-0ac7-4765-9d30-9b78873b65d0" />
+
 
 ## Installation
 
