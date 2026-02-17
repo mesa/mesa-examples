@@ -57,14 +57,14 @@ To run the model interactively with the Solara visualization, run `solara run` i
 Then open your browser to [http://localhost:8765/](http://localhost:8765/) and press Reset, then Run.
 
 You can adjust the following parameters in real-time:
-- **Number**: Population size of pedestrians 
-- **speed**: Pedestrian movement speed 
-- **min trail strength**: Minimum grass wear value 
-- **max trail strength**: Maximum grass wear value 
-- **agent print strength**: How much grass wear each pedestrian creates with each step 
-- **trail dies in**: Steps until grass recovers (wears back to original state) 
-- **vision**: Radius for sensing worn path gradients 
-- **resolution of trail grid**: Grid resolution for grass wear tracking 
+- **Number**: Population size of pedestrians
+- **speed**: Pedestrian movement speed
+- **min trail strength**: Minimum grass wear value
+- **max trail strength**: Maximum grass wear value
+- **agent print strength**: How much grass wear each pedestrian creates with each step
+- **trail dies in**: Steps until grass recovers (wears back to original state)
+- **vision**: Radius for sensing worn path gradients
+- **resolution of trail grid**: Grid resolution for grass wear tracking
 
 ## Files
 
