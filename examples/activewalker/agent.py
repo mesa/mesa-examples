@@ -1,7 +1,7 @@
 import numpy as np
 from mesa.experimental.continuous_space import ContinuousSpaceAgent
 
-class activewalker(ContinuousSpaceAgent):
+class WalkerAgent(ContinuousSpaceAgent):
     def __init__(
             self,
             model,
@@ -106,7 +106,7 @@ class activewalker(ContinuousSpaceAgent):
         self.update_grid_indices()
 
 
-class Stop_agent(ContinuousSpaceAgent):
+class StopsAgent(ContinuousSpaceAgent):
     def __init__(self, model, space, position):
         super().__init__(space, model)
         self.position = np.array(position)

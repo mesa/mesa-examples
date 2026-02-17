@@ -4,9 +4,9 @@ from mesa.space import PropertyLayer
 from scipy.signal import convolve2d
 from mesa.experimental.continuous_space import ContinuousSpace
 from mesa.agent import AgentSet
-from agent import activewalker, Stop_agent
+from agent import WalkerAgent, StopsAgent
 
-class activeModel(mesa.Model):
+class ActiveWalkerModel(mesa.Model):
     def __init__(
             self,
             stops=[(5, 5), (35, 5), (20, 35)],
@@ -44,7 +44,7 @@ class activeModel(mesa.Model):
         d, p = self.origin_destination(population_size)
         s= np.random.normal(loc=speed_mean, scale=0.1, size=population_size)
 
-        self.G_layer=stepDeposit(
+        self.G_layer=StepDeposit(
             self,
             width=width*resolution,
             height=height*resolution,
@@ -55,9 +55,9 @@ class activeModel(mesa.Model):
             vision=vision
             )
 
-        activewalker.create_agents(model=self,space=self.space, n=population_size, destination=d, speed=s, position=p)
+        WalkerAgent.create_agents(model=self,space=self.space, n=population_size, destination=d, speed=s, position=p)
 
-        Stop_agent.create_agents(model=self, space=self.space, n=len(self.stops), position=self.stops)
+        StopsAgent.create_agents(model=self, space=self.space, n=len(self.stops), position=self.stops)
 
 
     def origin_destination(self,k):
@@ -75,7 +75,7 @@ class activeModel(mesa.Model):
 
 
     def step(self):
-        zero_time=self.agents.select(lambda a: isinstance(a, activewalker) and a.step_time == 0)
+        zero_time=self.agents.select(lambda a: isinstance(a, WalkerAgent) and a.step_time == 0)
 
         if self.steps %45 ==1:
             k = min(len(self.stops) + 2, len(zero_time))
@@ -103,7 +103,7 @@ class activeModel(mesa.Model):
         self.G_layer.update()
 
 
-class stepDeposit(PropertyLayer):
+class StepDeposit(PropertyLayer):
     def __init__(
         self,
         model,

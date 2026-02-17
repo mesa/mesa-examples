@@ -5,8 +5,8 @@ import solara
 from matplotlib.figure import Figure
 from mesa.visualization.utils import update_counter
 from matplotlib.figure import Figure
-from model import activeModel
-from agent import Stop_agent
+from model import ActiveWalkerModel
+from agent import StopsAgent
 
 parameters = {
     'stops': [(5, 5), (35, 5), (20, 35)], 
@@ -26,7 +26,7 @@ parameters = {
     'rng': None
 }
 
-model = activeModel(**parameters)
+model = ActiveWalkerModel(**parameters)
 
 
 @solara.component
@@ -67,7 +67,7 @@ def Trail(model):
 
 
 def agent_portrayal(agent):
-    if isinstance(agent, Stop_agent):
+    if isinstance(agent, StopsAgent):
         return AgentPortrayalStyle(
             size=200,      
             marker="house.png",
