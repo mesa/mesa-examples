@@ -57,9 +57,4 @@ jobs:
         pip install -U "mesa-geo @ git+https://github.com/mesa/mesa-geo@main"
         pip install .[test_gis]
     - name: Test with pytest
-      run: pytest -rA -Werror -Wdefault::PendingDeprecationWarning test_gis_examples.py --cov-report=xml
-    - name: Codecov
-      uses: codecov/codecov-action@v5
-      with:
-        fail_ci_if_error: true
-        token: ${{ secrets.CODECOV_TOKEN }}
+      run: pytest -rA -Werror -Wdefault::PendingDeprecationWarning test_gis_examples.py

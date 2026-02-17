@@ -20,7 +20,6 @@ readme = "README.md"
 test = [
     "pytest",
     "scipy",
-    "pytest-cov",
 ]
 test_gis = [
     "pytest",
