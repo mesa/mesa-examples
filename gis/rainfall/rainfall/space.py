@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import gzip
 
+import mesa
 import mesa_geo as mg
 import numpy as np
 
