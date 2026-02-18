@@ -3,7 +3,6 @@ import numpy as np
 from agent import StopsAgent, WalkerAgent
 from mesa.agent import AgentSet
 from mesa.experimental.continuous_space import ContinuousSpace
-from mesa.space import PropertyLayer
 from scipy.signal import convolve2d
 
 
@@ -117,11 +116,10 @@ class ActiveModel(mesa.Model):
         self.G_layer.update()
 
 
-class StepDeposit(PropertyLayer):
+class StepDeposit:
     def __init__(
         self,
         model,
-        name="stepDeposit",
         width=1000,
         height=1000,
         default_value=0,
@@ -130,13 +128,15 @@ class StepDeposit(PropertyLayer):
         trail_dies_in=200,
         vision=20,
     ):
-        super().__init__(name, width, height, default_value)
-
         self.model = model
+        self.data = np.full((height, width), default_value)
 
         (_, xmax), (_, ymax) = self.model.space.dimensions
         self.cell_w = (xmax) / width
         self.cell_h = (ymax) / height
+
+        self.width = width
+        self.height = height
 
         self.sigma = vision
 
