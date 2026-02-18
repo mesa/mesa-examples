@@ -5,28 +5,6 @@ from mesa.discrete_space import Network
 from .agent import ForkAgent, PhilosopherAgent, State
 
 
-class NetworkGridAdapter:
-    """Compatibility adapter that provides the old NetworkGrid API."""
-
-    def __init__(self, graph, random):
-        self._space = Network(graph, random=random)
-        self._cells_by_node = {cell.coordinate: cell for cell in self._space.all_cells}
-
-    def place_agent(self, agent, node_id):
-        self._cells_by_node[node_id].add_agent(agent)
-        agent.pos = node_id
-
-    def get_neighbors(self, node_id, include_center=False):
-        cell = self._cells_by_node[node_id]
-        neighbors = list(cell.agents) if include_center else []
-        for adjacent in cell.connections.values():
-            neighbors.extend(adjacent.agents)
-        return neighbors
-
-    def get_all_cell_contents(self):
-        return list(self._space.agents)
-
-
 class DiningPhilosophersModel(mesa.Model):
     def __init__(
         self,
@@ -43,18 +21,19 @@ class DiningPhilosophersModel(mesa.Model):
         self.num_nodes = num_philosophers * 2
 
         self.G = nx.circulant_graph(self.num_nodes, [1])
-        self.grid = NetworkGridAdapter(self.G, random=self.random)
+        self.grid = Network(self.G, random=self.random)
 
         philosophers_list = []
 
         for node_id in range(self.num_nodes):
+            node_cell = self.grid[node_id]
             if node_id % 2 == 0:
-                p = PhilosopherAgent(self, node_id)
-                self.grid.place_agent(p, node_id)
+                p = PhilosopherAgent(self)
+                p.cell = node_cell
                 philosophers_list.append(p)
             else:
-                f = ForkAgent(self, node_id)
-                self.grid.place_agent(f, node_id)
+                f = ForkAgent(self)
+                f.cell = node_cell
 
         self.philosophers = mesa.agent.AgentSet(philosophers_list, random=self.random)
 

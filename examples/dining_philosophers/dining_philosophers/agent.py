@@ -1,6 +1,6 @@
 from enum import Enum, auto
 
-import mesa
+from mesa.discrete_space import FixedAgent
 
 
 class State(Enum):
@@ -9,27 +9,33 @@ class State(Enum):
     EATING = auto()
 
 
-class ForkAgent(mesa.Agent):
-    def __init__(self, model, position):
+class ForkAgent(FixedAgent):
+    def __init__(self, model):
         super().__init__(model)
-        self.position = position
         self.is_used = False
         self.owner = None
+
+    @property
+    def position(self):
+        return self.cell.coordinate
 
     def __repr__(self):
         owner = None if self.owner is None else getattr(self.owner, "position", None)
         return f"Fork-{self.position}(used={self.is_used}, owner={owner})"
 
 
-class PhilosopherAgent(mesa.Agent):
-    def __init__(self, model, position):
+class PhilosopherAgent(FixedAgent):
+    def __init__(self, model):
         super().__init__(model)
-        self.position = position
         self.state = State.THINKING
         self.total_eaten = 0
         self.ticks_since_state_change = 0
         self.total_wait_time = 0
         self.eating_count = 0
+
+    @property
+    def position(self):
+        return self.cell.coordinate
 
     def _start_eating(self):
         self.total_wait_time += self.ticks_since_state_change
@@ -59,8 +65,7 @@ class PhilosopherAgent(mesa.Agent):
             self.ticks_since_state_change = 0
 
     def put_down_forks(self):
-        neighbors = self.model.grid.get_neighbors(self.pos, include_center=False)
-        my_forks = [a for a in neighbors if isinstance(a, ForkAgent)]
+        my_forks = self._get_neighbor_forks()
 
         for fork in my_forks:
             if fork.owner == self:
@@ -78,8 +83,7 @@ class PhilosopherAgent(mesa.Agent):
             self.eat_strategy_cooperative()
 
     def eat_strategy_naive(self):
-        neighbors = self.model.grid.get_neighbors(self.pos, include_center=False)
-        my_forks = [a for a in neighbors if isinstance(a, ForkAgent)]
+        my_forks = self._get_neighbor_forks()
 
         left_pos = (self.position - 1) % self.model.num_nodes
         right_pos = (self.position + 1) % self.model.num_nodes
@@ -100,8 +104,7 @@ class PhilosopherAgent(mesa.Agent):
                 pass
 
     def eat_strategy_atomic(self):
-        neighbors = self.model.grid.get_neighbors(self.pos, include_center=False)
-        my_forks = [a for a in neighbors if isinstance(a, ForkAgent)]
+        my_forks = self._get_neighbor_forks()
 
         if all(not fork.is_used for fork in my_forks):
             for fork in my_forks:
@@ -110,8 +113,7 @@ class PhilosopherAgent(mesa.Agent):
             self._start_eating()
 
     def eat_strategy_cooperative(self):
-        neighbors = self.model.grid.get_neighbors(self.pos, include_center=False)
-        my_forks = [a for a in neighbors if isinstance(a, ForkAgent)]
+        my_forks = self._get_neighbor_forks()
 
         # If any fork is used, we can't eat anyway
         if any(fork.is_used for fork in my_forks):
@@ -151,3 +153,11 @@ class PhilosopherAgent(mesa.Agent):
 
     def __repr__(self):
         return f"Phil-{self.position}({self.state.name})"
+
+    def _get_neighbor_forks(self):
+        return [
+            agent
+            for neighbor in self.cell.neighborhood
+            for agent in neighbor.agents
+            if isinstance(agent, ForkAgent)
+        ]

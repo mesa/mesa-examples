@@ -44,8 +44,8 @@ def DiningTable(model):
         )
     )
 
-    for agent in model.grid.get_all_cell_contents():
-        node_id = agent.pos
+    for agent in model.grid.agents:
+        node_id = agent.cell.coordinate
         x, y = pos[node_id]
 
         # Map (-1, 1) to (50, 350)
