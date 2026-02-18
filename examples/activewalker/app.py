@@ -105,7 +105,8 @@ renderer = SpaceRenderer(
     model,
     backend="matplotlib",
 )
-renderer.draw_agents(agent_portrayal)
+renderer.setup_agents(agent_portrayal)
+renderer.draw_agents()
 
 page = SolaraViz(
     model,
