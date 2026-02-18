@@ -79,13 +79,13 @@ class Population(mesa.Model):
             if popu_round > 0:
                 for _ in range(popu_round):
                     num_agents += 1
-                    point = Point(self.space.population_layer.transform * cell.indices)
+                    point = Point(self.space.population_layer.transform * cell.rowcol)
                     if not point.within(self.space.lake):
                         person = Person(
                             model=self,
                             crs=self.space.crs,
                             geometry=point,
-                            img_coord=cell.indices,
+                            img_coord=cell.rowcol,
                         )
                         person.set_random_world_coord()
                         self.space.add_agents(person)

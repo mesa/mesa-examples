@@ -14,11 +14,10 @@ class LakeCell(mg.Cell):
 
     def __init__(
         self,
-        model,
-        pos: Coordinate | None = None,
-        indices: Coordinate | None = None,
+        model: mesa.Model | None = None,
+        **kwargs: dict,
     ):
-        super().__init__(model, pos, indices)
+        super().__init__(model, **kwargs)
         self.elevation = None
         self.water_level = None
         self.water_level_normalized = None
@@ -68,7 +67,7 @@ class CraterLake(mg.GeoSpace):
 
     def add_raindrop(self, raindrop):
         x, y = raindrop.pos
-        row_ind, col_ind = raindrop.indices
+        row_ind, col_ind = raindrop.rowcol
         if self.is_at_boundary(row_ind, col_ind):
             raindrop.is_at_boundary = True
             self.outflow += 1
