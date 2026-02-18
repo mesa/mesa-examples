@@ -1,6 +1,8 @@
 import mesa
 from mesa.discrete_space import HexGrid
 
+from .agent import Ant
+
 
 class AntForaging(mesa.Model):
     """
@@ -79,8 +81,6 @@ class AntForaging(mesa.Model):
         """Spawn our ants at the nest."""
         center = (self.grid.width // 2, self.grid.height // 2)
         center_cell = self.grid[center]
-
-        from .agent import Ant
 
         for _ in range(num_ants):
             ant = Ant(self)

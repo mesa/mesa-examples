@@ -31,5 +31,5 @@ def get_models(directory):
 def test_model_steps(model_class):
     model = model_class()  # Assume no arguments are needed
     for _ in range(10):
-        model.step()
+        model.run_for(1)
     assert model.time == 10.0

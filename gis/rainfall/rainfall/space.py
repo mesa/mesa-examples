@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import gzip
 
-import mesa
 import mesa_geo as mg
 import numpy as np
+from mesa.discrete_space.cell import Coordinate
 
 
 class LakeCell(mg.Cell):
@@ -15,8 +15,8 @@ class LakeCell(mg.Cell):
     def __init__(
         self,
         model,
-        pos: mesa.space.Coordinate | None = None,
-        indices: mesa.space.Coordinate | None = None,
+        pos: Coordinate | None = None,
+        indices: Coordinate | None = None,
     ):
         super().__init__(model, pos, indices)
         self.elevation = None

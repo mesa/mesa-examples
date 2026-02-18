@@ -3,7 +3,7 @@ from __future__ import annotations
 import gzip
 
 import geopandas as gpd
-import mesa
+from mesa.discrete_space.cell import Coordinate
 from mesa_geo.geoagent import GeoAgent
 from mesa_geo.geospace import GeoSpace
 from mesa_geo.raster_layers import Cell, RasterLayer
@@ -15,8 +15,8 @@ class UgandaCell(Cell):
     def __init__(
         self,
         model,
-        pos: mesa.space.Coordinate | None = None,
-        indices: mesa.space.Coordinate | None = None,
+        pos: Coordinate | None = None,
+        indices: Coordinate | None = None,
     ):
         super().__init__(model, pos, indices)
         self.population = None

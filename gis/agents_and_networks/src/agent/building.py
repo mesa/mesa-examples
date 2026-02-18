@@ -8,16 +8,18 @@ import mesa_geo as mg
 import pyproj
 from shapely.geometry import Polygon
 
+FloatCoordinate = tuple[float, float]
+
 
 class Building(mg.GeoAgent):
     unique_id: int  # an ID that represents the building
     model: mesa.Model
     geometry: Polygon
     crs: pyproj.CRS
-    centroid: mesa.space.FloatCoordinate
+    centroid: FloatCoordinate
     name: str
     function: float  # 1.0 for work, 2.0 for home, 0.0 for neither
-    entrance_pos: mesa.space.FloatCoordinate  # nearest vertex on road
+    entrance_pos: FloatCoordinate  # nearest vertex on road
 
     def __init__(self, model, geometry, crs) -> None:
         super().__init__(model=model, geometry=geometry, crs=crs)

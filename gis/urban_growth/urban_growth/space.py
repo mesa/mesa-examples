@@ -7,6 +7,7 @@ import mesa
 import mesa_geo as mg
 import numpy as np
 import rasterio as rio
+from mesa.discrete_space.cell import Coordinate
 
 
 class UrbanCell(mg.Cell):
@@ -28,8 +29,8 @@ class UrbanCell(mg.Cell):
     def __init__(
         self,
         model: mesa.Model | None = None,
-        pos: mesa.space.Coordinate | None = None,
-        indices: mesa.space.Coordinate | None = None,
+        pos: Coordinate | None = None,
+        indices: Coordinate | None = None,
     ):
         super().__init__(model, pos, indices)
         self.urban = None

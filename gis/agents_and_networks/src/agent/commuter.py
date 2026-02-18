@@ -11,6 +11,8 @@ from shapely.geometry import LineString, Point
 from ..space.utils import UnitTransformer, redistribute_vertices
 from .building import Building
 
+FloatCoordinate = tuple[float, float]
+
 
 class Commuter(mg.GeoAgent):
     unique_id: int  # commuter_id, used to link commuters and nodes
@@ -20,7 +22,7 @@ class Commuter(mg.GeoAgent):
     origin: Building  # where he begins his trip
     destination: Building  # the destination he wants to arrive at
     my_path: list[
-        mesa.space.FloatCoordinate
+        FloatCoordinate
     ]  # a set containing nodes to visit in the shortest path
     step_in_path: int  # the number of step taking in the walk
     my_home: Building
