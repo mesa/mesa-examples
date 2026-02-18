@@ -5,6 +5,7 @@ from mesa.visualization import (
     make_plot_component,
     make_space_component,
 )
+from mesa.visualization.components import AgentPortrayalStyle
 from mesa.visualization.user_param import (
     Slider,
 )
@@ -22,15 +23,8 @@ def person_portrayal(agent):
     if agent is None:
         return
 
-    portrayal = {}
-
     # update portrayal characteristics for each Person object
     if isinstance(agent, Person):
-        portrayal["Shape"] = "circle"
-        portrayal["r"] = 0.5
-        portrayal["Layer"] = 0
-        portrayal["Filled"] = "true"
-
         color = MID_COLOR
 
         # set agent color based on savings and loans
@@ -41,9 +35,12 @@ def person_portrayal(agent):
         if agent.loans > 10:
             color = POOR_COLOR
 
-        portrayal["color"] = color
-
-    return portrayal
+        return AgentPortrayalStyle(
+            marker="o",
+            size=50,
+            zorder=0,
+            color=color,
+        )
 
 
 def post_process_space(ax):
@@ -90,7 +87,7 @@ lineplot_component = make_plot_component(
     {"Rich": RICH_COLOR, "Poor": POOR_COLOR, "Middle Class": MID_COLOR},
     post_process=post_process_lines,
 )
-model = BankReservesModel()
+model = BankReservesModel(init_people=25, rich_threshold=10, reserve_percent=50)
 
 page = SolaraViz(
     model,
