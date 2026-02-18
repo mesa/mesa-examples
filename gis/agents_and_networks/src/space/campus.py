@@ -55,9 +55,7 @@ class Campus(mg.GeoSpace):
         self.works = self.works + tuple(works)
         self.homes = self.homes + tuple(homes)
 
-    def get_commuters_by_pos(
-        self, float_pos: FloatCoordinate
-    ) -> set[Commuter]:
+    def get_commuters_by_pos(self, float_pos: FloatCoordinate) -> set[Commuter]:
         return self._commuters_pos_map[float_pos]
 
     def get_commuter_by_id(self, commuter_id: int) -> Commuter:
@@ -77,9 +75,7 @@ class Campus(mg.GeoSpace):
             self.home_counter[old_home_pos] -= 1
         self.home_counter[new_home_pos] += 1
 
-    def move_commuter(
-        self, commuter: Commuter, pos: FloatCoordinate
-    ) -> None:
+    def move_commuter(self, commuter: Commuter, pos: FloatCoordinate) -> None:
         self.__remove_commuter(commuter)
         commuter.geometry = Point(pos)
         self.add_commuter(commuter)

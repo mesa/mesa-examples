@@ -41,9 +41,7 @@ class RoadNetwork:
     def crs(self, crs) -> None:
         self._crs = crs
 
-    def get_nearest_node(
-        self, float_pos: FloatCoordinate
-    ) -> FloatCoordinate:
+    def get_nearest_node(self, float_pos: FloatCoordinate) -> FloatCoordinate:
         node_index = self._kd_tree.query([float_pos], k=1, return_distance=False)
         node_pos = self._kd_tree.get_arrays()[0][node_index[0, 0]]
         return tuple(node_pos)

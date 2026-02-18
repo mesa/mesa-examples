@@ -10,9 +10,7 @@ class NetworkGridAdapter:
 
     def __init__(self, graph, random):
         self._space = Network(graph, random=random)
-        self._cells_by_node = {
-            cell.coordinate: cell for cell in self._space.all_cells
-        }
+        self._cells_by_node = {cell.coordinate: cell for cell in self._space.all_cells}
 
     def place_agent(self, agent, node_id):
         self._cells_by_node[node_id].add_agent(agent)
