@@ -7,7 +7,6 @@ import mesa
 import mesa_geo as mg
 import numpy as np
 import rasterio as rio
-from mesa.discrete_space.cell import Coordinate
 
 
 class UrbanCell(mg.Cell):

@@ -4,7 +4,6 @@ import gzip
 
 import mesa_geo as mg
 import numpy as np
-from mesa.discrete_space.cell import Coordinate
 
 
 class LakeCell(mg.Cell):
