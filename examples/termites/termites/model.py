@@ -1,5 +1,5 @@
 from mesa import Model
-from mesa.discrete_space import OrthogonalMooreGrid, PropertyLayer
+from mesa.discrete_space import OrthogonalMooreGrid
 
 from .agents import Termite
 
@@ -25,18 +25,13 @@ class TermiteModel(Model):
 
         self.grid = OrthogonalMooreGrid((width, height), torus=True, random=self.random)
 
-        self.wood_chips_layer = PropertyLayer(
-            "woodcell", (width, height), default_value=False, dtype=bool
-        )
-
-        # Randomly distribute wood chips, by directly modifying the layer's underlying ndarray
-        self.wood_chips_layer.data = self.rng.choice(
+        wood_chips = self.rng.choice(
             [True, False],
             size=(width, height),
             p=[self.wood_chip_density, 1 - self.wood_chip_density],
         )
-
-        self.grid.add_property_layer(self.wood_chips_layer)
+        
+        self.grid.add_property("woodcell", wood_chips)
 
         # Create agents and randomly distribute them over the grid
         Termite.create_agents(
