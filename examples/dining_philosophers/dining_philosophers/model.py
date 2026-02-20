@@ -23,40 +23,50 @@ class DiningPhilosophersModel(mesa.Model):
         self.G = nx.circulant_graph(self.num_nodes, [1])
         self.grid = Network(self.G, random=self.random)
 
-        philosophers_list = []
-
         for node_id in range(self.num_nodes):
             node_cell = self.grid[node_id]
             if node_id % 2 == 0:
                 p = PhilosopherAgent(self)
                 p.cell = node_cell
-                philosophers_list.append(p)
             else:
                 f = ForkAgent(self)
                 f.cell = node_cell
 
-        self.philosophers = mesa.agent.AgentSet(philosophers_list, random=self.random)
-
         model_reporters = {
             "Eating": lambda m: len(
-                [p for p in m.philosophers if p.state == State.EATING]
+                [
+                    p
+                    for p in m.agents_by_type[PhilosopherAgent]
+                    if p.state == State.EATING
+                ]
             ),
             "Hungry": lambda m: len(
-                [p for p in m.philosophers if p.state == State.HUNGRY]
+                [
+                    p
+                    for p in m.agents_by_type[PhilosopherAgent]
+                    if p.state == State.HUNGRY
+                ]
             ),
             "Thinking": lambda m: len(
-                [p for p in m.philosophers if p.state == State.THINKING]
+                [
+                    p
+                    for p in m.agents_by_type[PhilosopherAgent]
+                    if p.state == State.THINKING
+                ]
             ),
             "Avg Wait Time": lambda m: (
                 (
-                    sum(p.total_wait_time for p in m.philosophers)
-                    / sum(p.eating_count for p in m.philosophers)
+                    sum(p.total_wait_time for p in m.agents_by_type[PhilosopherAgent])
+                    / sum(p.eating_count for p in m.agents_by_type[PhilosopherAgent])
                 )
-                if sum(p.eating_count for p in m.philosophers) > 0
+                if sum(p.eating_count for p in m.agents_by_type[PhilosopherAgent]) > 0
                 else 0
             ),
             "Throughput": lambda m: (
-                (sum(p.total_eaten for p in m.philosophers) / m.time)
+                (
+                    sum(p.total_eaten for p in m.agents_by_type[PhilosopherAgent])
+                    / m.time
+                )
                 if m.time > 0
                 else 0
             ),
@@ -70,11 +80,18 @@ class DiningPhilosophersModel(mesa.Model):
 
             # Use default argument in lambda to capture the current value of p_id
             model_reporters[f"P{i}"] = lambda m, pid=p_id: (
-                next((p.total_eaten for p in m.philosophers if p.position == pid), 0)
+                next(
+                    (
+                        p.total_eaten
+                        for p in m.agents_by_type[PhilosopherAgent]
+                        if p.position == pid
+                    ),
+                    0,
+                )
             )
 
         self.datacollector = mesa.DataCollector(model_reporters=model_reporters)
 
     def step(self):
-        self.philosophers.shuffle_do("step")
+        self.agents_by_type[PhilosopherAgent].shuffle_do("step")
         self.datacollector.collect(self)

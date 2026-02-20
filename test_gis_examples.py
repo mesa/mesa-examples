@@ -4,8 +4,6 @@ import os
 import pytest
 from mesa import Model
 
-pytest.importorskip("mesa_geo")
-
 
 def get_models(directory):
     models = []
@@ -32,5 +30,4 @@ def get_models(directory):
 @pytest.mark.parametrize("model_class", get_models("gis"))
 def test_model_steps(model_class):
     model = model_class()  # Assume no arguments are needed
-    for _ in range(10):
-        model.run_for(1)
+    model.run_for(10)

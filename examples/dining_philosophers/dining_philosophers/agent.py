@@ -125,7 +125,7 @@ class PhilosopherAgent(FixedAgent):
 
         neighbors_p = [
             p
-            for p in self.model.philosophers
+            for p in self.model.agents_by_type[PhilosopherAgent]
             if p.position in (left_p_pos, right_p_pos)
         ]
 
@@ -157,7 +157,6 @@ class PhilosopherAgent(FixedAgent):
     def _get_neighbor_forks(self):
         return [
             agent
-            for neighbor in self.cell.neighborhood
-            for agent in neighbor.agents
+            for agent in self.cell.neighborhood.agents
             if isinstance(agent, ForkAgent)
         ]
