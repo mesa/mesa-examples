@@ -105,8 +105,9 @@ class BankReservesModel(mesa.Model):
         init_people=2,
         rich_threshold=10,
         reserve_percent=50,
+        rng=None,
     ):
-        super().__init__()
+        super().__init__(rng=rng)
         self.height = height
         self.width = width
         self.init_people = init_people
