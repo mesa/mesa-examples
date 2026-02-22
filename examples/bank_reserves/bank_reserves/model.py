@@ -9,6 +9,8 @@ Author of NetLogo code:
     Northwestern University, Evanston, IL.
 """
 
+import threading
+
 import mesa
 import numpy as np
 from mesa.discrete_space import OrthogonalMooreGrid
@@ -21,6 +23,28 @@ For details see batch_run.py in the same directory as run.py.
 """
 
 # Start of datacollector functions
+
+
+class ThreadSafeDataCollector(mesa.DataCollector):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.lock = threading.Lock()
+
+    def collect(self, model):
+        with self.lock:
+            super().collect(model)
+
+    def get_model_vars_dataframe(self):
+        with self.lock:
+            return super().get_model_vars_dataframe()
+
+    def get_agent_vars_dataframe(self):
+        with self.lock:
+            return super().get_agent_vars_dataframe()
+
+    def get_table_dataframe(self, table_name):
+        with self.lock:
+            return super().get_table_dataframe(table_name)
 
 
 def get_num_rich_agents(model):
@@ -105,8 +129,11 @@ class BankReservesModel(mesa.Model):
         init_people=2,
         rich_threshold=10,
         reserve_percent=50,
+        seed=None,
+        rng=None,
+        **kwargs,
     ):
-        super().__init__()
+        super().__init__(seed=seed, rng=rng)
         self.height = height
         self.width = width
         self.init_people = init_people
@@ -118,7 +145,7 @@ class BankReservesModel(mesa.Model):
         self.rich_threshold = rich_threshold
         self.reserve_percent = reserve_percent
         # see datacollector functions above
-        self.datacollector = mesa.DataCollector(
+        self.datacollector = ThreadSafeDataCollector(
             model_reporters={
                 "Rich": get_num_rich_agents,
                 "Poor": get_num_poor_agents,
