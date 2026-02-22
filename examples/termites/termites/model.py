@@ -31,7 +31,7 @@ class TermiteModel(Model):
             p=[self.wood_chip_density, 1 - self.wood_chip_density],
         )
 
-        self.grid.add_property("woodcell", wood_chips)
+        self.grid.add_property_layer("woodcell", wood_chips)
 
         # Create agents and randomly distribute them over the grid
         Termite.create_agents(
