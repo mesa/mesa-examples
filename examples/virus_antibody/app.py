@@ -1,7 +1,6 @@
 import weakref
 
 from matplotlib.markers import MarkerStyle
-from mesa.experimental.devs import ABMSimulator
 from mesa.visualization import (
     Slider,
     SolaraViz,
@@ -56,7 +55,6 @@ def agent_portrayal(agent):
 
 
 # Setup model parameters for the visualization interface
-simulator = ABMSimulator()
 model = VirusAntibodyModel()
 
 model_params = {
