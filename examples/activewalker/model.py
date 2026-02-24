@@ -90,7 +90,7 @@ class ActiveModel(mesa.Model):
             lambda a: isinstance(a, WalkerAgent) and a.step_time == 0
         )
 
-        if self.steps % 45 == 1:
+        if self.time % 45 == 1:
             k = min(len(self.stops) + 2, len(zero_time))
             add_ag = self.random.choices(zero_time.to_list(), k=k)
             for add_a in add_ag:

@@ -38,7 +38,7 @@ def TrailHeatmap(model):
 
         fig.colorbar(im, ax=ax, label="Pheromone Intensity")
 
-        ax.set_title(f"Trail Intensity (Step {model.steps})")
+        ax.set_title(f"Trail Intensity (Step {model.time})")
         ax.set_xlabel("X Coordinate")
         ax.set_ylabel("Y Coordinate")
 
@@ -59,7 +59,7 @@ def Trail(model):
 
         fig.colorbar(im, ax=ax, label="Pheromone Intensity")
 
-        ax.set_title(f"Trail (Step {model.steps})")
+        ax.set_title(f"Trail (Step {model.time})")
         ax.set_xlabel("X Coordinate")
         ax.set_ylabel("Y Coordinate")
 
