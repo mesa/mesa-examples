@@ -1,4 +1,6 @@
-"""This file was copied over from the original Schelling mesa example."""
+"""Schelling segregation model."""
+
+from contextlib import suppress
 
 import mesa
 from mesa.discrete_space import CellAgent, OrthogonalMooreGrid
@@ -25,7 +27,9 @@ class SchellingAgent(CellAgent):
 
         # If unhappy, move:
         if similar < self.model.homophily:
-            self.cell = self.model.grid.select_random_empty_cell()
+            with suppress(IndexError):
+                # Try to move; if no empty cells, agent stays in place
+                self.cell = self.model.grid.select_random_empty_cell()
         else:
             self.model.happy += 1
 
@@ -69,9 +73,7 @@ class Schelling(mesa.Model):
         )
 
         # Set up agents
-        # We use a grid iterator that returns
-        # the coordinates of a cell as well as
-        # its contents. (coord_iter)
+        # We use a grid iterator that returns the coordinates of a cell as well as its contents. (coord_iter)
         for cell in self.grid.all_cells:
             if self.random.random() < self.density:
                 agent_type = 1 if self.random.random() < self.minority_pc else 0
