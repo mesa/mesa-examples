@@ -6,7 +6,6 @@ from mesa.visualization import (
     make_plot_component,
 )
 from mesa.visualization.components.portrayal_components import AgentPortrayalStyle
-
 from model import EmperorModel
 
 # Colors matching Figure 2
