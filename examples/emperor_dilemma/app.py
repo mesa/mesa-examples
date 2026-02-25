@@ -7,7 +7,7 @@ from mesa.visualization import (
 )
 from mesa.visualization.components.portrayal_components import AgentPortrayalStyle
 
-from .model import EmperorModel
+from model import EmperorModel
 
 # Colors matching Figure 2
 COLOR_COMPLY_QUIET = "#F0F8FF"  # AliceBlue
@@ -83,17 +83,19 @@ model_params = {
     "height": 25,
 }
 
-model = EmperorModel()
+emperor_model = EmperorModel()
 
 renderer = SpaceRenderer(
-    model,
+    model=emperor_model,
     backend="matplotlib",
-).setup_agents(emperor_portrayal)
+).render(
+    agent_portrayal=emperor_portrayal
+)
 renderer.post_process = post_process_space
-renderer.draw_agents()
+
 
 page = SolaraViz(
-    model,
+    emperor_model,
     renderer,
     components=[lineplot_component, CommandConsole],
     model_params=model_params,
