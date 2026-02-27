@@ -6,10 +6,13 @@ and run_until — no step() needed.
 
 from collections import deque
 
-from agents import Customer, Server
-from analytical_mmc import analytical_mmc
 from mesa import Model
 from mesa.time import Schedule
+
+try:
+    from .agents import Customer, Server
+except ImportError:
+    from agents import Customer, Server
 
 
 class MMcQueue(Model):
@@ -94,6 +97,11 @@ class MMcQueue(Model):
 
 
 if __name__ == "__main__":
+    try:
+        from .analytical_mmc import analytical_mmc
+    except ImportError:
+        from analytical_mmc import analytical_mmc
+
     ARRIVAL_RATE = 2.0
     SERVICE_RATE = 1.0
     N_SERVERS = 3
