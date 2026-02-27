@@ -47,7 +47,7 @@ def WealthVsConfidenceScatter(model):
 
     if wealths:
         avg_w = sum(wealths) / len(wealths)
-        sc = ax.scatter(confidences, wealths, alpha=0.6, c=wealths, cmap="RdYlGn")
+        ax.scatter(confidences, wealths, alpha=0.6, c=wealths, cmap="RdYlGn")
 
         w_min, w_max = min(wealths), max(wealths)
         padding = (w_max - w_min) * 0.2 if w_max > w_min else 10

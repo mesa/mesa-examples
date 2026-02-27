@@ -3,7 +3,7 @@ from mesa import Agent
 
 class InvestorAgent(Agent):
     """
-    While Banerjee’s Herding Effect highlights how investors blindly follow the crowd, Barber & Odean’s Overconfidence
+    While Banerjee's Herding Effect highlights how investors blindly follow the crowd, Barber & Odean's Overconfidence
     Theory explains their stubborn reliance on flawed personal judgment; together, they amplify irrational market
     volatility and pricing inefficiencies.
     """
@@ -13,7 +13,7 @@ class InvestorAgent(Agent):
         self.opinion = opinion
         self.confidence = confidence
         """
-        The core of the Barber & Odean theory lies in the critical distinction between gross returns
+        The core of the Barber and Odean theory lies in the critical distinction between gross returns
         and net returns, demonstrating how overconfident investors' excessive trading costs erode potential gains.
         """
         self.gross_wealth = (

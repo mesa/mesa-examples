@@ -19,16 +19,14 @@ class TradingDWModel(Model):
         self.datacollector = DataCollector(
             model_reporters={
                 "Variance": self.compute_variance,
-                "Avg Gross Wealth": lambda m: statistics.mean(
-                    [a.gross_wealth for a in m.agents]
-                )
-                if m.agents
-                else 0,
-                "Avg Net Wealth": lambda m: statistics.mean(
-                    [a.net_wealth for a in m.agents]
-                )
-                if m.agents
-                else 0,
+                "Avg Gross Wealth": lambda m: (
+                    statistics.mean([a.gross_wealth for a in m.agents])
+                    if m.agents
+                    else 0
+                ),
+                "Avg Net Wealth": lambda m: (
+                    statistics.mean([a.net_wealth for a in m.agents]) if m.agents else 0
+                ),
             },
             agent_reporters={
                 "opinion": "opinion",
