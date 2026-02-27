@@ -1,6 +1,8 @@
 import statistics
+
 from mesa import Model
 from mesa.datacollection import DataCollector
+
 from .agents import InvestorAgent
 
 
@@ -17,16 +19,23 @@ class TradingDWModel(Model):
         self.datacollector = DataCollector(
             model_reporters={
                 "Variance": self.compute_variance,
-
-                "Avg Gross Wealth": lambda m: statistics.mean([a.gross_wealth for a in m.agents]) if m.agents else 0,
-                "Avg Net Wealth": lambda m: statistics.mean([a.net_wealth for a in m.agents]) if m.agents else 0,
+                "Avg Gross Wealth": lambda m: statistics.mean(
+                    [a.gross_wealth for a in m.agents]
+                )
+                if m.agents
+                else 0,
+                "Avg Net Wealth": lambda m: statistics.mean(
+                    [a.net_wealth for a in m.agents]
+                )
+                if m.agents
+                else 0,
             },
             agent_reporters={
                 "opinion": "opinion",
                 "net_wealth": "net_wealth",
                 "confidence": "confidence",
-                "trades": "trades"
-            }
+                "trades": "trades",
+            },
         )
 
         for _ in range(self.n):
@@ -43,8 +52,8 @@ class TradingDWModel(Model):
         # Simulating Natural Market Volatility Returns (Random Walk with Positive Drift
         market_return = self.random.normalvariate(0.001, 0.01)
         for agent in agent_list:
-            agent.gross_wealth *= (1 + market_return)
-            agent.net_wealth *= (1 + market_return)
+            agent.gross_wealth *= 1 + market_return
+            agent.net_wealth *= 1 + market_return
 
         for _ in range(self.n):
             agent_a, agent_b = self.random.sample(agent_list, 2)

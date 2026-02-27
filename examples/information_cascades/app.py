@@ -1,14 +1,14 @@
-import solara
 import matplotlib.pyplot as plt
+import solara
 import solara.lab
-from mesa.visualization import SolaraViz, make_plot_component
 from information_cascades.model import TradingDWModel
-
+from mesa.visualization import SolaraViz, make_plot_component
 
 
 def TradingPerformanceStats(model):
     agents = list(model.agents)
-    if not agents: return solara.Text("initializing...")
+    if not agents:
+        return solara.Text("initializing...")
 
     avg_gross = sum(a.gross_wealth for a in agents) / len(agents)
     avg_net = sum(a.net_wealth for a in agents) / len(agents)
@@ -23,7 +23,6 @@ def TradingPerformanceStats(model):
     avg_net_low = sum(a.net_wealth for a in low_traders) / len(low_traders)
     avg_net_high = sum(a.net_wealth for a in high_traders) / len(high_traders)
 
-
     return solara.Card(
         title="Barber & Odean (2000) Validation",
         children=[
@@ -31,10 +30,12 @@ def TradingPerformanceStats(model):
             solara.Markdown(f"**Market Avg (Net)**: {avg_net:.2f}"),
             solara.Markdown("---"),
             solara.Markdown(
-                f"**Low Turnover Top 20% Net Wealth**: <span style='color:green; font-weight:bold;'>{avg_net_low:.2f}</span>"),
+                f"**Low Turnover Top 20% Net Wealth**: <span style='color:green; font-weight:bold;'>{avg_net_low:.2f}</span>"
+            ),
             solara.Markdown(
-                f"**High Turnover Top 20% Net Wealth**: <span style='color:red; font-weight:bold;'>{avg_net_high:.2f}</span>"),
-        ]
+                f"**High Turnover Top 20% Net Wealth**: <span style='color:red; font-weight:bold;'>{avg_net_high:.2f}</span>"
+            ),
+        ],
     )
 
 
@@ -52,8 +53,15 @@ def WealthVsConfidenceScatter(model):
         padding = (w_max - w_min) * 0.2 if w_max > w_min else 10
         ax.set_ylim(w_min - padding, w_max + padding)
 
-        ax.axhline(avg_w, color='blue', linestyle='--', alpha=0.5)
-        ax.fill_between([1, 5], w_min - padding, avg_w, color='red', alpha=0.1, label='Underperforming')
+        ax.axhline(avg_w, color="blue", linestyle="--", alpha=0.5)
+        ax.fill_between(
+            [1, 5],
+            w_min - padding,
+            avg_w,
+            color="red",
+            alpha=0.1,
+            label="Underperforming",
+        )
 
         ax.set_xlabel("Confidence Level")
         ax.set_ylabel("Net Wealth")
@@ -83,7 +91,7 @@ model_params = {
         "label": "Number of Investors",
         "min": 20,
         "max": 300,
-        "step": 1
+        "step": 1,
     },
     "epsilon": {
         "type": "SliderFloat",
@@ -91,7 +99,7 @@ model_params = {
         "label": "Confidence Threshold (ε)",
         "min": 0.01,
         "max": 1.0,
-        "step": 0.01
+        "step": 0.01,
     },
     "mu": {
         "type": "SliderFloat",
@@ -99,7 +107,7 @@ model_params = {
         "label": "Convergence Rate (μ)",
         "min": 0.01,
         "max": 0.5,
-        "step": 0.01
+        "step": 0.01,
     },
     "transaction_cost": {
         "type": "SliderFloat",
@@ -107,7 +115,7 @@ model_params = {
         "label": "Transaction Cost",
         "min": 0,
         "max": 10,
-        "step": 0.5
+        "step": 0.5,
     },
 }
 
@@ -122,5 +130,5 @@ page = SolaraViz(
         WealthVsConfidenceScatter,
         make_plot_component("Variance"),
         make_plot_component(["Avg Gross Wealth", "Avg Net Wealth"]),
-    ]
+    ],
 )

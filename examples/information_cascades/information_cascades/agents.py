@@ -1,21 +1,25 @@
 from mesa import Agent
 
+
 class InvestorAgent(Agent):
     """
     While Banerjee’s Herding Effect highlights how investors blindly follow the crowd, Barber & Odean’s Overconfidence
     Theory explains their stubborn reliance on flawed personal judgment; together, they amplify irrational market
     volatility and pricing inefficiencies.
     """
+
     def __init__(self, model, opinion, confidence):
         super().__init__(model)
         self.opinion = opinion
         self.confidence = confidence
         """
-        The core of the Barber & Odean theory lies in the critical distinction between gross returns 
+        The core of the Barber & Odean theory lies in the critical distinction between gross returns
         and net returns, demonstrating how overconfident investors' excessive trading costs erode potential gains.
         """
-        self.gross_wealth = 1000.0  # Theoretical Market Wealth Under a Buy-and-Hold Strategy (Gross)
-        self.net_wealth = 1000.0    # Actual Wealth After Deducting Frequent Trading Commissions and Fees (Net)
+        self.gross_wealth = (
+            1000.0  # Theoretical Market Wealth Under a Buy-and-Hold Strategy (Gross)
+        )
+        self.net_wealth = 1000.0  # Actual Wealth After Deducting Frequent Trading Commissions and Fees (Net)
         self.trades = 0
 
     def update_opinion(self, other_opinion, mu):
