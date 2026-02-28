@@ -1,9 +1,9 @@
 # Hierarchical Organization Model
 
-Category: Organizational Modeling  
-Focus: Meta-Agent Hierarchies & Activation Semantics  
-Mesa Version: >=3.0  
-Visualization: SolaraViz  
+Category: Organizational Modeling
+Focus: Meta-Agent Hierarchies & Activation Semantics
+Mesa Version: >=3.0
+Visualization: SolaraViz
 
 ## Overview
 

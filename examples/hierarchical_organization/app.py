@@ -30,9 +30,7 @@ def model_params():
 
 model = HierarchicalOrganizationModel()
 
-main_plot = make_plot_component(
-    ["Total Output", "Avg Department Performance"]
-)
+main_plot = make_plot_component(["Total Output", "Avg Department Performance"])
 
 shock_plot = make_plot_component(["Shock Event"])
 

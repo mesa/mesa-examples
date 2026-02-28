@@ -1,7 +1,8 @@
+import random
+
+from agents import DepartmentAgent, EmployeeAgent, OrganizationAgent
 from mesa import Model
 from mesa.datacollection import DataCollector
-import random
-from agents import EmployeeAgent, DepartmentAgent, OrganizationAgent
 
 
 class HierarchicalOrganizationModel(Model):
