@@ -1,5 +1,6 @@
 from mesa.discrete_space import FixedAgent
 
+
 class EmperorAgent(FixedAgent):
     """An agent in the Emperor's Dilemma model.
 
