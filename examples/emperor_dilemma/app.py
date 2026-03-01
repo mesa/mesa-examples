@@ -87,9 +87,7 @@ emperor_model = EmperorModel()
 renderer = SpaceRenderer(
     model=emperor_model,
     backend="matplotlib",
-).render(
-    agent_portrayal=emperor_portrayal
-)
+).render(agent_portrayal=emperor_portrayal)
 renderer.post_process = post_process_space
 
 
