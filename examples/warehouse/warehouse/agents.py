@@ -132,14 +132,17 @@ class WorkerAgent(mesa.Agent):
 
         if status == "movement complete" and self.meta_agent.status == "inventory":
             # Pick up item and bring to loading dock
+            source_coordinate = self.meta_agent.cell.coordinate
+            target_level = self.item.cell.coordinate[2]
             self.meta_agent.cell = self.model.warehouse[
-                *self.meta_agent.cell.coordinate[:2], self.item.cell.coordinate[2]
+                (source_coordinate[0], source_coordinate[1], target_level)
             ]
             self.meta_agent.status = "loading"
             self.carrying = self.item.item
             self.item.quantity -= 1
+            loading_coordinate = self.meta_agent.cell.coordinate
             self.meta_agent.cell = self.model.warehouse[
-                *self.meta_agent.cell.coordinate[:2], 0
+                (loading_coordinate[0], loading_coordinate[1], 0)
             ]
             self.path = self.find_path(self.cell, self.loading_dock)
 

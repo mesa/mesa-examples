@@ -22,7 +22,7 @@ class VirusAntibodyModel(Model):
     def __init__(
         # General parameters
         self,
-        seed=None,
+        rng=None,
         initial_antibody=20,
         initial_viruses=20,
         width=100,
@@ -36,7 +36,7 @@ class VirusAntibodyModel(Model):
         """Create a new Virus/Antibody  model.
 
         Args:
-            seed: Random seed for reproducibility
+            rng: Random seed for reproducibility
             initial_antibody: Number of Antibodies in the simulation
             initial_viruses: Number of viruses in the simulation
             width: Width of the space
@@ -51,7 +51,7 @@ class VirusAntibodyModel(Model):
 
         """
 
-        super().__init__(seed=seed)
+        super().__init__(rng=rng)
 
         # Model parameters
         self.initial_antibody = initial_antibody

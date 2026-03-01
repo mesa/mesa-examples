@@ -18,7 +18,7 @@ def agent_portrayal(agent):
 
 
 model_params = {
-    "seed": {
+    "rng": {
         "type": "InputText",
         "value": 42,
         "label": "Random seed",
@@ -49,7 +49,7 @@ def post_process(ax):
 
 
 # Create initial model instance
-money_model = BoltzmannWealthModelNetwork(n=7, num_nodes=10, seed=42)
+money_model = BoltzmannWealthModelNetwork(n=7, num_nodes=10, rng=42)
 
 # Create visualization elements. The visualization elements are Solara
 # components that receive the model instance as a "prop" and display it in a

@@ -3,13 +3,14 @@ from __future__ import annotations
 import pickle
 
 import geopandas as gpd
-import mesa
 import momepy
 import networkx as nx
 import pyproj
 from sklearn.neighbors import KDTree
 
 from .utils import segmented
+
+FloatCoordinate = tuple[float, float]
 
 
 class RoadNetwork:
@@ -40,16 +41,14 @@ class RoadNetwork:
     def crs(self, crs) -> None:
         self._crs = crs
 
-    def get_nearest_node(
-        self, float_pos: mesa.space.FloatCoordinate
-    ) -> mesa.space.FloatCoordinate:
+    def get_nearest_node(self, float_pos: FloatCoordinate) -> FloatCoordinate:
         node_index = self._kd_tree.query([float_pos], k=1, return_distance=False)
         node_pos = self._kd_tree.get_arrays()[0][node_index[0, 0]]
         return tuple(node_pos)
 
     def get_shortest_path(
-        self, source: mesa.space.FloatCoordinate, target: mesa.space.FloatCoordinate
-    ) -> list[mesa.space.FloatCoordinate]:
+        self, source: FloatCoordinate, target: FloatCoordinate
+    ) -> list[FloatCoordinate]:
         from_node_pos = self.get_nearest_node(source)
         to_node_pos = self.get_nearest_node(target)
         # return nx.shortest_path(self.nx_graph, from_node_pos,
@@ -60,8 +59,8 @@ class RoadNetwork:
 class CampusWalkway(RoadNetwork):
     campus: str
     _path_select_cache: dict[
-        tuple[mesa.space.FloatCoordinate, mesa.space.FloatCoordinate],
-        list[mesa.space.FloatCoordinate],
+        tuple[FloatCoordinate, FloatCoordinate],
+        list[FloatCoordinate],
     ]
 
     def __init__(self, campus, lines, output_dir) -> None:
@@ -76,9 +75,9 @@ class CampusWalkway(RoadNetwork):
 
     def cache_path(
         self,
-        source: mesa.space.FloatCoordinate,
-        target: mesa.space.FloatCoordinate,
-        path: list[mesa.space.FloatCoordinate],
+        source: FloatCoordinate,
+        target: FloatCoordinate,
+        path: list[FloatCoordinate],
     ) -> None:
         # print(f"caching path... current number of cached paths:
         # {len(self._path_select_cache)}")
@@ -88,6 +87,6 @@ class CampusWalkway(RoadNetwork):
             pickle.dump(self._path_select_cache, cached_result)
 
     def get_cached_path(
-        self, source: mesa.space.FloatCoordinate, target: mesa.space.FloatCoordinate
-    ) -> list[mesa.space.FloatCoordinate] | None:
+        self, source: FloatCoordinate, target: FloatCoordinate
+    ) -> list[FloatCoordinate] | None:
         return self._path_select_cache.get((source, target), None)

@@ -30,6 +30,5 @@ def get_models(directory):
 @pytest.mark.parametrize("model_class", get_models("examples"))
 def test_model_steps(model_class):
     model = model_class()  # Assume no arguments are needed
-    for _ in range(10):
-        model.step()
-    assert model.steps == 10
+    model.run_for(10)
+    assert model.time == 10.0

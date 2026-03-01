@@ -22,10 +22,10 @@ def agent_portrayal(agent):
 
 
 model_params = {
-    "seed": {
+    "rng": {
         "type": "InputText",
         "value": 42,
-        "label": "Seed",
+        "label": "rng",
     },
     "num_termites": {
         "type": "SliderInt",

@@ -1,7 +1,7 @@
 import numpy as np
 from mesa import Model
 from mesa.datacollection import DataCollector
-from mesa.space import PropertyLayer
+from mesa.discrete_space import PropertyLayer
 from scipy.signal import convolve2d
 
 
@@ -10,7 +10,9 @@ class GameOfLifeModel(Model):
     def __init__(self, width=10, height=10, alive_fraction=0.2):
         super().__init__()
         # Initialize the property layer for cell states
-        self.cell_layer = PropertyLayer("cells", width, height, False, dtype=bool)
+        self.cell_layer = PropertyLayer(
+            "cells", (width, height), default_value=False, dtype=bool
+        )
         # Randomly set cells to alive
         self.cell_layer.data = np.random.choice([True, False], size=(width, height), p=[alive_fraction, 1 - alive_fraction])
 

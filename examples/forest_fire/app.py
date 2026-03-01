@@ -41,11 +41,7 @@ lineplot_component = make_plot_component(
     COLORS,
     post_process=post_process_lines,
 )
-# TODO: add back in pie chart component
-# # no current pie chart equivalent in mesa>=3.0
-# pie_chart = mesa.visualization.PieChartModule(
-#     [{"Label": label, "Color": color} for (label, color) in COLORS.items()]
-# )
+
 model = ForestFire()
 model_params = {
     "height": 100,

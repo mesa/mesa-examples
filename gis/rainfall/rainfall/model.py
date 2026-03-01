@@ -25,8 +25,8 @@ class RaindropAgent(mg.GeoAgent):
         return self._pos
 
     @property
-    def indices(self):
-        return self._indices
+    def rowcol(self):
+        return self._rowcol
 
     @pos.setter
     def pos(self, pos):
@@ -35,9 +35,9 @@ class RaindropAgent(mg.GeoAgent):
             x, y = self.pos
             row_idx = self.model.space.raster_layer.height - y - 1
             col_idx = x
-            self._indices = row_idx, col_idx
+            self._rowcol = row_idx, col_idx
             self.geometry = Point(
-                self.model.space.raster_layer.transform * self.indices
+                self.model.space.raster_layer.transform * self._rowcol
             )
         else:
             self.geometry = None

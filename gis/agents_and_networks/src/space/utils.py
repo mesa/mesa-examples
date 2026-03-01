@@ -1,9 +1,11 @@
 import geopandas as gpd
-import mesa
 import numpy as np
 import pyproj
 from shapely.geometry import LineString, MultiLineString
 from shapely.ops import transform
+
+FloatCoordinate = tuple[float, float]
+Coordinate = tuple[int, int]
 
 
 def get_coord_matrix(
@@ -22,7 +24,7 @@ def get_coord_matrix(
 def get_affine_transform(
     from_coord: np.ndarray, to_coord: np.ndarray
 ) -> tuple[float, float, float, float, float, float]:
-    A, res, rank, s = np.linalg.lstsq(from_coord, to_coord, rcond=None)  # noqa: N806
+    A, res, _, _ = np.linalg.lstsq(from_coord, to_coord, rcond=None)  # noqa: N806
 
     np.testing.assert_array_almost_equal(res, np.zeros_like(res), decimal=15)
     np.testing.assert_array_almost_equal(A[:, 2], np.array([0.0, 0.0, 1.0]), decimal=15)
@@ -36,8 +38,8 @@ def get_affine_transform(
 
 
 def get_rounded_coordinate(
-    float_coordinate: mesa.space.FloatCoordinate,
-) -> mesa.space.Coordinate:
+    float_coordinate: FloatCoordinate,
+) -> Coordinate:
     return round(float_coordinate[0]), round(float_coordinate[1])
 
 

@@ -127,6 +127,8 @@ def SpaceDrawer(model):
 
         # Track store agents for cell coloring
         if isinstance(agent, StoreAgent):
+            if agent.pos is None:
+                continue
             if agent.pos not in cell_store_contents:
                 cell_store_contents[agent.pos] = []
             cell_store_contents[agent.pos].append(portrayal)
@@ -152,6 +154,8 @@ def SpaceDrawer(model):
 
     # Jittered scatter plot for all agents
     for agent in model.agents:
+        if agent.pos is None:
+            continue
         portrayal = agent_portrayal(agent)
         jitter_x = np.random.uniform(-jitter_amount, jitter_amount) + agent.pos[0] + 0.5
         jitter_y = np.random.uniform(-jitter_amount, jitter_amount) + agent.pos[1] + 0.5

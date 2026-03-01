@@ -29,7 +29,7 @@ class GeoSir(mesa.Model):
         """
         super().__init__()
         self.space = mg.GeoSpace(warn_crs_conversion=False)
-        self.steps = 0
+        self.time = 0
         self.counts = None
         self.reset_counts()
 

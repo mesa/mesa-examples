@@ -33,13 +33,13 @@ model_params = {
 model = UrbanGrowth()
 page = SolaraViz(
     model,
-    [
+    name="Urban Growth Model",
+    model_params=model_params,
+    components=[
         make_geospace_component(cell_portrayal, zoom=12.1),
         make_plot_component(["Percentage Urbanized"]),
         make_plot_urbanized,
     ],
-    name="Urban Growth Model",
-    model_params=model_params,
 )
 
 page  # noqa

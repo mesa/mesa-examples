@@ -2,21 +2,22 @@ import random
 from collections import defaultdict
 from typing import DefaultDict
 
-import mesa
 import mesa_geo as mg
 from shapely.geometry import Point
 
 from ..agent.building import Building
 from ..agent.commuter import Commuter
 
+FloatCoordinate = tuple[float, float]
+
 
 class Campus(mg.GeoSpace):
     homes: tuple[Building]
     works: tuple[Building]
     other_buildings: tuple[Building]
-    home_counter: DefaultDict[mesa.space.FloatCoordinate, int]
+    home_counter: DefaultDict[FloatCoordinate, int]
     _buildings: dict[int, Building]
-    _commuters_pos_map: DefaultDict[mesa.space.FloatCoordinate, set[Commuter]]
+    _commuters_pos_map: DefaultDict[FloatCoordinate, set[Commuter]]
     _commuter_id_map: dict[int, Commuter]
 
     def __init__(self, crs: str) -> None:
@@ -54,9 +55,7 @@ class Campus(mg.GeoSpace):
         self.works = self.works + tuple(works)
         self.homes = self.homes + tuple(homes)
 
-    def get_commuters_by_pos(
-        self, float_pos: mesa.space.FloatCoordinate
-    ) -> set[Commuter]:
+    def get_commuters_by_pos(self, float_pos: FloatCoordinate) -> set[Commuter]:
         return self._commuters_pos_map[float_pos]
 
     def get_commuter_by_id(self, commuter_id: int) -> Commuter:
@@ -69,16 +68,14 @@ class Campus(mg.GeoSpace):
 
     def update_home_counter(
         self,
-        old_home_pos: mesa.space.FloatCoordinate | None,
-        new_home_pos: mesa.space.FloatCoordinate,
+        old_home_pos: FloatCoordinate | None,
+        new_home_pos: FloatCoordinate,
     ) -> None:
         if old_home_pos is not None:
             self.home_counter[old_home_pos] -= 1
         self.home_counter[new_home_pos] += 1
 
-    def move_commuter(
-        self, commuter: Commuter, pos: mesa.space.FloatCoordinate
-    ) -> None:
+    def move_commuter(self, commuter: Commuter, pos: FloatCoordinate) -> None:
         self.__remove_commuter(commuter)
         commuter.geometry = Point(pos)
         self.add_commuter(commuter)

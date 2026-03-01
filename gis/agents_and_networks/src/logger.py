@@ -1,9 +1,8 @@
 import logging
+from functools import wraps
 
 
 def logger(func):
-    from functools import wraps
-
     @wraps(func)
     def wrapper(*args, **kwargs):
         logger = logging.getLogger(func.__name__)

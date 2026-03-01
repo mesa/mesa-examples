@@ -29,14 +29,14 @@ def cell_portrayal(cell: LakeCell) -> tuple[float, float, float, float]:
 model = Rainfall()
 page = SolaraViz(
     model,
-    [
+    name="Rainfall Model",
+    model_params=model_params,
+    components=[
         make_geospace_component(cell_portrayal, zoom=11),
         make_plot_component(
             ["Total Amount of Water", "Total Contained", "Total Outflow"]
         ),
     ],
-    name="Rainfall Model",
-    model_params=model_params,
 )
 
 page  # noqa

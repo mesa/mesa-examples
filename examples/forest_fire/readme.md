@@ -6,15 +6,17 @@ The [forest fire model](http://en.wikipedia.org/wiki/Forest-fire_model) is a sim
 
 ## How to Run
 
-To run the model interactively, run ``mesa runserver`` in this directory. e.g.
+To run the model interactively, run the following command (requires Mesa 3.0+):
 
-```
-    $ mesa runserver
-```
+ ```bash
+ solara run app.py
+ ```
 
 Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and press Reset, then Run.
 
 To view and run the model analyses, use the ``Forest Fire Model`` Notebook.
+
+
 
 ## Files
 

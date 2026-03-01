@@ -29,13 +29,13 @@ class WarehouseModel(mesa.Model):
     (e.g., routing, sensors, etc.).
     """
 
-    def __init__(self, seed=42):
+    def __init__(self, rng=42):
         """Initialize the model.
 
         Args:
-            seed (int): Random seed.
+            rng (int): Random number generator.
         """
-        super().__init__(seed=seed)
+        super().__init__(rng=rng)
         self.inventory = {}
         self.loading_docks = LOADING_DOCKS
         self.charging_stations = CHARGING_STATIONS
@@ -95,8 +95,10 @@ class WarehouseModel(mesa.Model):
     def step(self):
         """Advance the model by one step."""
         for robot in self.agents_by_type[type(self.RobotAgent)]:
+            agent_list = self.agents_by_type[InventoryAgent].to_list()
+
             if robot.status == "open":  # Assign a task to the robot
-                item = self.random.choice(self.agents_by_type[InventoryAgent])
+                item = self.random.choice(agent_list)
                 if item.quantity > 0:
                     robot.initiate_task(item)
                     robot.status = "inventory"

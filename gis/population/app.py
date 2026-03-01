@@ -32,11 +32,11 @@ def agent_portrayal(agent):
 model = Population()
 page = SolaraViz(
     model,
-    [
+    name="Population Model",
+    components=[
         make_geospace_component(agent_portrayal),
         make_plot_num_agents,
     ],
-    name="Population Model",
 )
 
 page  # noqa

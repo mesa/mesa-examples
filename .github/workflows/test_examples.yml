@@ -23,11 +23,11 @@ jobs:
   #   - name: Set up Python
   #     uses: actions/setup-python@v5
   #     with:
-  #       python-version: "3.12"
+  #       python-version: "3.14"
   #   - name: Install dependencies
   #     run: pip install mesa[network] pytest
   #   - name: Test with pytest
-  #     run: pytest -rA -Werror test_examples.py
+  #     run: pytest -rA -Werror -Wdefault::PendingDeprecationWarning test_examples.py
 
   build-pre:
     runs-on: ubuntu-latest
@@ -36,13 +36,13 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.12"
+        python-version: "3.14"
     - name: Install dependencies
       run: |
         pip install mesa[network] --pre
         pip install .[test]
     - name: Test with pytest
-      run: pytest -rA -Werror -Wdefault::FutureWarning test_examples.py
+      run: pytest -rA -Werror -Wdefault::PendingDeprecationWarning test_examples.py
 
   build-main:
     runs-on: ubuntu-latest
@@ -51,10 +51,10 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.12"
+        python-version: "3.14"
     - name: Install dependencies
       run: |
         pip install .[test]
-        pip install -U git+https://github.com/mesa/mesa@main#egg=mesa[network]
+        pip install -U "mesa[network] @ git+https://github.com/mesa/mesa@main"
     - name: Test with pytest
-      run: pytest -rA -Werror -Wdefault::FutureWarning test_examples.py
+      run: pytest -rA -Werror -Wdefault::PendingDeprecationWarning test_examples.py
