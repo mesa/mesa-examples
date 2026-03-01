@@ -1,16 +1,17 @@
-import random
-
 from mesa import Agent
+import random
 
 
 class EmployeeAgent(Agent):
     """
     Base-level agent representing an employee.
+    Produces output based on productivity and morale.
     """
 
-    def __init__(self, unique_id, model, department_id):
+    def __init__(self, model, department_id):
         super().__init__(model)
-        self.unique_id = unique_id
+        # NOTE: In Mesa 3.x, unique_id is auto-assigned by super().__init__()
+        # Do NOT manually set self.unique_id — it conflicts with Mesa internals.
         self.department_id = department_id
 
         self.productivity = random.uniform(0.7, 1.3)
@@ -40,14 +41,14 @@ class EmployeeAgent(Agent):
 
 class DepartmentAgent(Agent):
     """
-    Mid-level meta-agent (Department).
+    Mid-level meta-agent representing a Department.
     Aggregates employee performance and adjusts workload.
     """
 
-    def __init__(self, unique_id, model):
+    def __init__(self, model):
         super().__init__(model)
-        self.unique_id = unique_id
-        self.performance = 0
+        # unique_id auto-assigned by Mesa 3.x
+        self.performance = 0.0
 
     def step(self):
         self.aggregate_performance()
@@ -55,41 +56,35 @@ class DepartmentAgent(Agent):
 
     def aggregate_performance(self):
         employees = [
-            agent
-            for agent in self.model.employees
+            agent for agent in self.model.employees
             if agent.department_id == self.unique_id
         ]
-
-        self.performance = sum(agent.productivity * agent.morale for agent in employees)
+        self.performance = sum(
+            agent.productivity * agent.morale for agent in employees
+        )
 
     def adjust_workload(self):
         employees = [
-            agent
-            for agent in self.model.employees
+            agent for agent in self.model.employees
             if agent.department_id == self.unique_id
         ]
-
-        # Adaptive threshold (scales with department size)
         target = self.model.performance_threshold
         gap = target - self.performance
 
-        # Damped adjustment
         for agent in employees:
             agent.workload += 0.02 * gap
-
-            # Clamp workload to prevent explosion
             agent.workload = max(0.5, min(agent.workload, 2.0))
 
 
 class OrganizationAgent(Agent):
     """
-    Top-level meta-agent (Organization).
+    Top-level meta-agent representing the Organization.
     Applies policy adjustments based on global performance.
     """
 
-    def __init__(self, unique_id, model):
+    def __init__(self, model):
         super().__init__(model)
-        self.unique_id = unique_id
+        # unique_id auto-assigned by Mesa 3.x
         self.policy_factor = 1.0
 
     def step(self):
@@ -97,13 +92,11 @@ class OrganizationAgent(Agent):
 
     def evaluate_departments(self):
         departments = self.model.departments
-
         if not departments:
             return
 
         avg_performance = sum(d.performance for d in departments) / len(departments)
 
-        # Damped policy adjustment
         if avg_performance < self.model.performance_threshold:
             self.policy_factor += 0.01
         else:
@@ -111,6 +104,6 @@ class OrganizationAgent(Agent):
 
         self.policy_factor = max(0.9, min(self.policy_factor, 1.2))
 
-        # Additive morale adjustment (not multiplicative)
+        # Additive morale boost/penalty based on policy
         for employee in self.model.employees:
-            employee.morale += 0.02 * (self.policy_factor - 1)
+            employee.morale += 0.02 * (self.policy_factor - 1.0)

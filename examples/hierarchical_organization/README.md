@@ -1,44 +1,70 @@
 # Hierarchical Organization Model
 
-Category: Organizational Modeling
-Focus: Meta-Agent Hierarchies & Activation Semantics
-Mesa Version: >=3.0
-Visualization: SolaraViz
+**Category:** Organizational Modeling
+**Focus:** Meta-Agent Hierarchies & Explicit Activation Semantics
+**Mesa Version:** >=3.0
+**Visualization:** SolaraViz
 
-## Overview
+---
 
-This example demonstrates a three-level hierarchical agent system:
+## What This Model Does
 
-Employees → Departments → Organization
+This example implements a three-level hierarchical agent system that simulates how organizations respond to workload pressure and external disruptions:
 
-The model intentionally avoids legacy scheduler patterns and uses explicit activation ordering to remain compatible with Mesa 3.x.
+```
+EmployeeAgent → DepartmentAgent → OrganizationAgent
+```
 
-## Why This Example Matters
+Each level acts as a **meta-agent** that aggregates and responds to the level below it:
 
-While building this model in a clean environment, several friction points became apparent:
+- **Employees** produce output based on their productivity and morale.
+- **Departments** aggregate employee performance and rebalance workload.
+- **The Organization** evaluates department performance and applies a global policy boost or penalty to employee morale.
 
-- Removal of legacy schedulers (RandomActivation)
-- Agent constructor changes in Mesa 3.x
-- Implicit visualization dependencies
-- Lack of documented activation best practices
+---
 
-This example is structured to be:
+## Why Meta-Agents?
 
-- Reproducible
-- Explicit in dependency requirements
-- Clear in activation semantics
-- Compatible with modern Mesa visualization
+In many real systems, decisions happen at multiple levels simultaneously — an employee's behavior is influenced by their department, which is in turn constrained by organizational policy. A flat agent model cannot capture this cleanly.
 
-## Features
+This example shows how Mesa 3.x supports hierarchical activation explicitly, without needing a scheduler. The activation order is deliberate:
 
-- Hierarchical meta-agent structure
-- Organizational policy intervention
-- External shock events
-- System resilience dynamics
-- Explicit dependency isolation
+1. Employees step first (bottom-up information flow)
+2. Departments aggregate and adjust workload
+3. Organization evaluates and updates policy
+
+---
+
+## What Is the "Shock"?
+
+The `shock_probability` parameter introduces a random external disruption each step (e.g. a market downturn, a sudden restructuring). When triggered, all employees receive a random morale penalty. This tests the system's **resilience**: can the department and organization-level feedback loops recover output after a shock?
+
+---
+
+## Mesa 3.x Compatibility Notes
+
+This example was written to address several breaking changes in Mesa 3.x:
+
+- **No `RandomActivation`**: Removed in Mesa 3.x. Activation is now handled explicitly in `model.step()`.
+- **Agent constructor**: `unique_id` is auto-assigned by `super().__init__(model)`. Do not pass or manually set it.
+- **Relative imports**: `agents.py` uses `from .agents import ...` so the package works correctly when run from the repo root via pytest or `solara run`.
+
+---
 
 ## Run Instructions
 
-1. Create virtual environment
-2. pip install -r requirements.txt
-3. python -m solara run app.py
+```bash
+python -m venv venv
+source venv/bin/activate       # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python -m solara run app.py
+```
+
+---
+
+## Parameters
+
+| Parameter | Default | Description |
+| `num_departments` | 3 | Number of department agents |
+| `employees_per_department` | 5 | Employees per department |
+| `shock_probability` | 0.05 | Per-step probability of an external shock |
