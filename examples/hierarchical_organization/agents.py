@@ -1,5 +1,6 @@
-from mesa import Agent
 import random
+
+from mesa import Agent
 
 
 class EmployeeAgent(Agent):
@@ -56,16 +57,16 @@ class DepartmentAgent(Agent):
 
     def aggregate_performance(self):
         employees = [
-            agent for agent in self.model.employees
+            agent
+            for agent in self.model.employees
             if agent.department_id == self.unique_id
         ]
-        self.performance = sum(
-            agent.productivity * agent.morale for agent in employees
-        )
+        self.performance = sum(agent.productivity * agent.morale for agent in employees)
 
     def adjust_workload(self):
         employees = [
-            agent for agent in self.model.employees
+            agent
+            for agent in self.model.employees
             if agent.department_id == self.unique_id
         ]
         target = self.model.performance_threshold
