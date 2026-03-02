@@ -45,12 +45,11 @@ def color_patch_draw(cell):
     :return: the portrayal dictionary.
     """
     if cell is None:
-        raise AssertionError
-    portrayal = {"Shape": "rect", "w": 1, "h": 1, "Filled": "true", "Layer": 0}
-    portrayal["x"] = cell.get_row()
-    portrayal["y"] = cell.get_col()
-    portrayal["color"] = _COLORS[cell.state]
-    return portrayal
+        return
+    return {
+        "color": _COLORS[cell.state],
+        "size": 100,
+    }
 
 
 space_component = make_space_component(
