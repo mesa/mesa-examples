@@ -31,9 +31,9 @@ config = {
         "policy_sheep": PolicySpec(config=PPOConfig.overrides(framework_str="torch")),
         "policy_wolf": PolicySpec(config=PPOConfig.overrides(framework_str="torch")),
     },
-    "policy_mapping_fn": lambda agent_id, *args, **kwargs: "policy_sheep"
-    if agent_id[0:5] == "sheep"
-    else "policy_wolf",
+    "policy_mapping_fn": lambda agent_id, *args, **kwargs: (
+        "policy_sheep" if agent_id[0:5] == "sheep" else "policy_wolf"
+    ),
     "policies_to_train": ["policy_sheep", "policy_wolf"],
     "num_gpus": int(os.environ.get("RLLIB_NUM_GPUS", "1")),
     "num_learners": 50,  # Assuming a default value, adjust as necessary
