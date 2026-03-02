@@ -79,15 +79,13 @@ class DiningPhilosophersModel(mesa.Model):
             p_id = i * 2
 
             # Use default argument in lambda to capture the current value of p_id
-            model_reporters[f"P{i}"] = lambda m, pid=p_id: (
-                next(
-                    (
-                        p.total_eaten
-                        for p in m.agents_by_type[PhilosopherAgent]
-                        if p.position == pid
-                    ),
-                    0,
-                )
+            model_reporters[f"P{i}"] = lambda m, pid=p_id: next(
+                (
+                    p.total_eaten
+                    for p in m.agents_by_type[PhilosopherAgent]
+                    if p.position == pid
+                ),
+                0,
             )
 
         self.datacollector = mesa.DataCollector(model_reporters=model_reporters)

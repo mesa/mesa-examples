@@ -29,9 +29,9 @@ config = {
         "policy_cop": PolicySpec(config=PPOConfig.overrides(framework_str="torch")),
         "policy_citizen": PolicySpec(config=PPOConfig.overrides(framework_str="torch")),
     },
-    "policy_mapping_fn": lambda agent_id, *args, **kwargs: "policy_cop"
-    if agent_id[0:3] == "cop"
-    else "policy_citizen",
+    "policy_mapping_fn": lambda agent_id, *args, **kwargs: (
+        "policy_cop" if agent_id[0:3] == "cop" else "policy_citizen"
+    ),
     "policies_to_train": ["policy_cop", "policy_citizen"],
     "num_gpus": int(os.environ.get("RLLIB_NUM_GPUS", "1")),
     "num_learners": 50,
