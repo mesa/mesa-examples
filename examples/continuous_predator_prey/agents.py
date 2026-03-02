@@ -1,6 +1,12 @@
 import math
+import contextlib #it's works as a context manager to suppress specific exceptions that may occur within its block. In this case, it's used to handle potential errors when trying to remove agents from the space or schedule, allowing the code to continue running smoothly even if those operations fail for some reason.
 from mesa.experimental.continuous_space import ContinuousSpaceAgent
-
+# attempt to import the model by name; this works both when the
+# script is executed directly and when the package is imported by tests.
+try:
+    from .agents import Prey, Predator
+except ImportError:
+    from agents import Predator, Prey  # type: ignore[import-not-found]  # running as script
 
 # Simple scheduler that randomly activates agents in each step, without modifying the original list of agents.
 class SimpleRandomActivation:
@@ -26,7 +32,7 @@ class SimpleRandomActivation:
 
 class Prey(ContinuousSpaceAgent):
 
-    "a prey create which hase very random motion the a continous space"
+    "a prey create which hase very random motion the a continuous space"
     def __init__(self, unique_id, space, model, pos, speed=1.0):
         # ContinuousSpaceAgent requires (space, model)
         super().__init__(space, model)
@@ -93,43 +99,32 @@ class Predator(ContinuousSpaceAgent):
 
 
         if prey_neighbors:
-            prey_to_eat = self.random.choice(prey_neighbors)  # randomly select one nearby prey to eat
-            self.energy += self.model.predator_gain_from_food  # gain energy from eating the prey
+            prey_to_eat = self.random.choice(prey_neighbors) 
+            self.energy += self.model.predator_gain_from_food 
 
-            # Prefer the agent-level remove() which handles model and space cleanup.
-            try:
-                prey_to_eat.remove()
-            except Exception:
-                # Fallbacks: remove from space and schedule if available
-                if hasattr(self.model.space, "_remove_agent"):
-                    try:
-                        self.model.space._remove_agent(prey_to_eat)
-                    except Exception:
-                        pass
-                if hasattr(self.model.schedule, "remove"):
-                    try:
-                        self.model.schedule.remove(prey_to_eat)
-                    except Exception:
-                        pass
-                else:
-                    if hasattr(self.model.schedule, "agents") and prey_to_eat in self.model.schedule.agents:
-                        try:
-                            self.model.schedule.agents.remove(prey_to_eat)
-                        except Exception:
-                            pass
+            # Fallbacks: remove from space and schedule if available
+            if hasattr(self.model.space, "_remove_agent"):
+                with contextlib.suppress(Exception):
+                    self.model.space._remove_agent(prey_to_eat)
+                    
+            if hasattr(self.model.schedule, "remove"):
+                with contextlib.suppress(Exception):
+                    self.model.schedule.remove(prey_to_eat)
+            else:
+                if prey_to_eat in getattr(self.model.schedule, "agents", []):
+                    with contextlib.suppress(Exception):
+                        self.model.schedule.agents.remove(prey_to_eat)
+
         if self.energy <= 0:
-            # remove from scheduler and model/space
             if hasattr(self.model.schedule, "remove"):
                 self.model.schedule.remove(self)
             if self in getattr(self.model.schedule, "agents", []):
-                try:
+                with contextlib.suppress(Exception):
                     self.model.schedule.agents.remove(self)
-                except Exception:
-                    pass
-            try:
+            
+            with contextlib.suppress(Exception):
                 self.remove()
-            except Exception:
-                pass
+                
             return
 
         if self.random.random() < self.model.predator_reproduce:
