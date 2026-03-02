@@ -1,0 +1,61 @@
+name: Test viz
+
+on:
+  push:
+    paths:
+      - 'examples/**/app.py'  # If an example visualisation is modified
+      - 'examples/**/viz.py'  # If an example visualisation is modified
+      - 'viz.py'  # If the test script is modified
+      - '.github/workflows/test_viz.yml'  # If this workflow is modified
+  pull_request:
+    paths:
+      - 'examples/**/*.py'
+      - 'test_examples.py'
+      - '.github/workflows/test_examples.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'  # Monday at 6:00 UTC
+
+jobs:
+  # build-stable:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v4
+  #   - name: Set up Python
+  #     uses: actions/setup-python@v5
+  #     with:
+  #       python-version: "3.12"
+  #   - name: Install dependencies
+  #     run: pip install mesa pytest
+  #   - name: Test with pytest
+  #     run: pytest -rA -Werror test_examples.py
+
+  build-pre:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - name: Install dependencies
+      run: |
+        pip install --pre mesa[viz]
+        pip install .[test]
+    - name: Test with pytest
+      run: pytest -rA -Werror -Wdefault::FutureWarning viz.py
+
+#  build-main:
+#    runs-on: ubuntu-latest
+#    steps:
+#    - uses: actions/checkout@v4
+#    - name: Set up Python
+#      uses: actions/setup-python@v5
+#      with:
+#        python-version: "3.12"
+#    - name: Install dependencies
+#      run: |
+#        pip install .[test]
+#        pip install -U git+https://github.com/projectmesa/mesa@main#egg=mesa
+#    - name: Test with pytest
+#      run: pytest -rA -Werror -Wdefault::FutureWarning test_examples.py
