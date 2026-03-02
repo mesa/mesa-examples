@@ -9,8 +9,8 @@ except ImportError:
 
 model=PredatorPreyModel(width=100,height=100,initial_prey=50,initial_predators=10)
 
-# checking for 5 steps of the simulation
-for i in range(5):
+# checking for 50 steps of the simulation
+for i in range(50):
     model.step()
     #fetches latest data
     data=model.data_collector.get_model_vars_dataframe().iloc[-1] #it gets the latest data from the data collector for the current step of the simulation
