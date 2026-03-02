@@ -1,10 +1,9 @@
 import random
 
+from agents import EmperorAgent
 from mesa import Model
 from mesa.datacollection import DataCollector
 from mesa.discrete_space.grid import OrthogonalMooreGrid
-
-from .agents import EmperorAgent
 
 
 class EmperorModel(Model):
