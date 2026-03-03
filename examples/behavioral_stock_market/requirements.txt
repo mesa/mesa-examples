@@ -1,0 +1,9 @@
+mesa>=2.0
+solara>=1.30
+uvicorn==0.29.0
+networkx
+matplotlib
+pandas
+numpy
+scikit-learn==1.7.2
+joblib
