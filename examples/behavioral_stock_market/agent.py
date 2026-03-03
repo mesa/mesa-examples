@@ -1,5 +1,6 @@
-import mesa
 import random
+
+import mesa
 import pandas as pd
 from trend_predictor import TrendPredictor
 
@@ -30,7 +31,6 @@ class Trader(mesa.Agent):
         self.intrinsic_value = random.uniform(280, 320)
         self.memory = []
 
-
     def step(self):
         """Agent behavioral decision step"""
 
@@ -45,19 +45,17 @@ class Trader(mesa.Agent):
         elif self.trader_type == "RiskAverse":
             self.risk_averse_logic()
 
-
     # 📊 Fundamentalist Strategy
     def fundamental_logic(self):
-     if len(self.memory) < 3:
-        return
-     
-     p1, p2, p3 = self.memory[-3:]
+        if len(self.memory) < 3:
+            return
 
-     if p1 < p2 < p3:
-        self.buy()
-     elif p1 > p2 > p3:
-        self.sell()
+        p1, p2, p3 = self.memory[-3:]
 
+        if p1 < p2 < p3:
+            self.buy()
+        elif p1 > p2 > p3:
+            self.sell()
 
     # 📈 TrendFollower Strategy (ML Based)
     def trend_logic(self):
@@ -67,13 +65,17 @@ class Trader(mesa.Agent):
         0 → Sell
         """
 
-        current_df = pd.DataFrame([{
-            "open": self.model.open,
-            "high": self.model.high,
-            "low": self.model.low,
-            "close": self.model.close,
-            "volume": self.model.volume
-        }])
+        current_df = pd.DataFrame(
+            [
+                {
+                    "open": self.model.open,
+                    "high": self.model.high,
+                    "low": self.model.low,
+                    "close": self.model.close,
+                    "volume": self.model.volume,
+                }
+            ]
+        )
 
         prediction = Trader.trend_model.predict(current_df)[-1]
 
@@ -81,7 +83,6 @@ class Trader(mesa.Agent):
             self.buy()
         else:
             self.sell()
-
 
     # 🛑 Risk Averse Strategy
     def risk_averse_logic(self):
@@ -103,7 +104,6 @@ class Trader(mesa.Agent):
             self.volume += small_volume
             self.model.total_demand += small_volume
 
-
     def buy(self):
         price = self.model.share_price
         max_buy = int(self.amount / price)
@@ -116,7 +116,6 @@ class Trader(mesa.Agent):
         self.amount -= volume * price
         self.volume += volume
         self.model.total_demand += volume
-
 
     def sell(self):
         if self.volume <= 0:

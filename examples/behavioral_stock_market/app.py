@@ -1,10 +1,11 @@
-import solara
-import matplotlib.pyplot as plt
-from model import Trading_interface
-from collections import defaultdict, Counter
-import numpy as np
 import threading
 import time
+from collections import Counter, defaultdict
+
+import matplotlib.pyplot as plt
+import numpy as np
+import solara
+from model import Trading_interface
 
 # ==============================
 # MODEL INIT
@@ -18,7 +19,6 @@ running = solara.reactive(False)
 
 @solara.component
 def Page():
-
     solara.Markdown("# 📈 Behavioral Stock Market Dashboard")
 
     # ==============================
@@ -52,14 +52,15 @@ def Page():
     # CONTROLS
     # ==============================
 
-    solara.Row([
-        solara.Button("▶ STEP", on_click=step),
-        solara.Button(
-            "⏸ STOP" if running.value else "▶ AUTO RUN",
-            on_click=start_stop
-        ),
-        solara.Button("🔄 RESET", on_click=reset),
-    ])
+    solara.Row(
+        [
+            solara.Button("▶ STEP", on_click=step),
+            solara.Button(
+                "⏸ STOP" if running.value else "▶ AUTO RUN", on_click=start_stop
+            ),
+            solara.Button("🔄 RESET", on_click=reset),
+        ]
+    )
 
     # Force re-render
     _ = refresh.value

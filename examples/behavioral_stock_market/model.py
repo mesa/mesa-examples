@@ -1,7 +1,8 @@
-import mesa
-from mesa.datacollection import DataCollector
-from agent import Trader
 import random
+
+import mesa
+from agent import Trader
+from mesa.datacollection import DataCollector
 
 
 class Trading_interface(mesa.Model):
@@ -34,15 +35,12 @@ class Trading_interface(mesa.Model):
             model_reporters={
                 "Price": "share_price",
                 "Demand": "total_demand",
-                "Supply": "total_supply"
+                "Supply": "total_supply",
             },
-            agent_reporters={
-                "Wealth": lambda a: a.amount
-            }
+            agent_reporters={"Wealth": lambda a: a.amount},
         )
 
         self.datacollector.collect(self)
-
 
     def update_price(self):
         """
@@ -71,31 +69,30 @@ class Trading_interface(mesa.Model):
         self.total_demand = 0
         self.total_supply = 0
 
-
     def step(self):
-     """
-     🔄 Simulation Step Order (Corrected)
+        """
+        🔄 Simulation Step Order (Corrected)
 
-     1️⃣ Generate OHLC from previous price
-     2️⃣ Agents make decisions
-     3️⃣ Update price
-     4️⃣ Collect data
-     """
+        1️⃣ Generate OHLC from previous price
+        2️⃣ Agents make decisions
+        3️⃣ Update price
+        4️⃣ Collect data
+        """
 
-     # 1️⃣ Generate OHLC from current price
-     self.open = self.share_price
-     self.high = self.share_price + random.uniform(0, 1)
-     self.low = self.share_price - random.uniform(0, 1)
-     self.close = self.share_price
-     self.volume = self.total_demand + self.total_supply
+        # 1️⃣ Generate OHLC from current price
+        self.open = self.share_price
+        self.high = self.share_price + random.uniform(0, 1)
+        self.low = self.share_price - random.uniform(0, 1)
+        self.close = self.share_price
+        self.volume = self.total_demand + self.total_supply
 
-     # 2️⃣ Agents act (they now can access OHLC safely)
-     self.agents.shuffle_do("step")
+        # 2️⃣ Agents act (they now can access OHLC safely)
+        self.agents.shuffle_do("step")
 
-     # 3️⃣ Update price after trades
-     self.update_price()
+        # 3️⃣ Update price after trades
+        self.update_price()
 
-     print("Current Price:", self.share_price)
+        print("Current Price:", self.share_price)
 
-     # 4️⃣ Collect data
-     self.datacollector.collect(self)
+        # 4️⃣ Collect data
+        self.datacollector.collect(self)
