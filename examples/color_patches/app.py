@@ -68,7 +68,7 @@ model_params = {
         100,
     ),
     "height": Slider(
-        "Grid Height", 
+        "Grid Height",
         grid_cols,
         5,
         100,
