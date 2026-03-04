@@ -75,12 +75,6 @@ class ColorPatches(mesa.Model):
         self._grid = OrthogonalMooreGrid(
             (width, height), torus=False, random=self.random
         )
-
-        # self._grid.coord_iter()
-        #  --> should really not return content + col + row
-        #  -->but only col & row
-        # for (contents, col, row) in self._grid.coord_iter():
-        # replaced content with _ to appease linter
         for cell in self._grid.all_cells:
             agent = ColorCell(self, ColorCell.OPINIONS[self.random.randrange(0, 16)])
             agent.move_to(cell)
@@ -98,15 +92,5 @@ class ColorPatches(mesa.Model):
 
     @property
     def grid(self):
-        """
-        /mesa/visualization/modules/CanvasGridVisualization.py
-        is directly accessing Model.grid
-             76     def render(self, model):
-             77         grid_state = defaultdict(list)
-        ---> 78         for y in range(model.grid.height):
-             79             for x in range(model.grid.width):
-             80                 cell_objects = model.grid.get_cell_list_contents([(x, y)])
-
-        AttributeError: 'ColorPatches' object has no attribute 'grid'
-        """
+        """Provide backward compatibility for accessing the grid."""
         return self._grid
