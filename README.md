@@ -136,3 +136,18 @@ This folder contains an implementation of El Farol restaurant model. Agents (res
 ### [Schelling Model with Caching and Replay](https://github.com/mesa/mesa-examples/tree/main/examples/caching_and_replay)
 
 This example applies caching on the Mesa [Schelling](https://github.com/mesa/mesa-examples/tree/main/examples/schelling) example. It enables a simulation run to be "cached" or in other words recorded. The recorded simulation run is persisted on the local file system and can be replayed at any later point.
+
+## Running Examples
+
+To run the examples in this repository, install Mesa with visualization dependencies:
+
+pip install mesa[viz]
+
+Some examples may additionally require:
+
+pip install networkx matplotlib solara altair
+
+Then run an example:
+
+cd examples/bank_reserves
+python app.py
