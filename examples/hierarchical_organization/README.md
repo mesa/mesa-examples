@@ -1,29 +1,27 @@
 # Hierarchical Organization Model
 
-**Category:** Organizational Modeling
-**Mesa Version:** >=3.0
-**Visualization:** SolaraViz
+**Mesa Version:** >=3.0 | **Visualization:** SolaraViz
 
 ---
 
 ## Overview
 
-A three-level hierarchical agent simulation:
+This model simulates how a three-level organization works — employees doing the actual work, departments managing them, and an organization setting policy for everyone.
 
 ```
 EmployeeAgent → DepartmentAgent → OrganizationAgent
 ```
 
-Employees produce output based on productivity and morale. Departments aggregate performance and rebalance workload. The Organization applies global policy adjustments each step.
+Each level responds to what's happening below it. Employees produce output based on their productivity and morale. Departments watch that output and adjust workloads accordingly. The organization looks at the overall picture and nudges morale up or down through policy.
+
+The model also introduces random external shocks — sudden morale drops across all employees — to see whether the system can absorb and recover from disruptions.
 
 ---
 
-## Run Instructions
+## How to Run
 
 ```bash
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
-pip install -r requirements.txt
+pip install mesa[rec]
 python -m solara run app.py
 ```
 
@@ -32,7 +30,7 @@ python -m solara run app.py
 ## Parameters
 
 | Parameter | Default | Description |
-
+|---|---|---|
 | `num_departments` | 3 | Number of departments |
 | `employees_per_department` | 5 | Employees per department |
 | `shock_probability` | 0.05 | Probability of external shock per step |

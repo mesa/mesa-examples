@@ -1,3 +1,0 @@
-mesa[viz]>=3.0
-solara>=1.30
-matplotlib>=3.8
