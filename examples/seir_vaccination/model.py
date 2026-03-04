@@ -53,9 +53,7 @@ class SEIRModel(Model):
             self.population.append(person)
 
         # Seed initial infections
-        initial_infected_agents = self.random.sample(
-            self.population, initial_infected
-        )
+        initial_infected_agents = self.random.sample(self.population, initial_infected)
         for agent in initial_infected_agents:
             agent.state = "I"
 

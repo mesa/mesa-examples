@@ -3,7 +3,6 @@ from mesa.visualization import SolaraViz, make_plot_component
 # Use relative import consistent with model.py
 from .model import HierarchicalOrganizationModel
 
-
 model_params = {
     "num_departments": {
         "type": "SliderInt",
@@ -35,9 +34,7 @@ model_params = {
 # Do NOT instantiate the model here manually — pass the class instead.
 model = HierarchicalOrganizationModel()
 
-main_plot = make_plot_component(
-    ["Total Output", "Avg Department Performance"]
-)
+main_plot = make_plot_component(["Total Output", "Avg Department Performance"])
 
 shock_plot = make_plot_component(["Shock Event"])
 

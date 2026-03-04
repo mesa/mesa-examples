@@ -1,7 +1,3 @@
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-import numpy as np
-import solara
 from mesa.visualization import SolaraViz, make_plot_component, make_space_component
 
 from .model import SEIRModel
@@ -23,14 +19,70 @@ def agent_portrayal(agent):
 
 
 model_params = {
-    "width": {"type": "SliderInt", "value": 30, "min": 10, "max": 50, "step": 5, "label": "Grid Width"},
-    "height": {"type": "SliderInt", "value": 30, "min": 10, "max": 50, "step": 5, "label": "Grid Height"},
-    "initial_infected": {"type": "SliderInt", "value": 5, "min": 1, "max": 20, "step": 1, "label": "Initial Infected"},
-    "transmission_rate": {"type": "SliderFloat", "value": 0.3, "min": 0.0, "max": 1.0, "step": 0.05, "label": "Transmission Rate"},
-    "incubation_period": {"type": "SliderInt", "value": 3, "min": 1, "max": 10, "step": 1, "label": "Incubation Period (days)"},
-    "infection_duration": {"type": "SliderInt", "value": 7, "min": 1, "max": 21, "step": 1, "label": "Infection Duration (days)"},
-    "vaccination_threshold": {"type": "SliderFloat", "value": 0.1, "min": 0.0, "max": 0.5, "step": 0.01, "label": "Vaccination Threshold"},
-    "vaccination_rate": {"type": "SliderFloat", "value": 0.05, "min": 0.0, "max": 0.3, "step": 0.01, "label": "Vaccination Rate per Campaign"},
+    "width": {
+        "type": "SliderInt",
+        "value": 30,
+        "min": 10,
+        "max": 50,
+        "step": 5,
+        "label": "Grid Width",
+    },
+    "height": {
+        "type": "SliderInt",
+        "value": 30,
+        "min": 10,
+        "max": 50,
+        "step": 5,
+        "label": "Grid Height",
+    },
+    "initial_infected": {
+        "type": "SliderInt",
+        "value": 5,
+        "min": 1,
+        "max": 20,
+        "step": 1,
+        "label": "Initial Infected",
+    },
+    "transmission_rate": {
+        "type": "SliderFloat",
+        "value": 0.3,
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.05,
+        "label": "Transmission Rate",
+    },
+    "incubation_period": {
+        "type": "SliderInt",
+        "value": 3,
+        "min": 1,
+        "max": 10,
+        "step": 1,
+        "label": "Incubation Period (days)",
+    },
+    "infection_duration": {
+        "type": "SliderInt",
+        "value": 7,
+        "min": 1,
+        "max": 21,
+        "step": 1,
+        "label": "Infection Duration (days)",
+    },
+    "vaccination_threshold": {
+        "type": "SliderFloat",
+        "value": 0.1,
+        "min": 0.0,
+        "max": 0.5,
+        "step": 0.01,
+        "label": "Vaccination Threshold",
+    },
+    "vaccination_rate": {
+        "type": "SliderFloat",
+        "value": 0.05,
+        "min": 0.0,
+        "max": 0.3,
+        "step": 0.01,
+        "label": "Vaccination Rate per Campaign",
+    },
 }
 
 model = SEIRModel()

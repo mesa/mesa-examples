@@ -1,9 +1,10 @@
-from mesa import Model
-from mesa.datacollection import DataCollector
 import random
 
+from mesa import Model
+from mesa.datacollection import DataCollector
+
 # Use relative imports so pytest can find the module from repo root
-from .agents import EmployeeAgent, DepartmentAgent, OrganizationAgent
+from .agents import DepartmentAgent, EmployeeAgent, OrganizationAgent
 
 
 class HierarchicalOrganizationModel(Model):
@@ -62,7 +63,9 @@ class HierarchicalOrganizationModel(Model):
                 "Total Output": lambda m: m.total_output,
                 "Avg Department Performance": lambda m: (
                     sum(d.performance for d in m.departments) / len(m.departments)
-                ) if m.departments else 0,
+                )
+                if m.departments
+                else 0,
                 "Shock Event": lambda m: int(m.shock_event),
             }
         )

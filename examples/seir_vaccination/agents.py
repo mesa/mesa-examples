@@ -76,9 +76,7 @@ class GovernmentAgent(CellAgent):
         if total == 0:
             return
 
-        infected_count = sum(
-            1 for a in self.model.population if a.state == "I"
-        )
+        infected_count = sum(1 for a in self.model.population if a.state == "I")
         infection_rate = infected_count / total
 
         if infection_rate >= self.model.vaccination_threshold:
@@ -90,9 +88,7 @@ class GovernmentAgent(CellAgent):
     def _run_vaccination_campaign(self):
         """Vaccinate a fraction of susceptible people."""
         susceptible = [a for a in self.model.population if a.state == "S"]
-        n_to_vaccinate = int(
-            len(susceptible) * self.model.vaccination_rate
-        )
+        n_to_vaccinate = int(len(susceptible) * self.model.vaccination_rate)
         targets = self.random.sample(susceptible, min(n_to_vaccinate, len(susceptible)))
         for person in targets:
             person.vaccinate()
