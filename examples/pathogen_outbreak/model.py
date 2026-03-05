@@ -1,8 +1,8 @@
-from mesa import Model
-from mesa.space import MultiGrid
 import random
-from mesa import DataCollector
+
 from agents import Citizen
+from mesa import DataCollector, Model
+from mesa.space import MultiGrid
 
 
 def c_healthy(model):
@@ -22,7 +22,6 @@ def c_dead(model):
 
 
 class PathogenModel(Model):
-
     def __init__(
         self,
         n=100,
