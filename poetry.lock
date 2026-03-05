@@ -120,8 +120,8 @@ files = [
 ]
 
 [package.extras]
-astroid = ["astroid (>=2,<5)"]
-test = ["astroid (>=2,<5)", "pytest (<9.0)", "pytest-cov", "pytest-xdist"]
+asteriod = ["asteriod (>=2,<5)"]
+test = ["asteriod (>=2,<5)", "pytest (<9.0)", "pytest-cov", "pytest-xdist"]
 
 [[package]]
 name = "attrs"
