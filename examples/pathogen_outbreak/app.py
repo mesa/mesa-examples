@@ -1,5 +1,5 @@
 from mesa.visualization import SolaraViz, make_space_component, make_plot_component
-from model import dis_Model
+from model import PathogenModel
 
 
 def make_agent(agent):
@@ -51,7 +51,7 @@ model_params = {
     },
 }
 
-model = dis_Model(n=100, infn=5, width=25, height=25)
+model = PathogenModel(n=100, infn=5, width=25, height=25)
 
 renderer = make_space_component(make_agent)
 

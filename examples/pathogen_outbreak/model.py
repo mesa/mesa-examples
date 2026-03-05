@@ -2,7 +2,7 @@ from mesa import Model
 from mesa.space import MultiGrid
 import random
 from mesa import DataCollector
-from agents import citizen
+from agents import Citizen
 
 
 def c_healthy(model):
@@ -21,7 +21,7 @@ def c_dead(model):
     return sum(1 for i in model.agents if i.state == "dead")
 
 
-class dis_Model(Model):
+class PathogenModel(Model):
 
     def __init__(
         self,
@@ -52,10 +52,10 @@ class dis_Model(Model):
             }
         )
 
-        for i in range(n):
-            j = citizen(self)
+        for _ in range(n):
+            agent = Citizen(self)
             self.grid.place_agent(
-                j, (random.randrange(width), random.randrange(height))
+                agent, (random.randrange(width), random.randrange(height))
             )
 
         for i in range(infn):
@@ -72,22 +72,3 @@ class dis_Model(Model):
         self.datacollector.collect(self)
 
         self.agents.do("step")
-        # see_on_terminal(self)
-
-
-def see_on_terminal(model):
-    hthy = 0
-    inf = 0
-    im = 0
-    ded = 0
-    for i in model.agents:
-        if i.state == "healthy":
-            hthy += 1
-        elif i.state == "infected":
-            inf += 1
-        elif i.state == "immune":
-            im += 1
-        elif i.state == "dead":
-            ded += 1
-
-    print(f"Step {model.steps}: H={hthy}, I={inf}, R={im}, D={ded}")

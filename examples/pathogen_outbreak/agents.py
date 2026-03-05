@@ -2,7 +2,7 @@ from mesa import Agent
 import random
 
 
-class citizen(Agent):
+class Citizen(Agent):
 
     def __init__(self, model):
         super().__init__(model)
