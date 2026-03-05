@@ -1,9 +1,9 @@
-from mesa import Agent
 import random
+
+from mesa import Agent
 
 
 class Citizen(Agent):
-
     def __init__(self, model):
         super().__init__(model)
 
@@ -12,7 +12,6 @@ class Citizen(Agent):
         self.compliant = random.random() < self.model.compliance_rate
 
     def step(self):
-
         if self.model.quarantine_status and self.compliant:
             self.quarantine()
         else:
@@ -75,7 +74,6 @@ class Citizen(Agent):
 
     def move(self):
         if self.state != "dead":
-
             possible_ops = self.model.grid.get_neighborhood(
                 self.pos, moore=False, include_center=False
             )

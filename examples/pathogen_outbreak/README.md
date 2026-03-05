@@ -1,42 +1,42 @@
 # Pathogen Outbreak & Quarantine Compliance Model
 
-A fast-spreading pathogen outbreak model with no exposed/latency period  
-inspired loosely from the game Plague Inc, though the goal here is containment 
-rather than world domination. The model simulates how quarantine 
-compliance rates at the population level affect outbreak dynamics, 
+A fast-spreading pathogen outbreak model with no exposed/latency period
+inspired loosely from the game Plague Inc, though the goal here is containment
+rather than world domination. The model simulates how quarantine
+compliance rates at the population level affect outbreak dynamics,
 analyzing changes in infection, death and immunity rates.
 
 **It showcases:**
 
-- **Two-threshold quarantine system** - quarantine triggers when infected 
-  count exceeds an upper threshold and lifts only when it drops below a 
-  lower one, preventing quarantine from lifting the moment a single agent 
-  recovers 
-- **Compliance rate** - a configurable fraction of citizens actually follow 
-  quarantine orders, attempting to simulate real-world partial adherence. The rest 
+- **Two-threshold quarantine system** - quarantine triggers when infected
+  count exceeds an upper threshold and lifts only when it drops below a
+  lower one, preventing quarantine from lifting the moment a single agent
+  recovers
+- **Compliance rate** - a configurable fraction of citizens actually follow
+  quarantine orders, attempting to simulate real-world partial adherence. The rest
   (shown as squares) keep moving freely by not following quarantine instructions.
 - **Flee behaviour** — compliant healthy agents moves away from quarantined zones during lockdown.
-- **Infected agents freeze** — simulating a government isolating/quarantining an infected 
+- **Infected agents freeze** — simulating a government isolating/quarantining an infected
   zone. Non-compliant agents ignore this entirely.
 - **Emergence of different outcomes** — combination of different configurations produce dramatically different outbreak curves.
 
 ## How It Works
 
-1. **Initialization** — citizens are placed randomly on a MultiGrid. 
+1. **Initialization** — citizens are placed randomly on a MultiGrid.
    A configurable number are set initially as infected.
-2. **Disease Spread** — each step, healthy agents check their neighbours including diagonals. 
-   If any are infected, there is a configurable chance of transmission. 
+2. **Disease Spread** — each step, healthy agents check their neighbours including diagonals.
+   If any are infected, there is a configurable chance of transmission.
    No latency period — infection is immediate on contact,chance of getting an infection is 60%.
-3. **Quarantine System** — the model monitors total infected count each step. 
-   When it exceeds the upper threshold, quarantine activates. It only lifts 
+3. **Quarantine System** — the model monitors total infected count each step.
+   When it exceeds the upper threshold, quarantine activates. It only lifts
    when infected drops below the lower threshold.
 4. **Agent Behaviour during Quarantine:**
-   - Compliant agents(circles) - use Manhattan distance  
+   - Compliant agents(circles) - use Manhattan distance
      to flee away from all infected agents.
    - Non-compliant agents(squares) — move randomly, ignoring quarantine
    - Infected agents - compliant ones, freeze in place, simulating isolation or a lockdowned zone
-5. **Recovery** — after 10 steps of infection, agents recover to full 
-   immunity or die with the probability of 10%. Dead agents remain 
+5. **Recovery** — after 10 steps of infection, agents recover to full
+   immunity or die with the probability of 10%. Dead agents remain
    on the grid as red circles/squares(this is an intentional mechanic) as a visual indicator to assess how compliance affects the compliant as well as non-compliant groups.
 
 ## Interesting Cases to Observe
