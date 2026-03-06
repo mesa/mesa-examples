@@ -18,13 +18,13 @@ An agent's state represents its "opinion" and is shown by the color of the cell 
 
 ## How to Run
 
-To run the model interactively, run ``mesa runserver` in this directory. e.g.
+To run the model interactively, run ``solara run`` in this directory. e.g.
 
-```
-    $ mesa runserver
+```bash
+    $ solara run app.py
 ```
 
-Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and press Reset, then Run.
+Then open your browser to [http://localhost:8765/](http://localhost:8765/) and press Reset, then Run.
 
 ## Files
 
