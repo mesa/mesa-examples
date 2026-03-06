@@ -2,7 +2,8 @@ from mesa import Model
 from mesa.discrete_space import OrthogonalMooreGrid
  
 from .agent import CarAgent
- 
+
+
 class TraficFlow(Model):
     def __init__(self, width=20, height=5, n_cars=10, seed=None):
         super().__init__(seed=seed)

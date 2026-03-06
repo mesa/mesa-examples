@@ -1,9 +1,10 @@
 from mesa import Agent
 
+
 class CarAgent(Agent):
     def __init__(self, model):
         super().__init__(model)
-        
+
     def move(self):
         x,y = self.pos
         new_pos = ((x + 1) % self.model.grid.dimensions[0], y)
@@ -17,4 +18,3 @@ class CarAgent(Agent):
 
     def step(self):
         self.move()
-        
