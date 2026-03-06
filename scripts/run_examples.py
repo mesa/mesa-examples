@@ -1,5 +1,5 @@
-import subprocess
 import os
+import subprocess
 
 # Root directory containing all Mesa examples
 EXAMPLES_DIR = "examples"
@@ -42,11 +42,11 @@ for example in examples:
         # Run the example using subprocess
         subprocess.run(
             ["python", "app.py"],  # command to execute
-            cwd=example,           # run the command inside the example folder
-            timeout=15,            # stop execution if it runs longer than 15 seconds
-            check=True,            # raise an exception if the program exits with an error
+            cwd=example,  # run the command inside the example folder
+            timeout=15,  # stop execution if it runs longer than 15 seconds
+            check=True,  # raise an exception if the program exits with an error
             stdout=subprocess.DEVNULL,  # suppress normal output from the example
-            stderr=subprocess.DEVNULL   # suppress error output
+            stderr=subprocess.DEVNULL,  # suppress error output
         )
 
         # If execution finishes successfully
