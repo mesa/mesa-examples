@@ -2,11 +2,13 @@
 
 A minimal traffic flow agent-based model built with the Mesa framework (tested with Mesa `3.3.1`).
 
+The model uses Mesa 3.x's modern `OrthogonalMooreGrid` for discrete space representation, providing the latest Mesa API features.
+
 The model uses a discrete grid world with cars that move only from left to right. When a car reaches the right edge, it wraps back to the left using a torus grid.
 
 ## What this model does
 
-- The world is a `width x height` `MultiGrid` with `torus=True`.
+- The world is a `width x height` `OrthogonalMooreGrid`.
 - Cars are placed randomly at initialization (one car per cell).
 - Each simulation step (a “tick”), every car attempts to move one cell to the right:
   - If the cell is empty, it moves.
