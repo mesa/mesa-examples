@@ -65,6 +65,7 @@ Respond with ONLY a single number between 0.0 and 10.0 representing your new opi
                         response_text += block.text
             # Extract first float found in response
             import re
+
             numbers = re.findall(r"\b\d+\.?\d*\b", response_text)
             if numbers:
                 new_opinion = float(numbers[0])
