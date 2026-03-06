@@ -1,6 +1,6 @@
 import random
 
-from agents import Citizen
+from .agents import Citizen
 from mesa import DataCollector, Model
 from mesa.space import MultiGrid
 
