@@ -1,13 +1,13 @@
 from mesa import Model
 from mesa.discrete_space import OrthogonalMooreGrid
- 
+
 from .agent import CarAgent
 
 
 class TraficFlow(Model):
     def __init__(self, width=20, height=5, n_cars=10, seed=None):
         super().__init__(seed=seed)
-        
+
         self.grid = OrthogonalMooreGrid([width, height], torus=True, random=self.random)
 
         for _ in range(n_cars):

@@ -6,7 +6,7 @@ class CarAgent(Agent):
         super().__init__(model)
 
     def move(self):
-        x,y = self.pos
+        x, y = self.pos
         new_pos = ((x + 1) % self.model.grid.dimensions[0], y)
         if len(self.model.grid._cells[new_pos].agents) == 0:
             # Remove from current cell
