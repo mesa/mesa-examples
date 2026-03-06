@@ -44,18 +44,12 @@ class LLMSchellingModel(mesa.Model):
     ):
         super().__init__(rng=rng)
 
-        self.grid = OrthogonalMooreGrid(
-            (width, height), torus=True, random=self.random
-        )
+        self.grid = OrthogonalMooreGrid((width, height), torus=True, random=self.random)
 
         self.datacollector = mesa.DataCollector(
             model_reporters={
-                "happy": lambda m: sum(
-                    1 for a in m.agents if a.is_happy
-                ),
-                "unhappy": lambda m: sum(
-                    1 for a in m.agents if not a.is_happy
-                ),
+                "happy": lambda m: sum(1 for a in m.agents if a.is_happy),
+                "unhappy": lambda m: sum(1 for a in m.agents if not a.is_happy),
                 "segregation_index": lambda m: self._segregation_index(m),
             }
         )
