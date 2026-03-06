@@ -39,13 +39,14 @@ class LLMOpinionDynamicsModel(mesa.Model):
         super().__init__(rng=rng)
 
         self.topic = topic
-        self.grid = OrthogonalMooreGrid((width, height), torus=True, random=self.random)
+        self.grid = OrthogonalMooreGrid(
+            (width, height), torus=True, random=self.random
+        )
 
         self.datacollector = mesa.DataCollector(
             agent_reporters={"opinion": "opinion"},
             model_reporters={
-                "mean_opinion": lambda m: sum(a.opinion for a in m.agents)
-                / len(m.agents),
+                "mean_opinion": lambda m: sum(a.opinion for a in m.agents) / len(m.agents),
                 "opinion_variance": lambda m: self._variance(m),
             },
         )
@@ -55,7 +56,7 @@ class LLMOpinionDynamicsModel(mesa.Model):
         self.random.shuffle(cells)
         selected_cells = cells[:n_agents]
 
-        for i, cell in enumerate(selected_cells):
+        for cell in enumerate(selected_cells):
             initial_opinion = self.random.uniform(0.0, 10.0)
             agent = OpinionAgent(
                 model=self,
