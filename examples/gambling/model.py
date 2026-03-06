@@ -39,8 +39,7 @@ class LuckVsSkillModel(Model):
     def step(self):
         self.steps += 1
 
-        for agent in list(self.agents):
-            agent.step()
+        self.agents.shuffle_do("step")
 
         self.datacollector.collect(self)
 
