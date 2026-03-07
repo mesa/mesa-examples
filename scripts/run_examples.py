@@ -10,13 +10,15 @@ def find_examples():
     Recursively search the examples directory and return
     a list of folders that contain an 'app.py' file.
     """
+    Local_EXAMPLE_DIR = EXAMPLES_DIR
+
     example_paths = []
 
     # os.walk traverses the directory tree:
     # root -> current directory path
     # dirs -> subdirectories inside root
     # files -> files inside root
-    for root, dirs, files in os.walk(EXAMPLES_DIR):
+    for root, dirs, files in os.walk(Local_EXAMPLE_DIR):
         if "app.py" in files:
             # If an app.py exists in this directory,
             # it is considered a runnable Mesa example
