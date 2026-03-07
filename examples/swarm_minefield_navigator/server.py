@@ -4,22 +4,20 @@ from __future__ import annotations
 
 import socket
 
-from mesa.visualization.ModularVisualization import ModularServer
-from mesa.visualization.UserParam import Slider
-from mesa.visualization.UserParam import StaticText
-from mesa.visualization.modules import CanvasGrid, TextElement
-
 from agents import (
-    CheckpointAgent,
-    DeadEndAgent,
     FINAL_PATH,
     MINE,
     SAFE,
     UNSAFE_BUFFER,
+    CheckpointAgent,
+    DeadEndAgent,
     DroneAgent,
     KnowledgeCellAgent,
     MineAgent,
 )
+from mesa.visualization.ModularVisualization import ModularServer
+from mesa.visualization.modules import CanvasGrid, TextElement
+from mesa.visualization.UserParam import Slider, StaticText
 from model import MinefieldModel
 
 
@@ -47,7 +45,11 @@ def portrayal(agent):
             layer = 4
             text = "L"
         else:
-            color = "Orange" if agent.state == "RALLYING" and agent.safety_override else "DeepSkyBlue"
+            color = (
+                "Orange"
+                if agent.state == "RALLYING" and agent.safety_override
+                else "DeepSkyBlue"
+            )
             radius = 0.7
             layer = 3
             text = "R" if agent.state == "RALLYING" and agent.safety_override else "F"

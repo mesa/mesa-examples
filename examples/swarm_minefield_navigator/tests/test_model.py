@@ -6,12 +6,18 @@ import sys
 import unittest
 from pathlib import Path
 
-
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from agents import DEAD_END, FINAL_PATH, MINE, SAFE, UNSAFE_BUFFER, DroneAgent, MineAgent  # noqa: E402
+from agents import (  # noqa: E402
+    DEAD_END,
+    FINAL_PATH,
+    MINE,
+    SAFE,
+    UNSAFE_BUFFER,
+    MineAgent,
+)
 from model import MinefieldModel  # noqa: E402
 
 
@@ -117,7 +123,10 @@ class MinefieldModelTestCase(unittest.TestCase):
 
         self.assertEqual(final_path, safe_path)
         self.assertTrue(
-            all(self.model.knowledge_base[position] == FINAL_PATH for position in final_path)
+            all(
+                self.model.knowledge_base[position] == FINAL_PATH
+                for position in final_path
+            )
         )
 
     def test_model_stops_when_all_drones_are_inactive(self) -> None:
@@ -192,7 +201,9 @@ class MinefieldModelTestCase(unittest.TestCase):
         self.assertEqual(promoted.role, "LEADER")
         self.assertEqual(old_leader.role, "FOLLOWER")
         self.assertIsNone(promoted.leader_agent)
-        followers = [drone for drone in self.model.iter_drones() if drone is not promoted]
+        followers = [
+            drone for drone in self.model.iter_drones() if drone is not promoted
+        ]
         self.assertTrue(all(drone.leader_agent is promoted for drone in followers))
         self.assertTrue(all(drone.state == "RALLYING" for drone in followers))
 
@@ -207,7 +218,9 @@ class MinefieldModelTestCase(unittest.TestCase):
         self.model.start_free_flight()
 
         self.assertEqual(self.model.free_flight_ticks_remaining, 2)
-        self.assertTrue(all(drone.state == "FREE_FLY" for drone in self.model.iter_drones()))
+        self.assertTrue(
+            all(drone.state == "FREE_FLY" for drone in self.model.iter_drones())
+        )
 
         self.model.grid.move_agent(promoted, (6, 7))
         self.model._update_free_flight()

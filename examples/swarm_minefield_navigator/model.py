@@ -3,28 +3,27 @@
 from __future__ import annotations
 
 import heapq
-from typing import Dict, Iterable, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Set, Tuple
+from collections.abc import Iterable
 
+from agents import (
+    DEAD_END,
+    FINAL_PATH,
+    MINE,
+    SAFE,
+    UNSAFE_BUFFER,
+    CheckpointAgent,
+    DeadEndAgent,
+    DroneAgent,
+    KnowledgeCellAgent,
+    MineAgent,
+)
 from mesa import Model
 from mesa.datacollection import DataCollector
 from mesa.space import MultiGrid
 from mesa.time import RandomActivation
 
-from agents import (
-    CheckpointAgent,
-    DEAD_END,
-    DeadEndAgent,
-    FINAL_PATH,
-    MINE,
-    SAFE,
-    UNSAFE_BUFFER,
-    DroneAgent,
-    KnowledgeCellAgent,
-    MineAgent,
-)
-
-
-Coordinate = Tuple[int, int]
+Coordinate = tuple[int, int]
 
 
 class MinefieldModel(Model):
@@ -41,7 +40,7 @@ class MinefieldModel(Model):
         drone_2_x: int = 45,
         drone_3_x: int = 50,
         drone_4_x: int = 55,
-        seed: Optional[int] = None,
+        seed: int | None = None,
     ) -> None:
         super().__init__(seed=seed)
         self.width = width
@@ -51,28 +50,28 @@ class MinefieldModel(Model):
         self.num_mines = min(500, max(0, int(num_mines)))
         self.grid = MultiGrid(width, height, False)
         self.schedule = RandomActivation(self)
-        self.knowledge_base: Dict[Coordinate, str] = {}
+        self.knowledge_base: dict[Coordinate, str] = {}
         self.discovered_map = self.knowledge_base
-        self.verification_queue: Set[Coordinate] = set()
-        self.checkpoints: List[Coordinate] = []
-        self.checkpoint_positions: Set[Coordinate] = set()
-        self.dead_ends: Set[Coordinate] = set()
-        self.discovered_mines: Set[Coordinate] = set()
-        self.scanned_cells: Set[Coordinate] = set()
-        self.knowledge_cell_agents: Dict[Coordinate, KnowledgeCellAgent] = {}
-        self.checkpoint_agents: Dict[Coordinate, CheckpointAgent] = {}
-        self.dead_end_agents: Dict[Coordinate, DeadEndAgent] = {}
-        self.entry_points: List[Coordinate] = []
-        self.top_reached_positions: Set[Coordinate] = set()
-        self.final_path: List[Coordinate] = []
+        self.verification_queue: set[Coordinate] = set()
+        self.checkpoints: list[Coordinate] = []
+        self.checkpoint_positions: set[Coordinate] = set()
+        self.dead_ends: set[Coordinate] = set()
+        self.discovered_mines: set[Coordinate] = set()
+        self.scanned_cells: set[Coordinate] = set()
+        self.knowledge_cell_agents: dict[Coordinate, KnowledgeCellAgent] = {}
+        self.checkpoint_agents: dict[Coordinate, CheckpointAgent] = {}
+        self.dead_end_agents: dict[Coordinate, DeadEndAgent] = {}
+        self.entry_points: list[Coordinate] = []
+        self.top_reached_positions: set[Coordinate] = set()
+        self.final_path: list[Coordinate] = []
         self.mission_time_seconds = 0.0
         self.path_status = "Exploration in progress"
         self.running = True
-        self.minefield_epicenters: List[Coordinate] = []
-        self.leader_agent: Optional[DroneAgent] = None
-        self.follower_offsets: List[Coordinate] = [(-2, -1), (2, -1), (0, -2)]
+        self.minefield_epicenters: list[Coordinate] = []
+        self.leader_agent: DroneAgent | None = None
+        self.follower_offsets: list[Coordinate] = [(-2, -1), (2, -1), (0, -2)]
         self.free_flight_ticks_remaining = 0
-        self.free_flight_origin_y: Dict[int, int] = {}
+        self.free_flight_origin_y: dict[int, int] = {}
         self.initial_drone_x = [
             self._normalize_drone_x(drone_1_x),
             self._normalize_drone_x(drone_2_x),
@@ -95,9 +94,9 @@ class MinefieldModel(Model):
         )
         self.datacollector.collect(self)
 
-    def _generate_reserved_safe_zone(self) -> Set[Coordinate]:
+    def _generate_reserved_safe_zone(self) -> set[Coordinate]:
         """Create a narrow wandering corridor that guarantees a valid route exists."""
-        reserved: Set[Coordinate] = set()
+        reserved: set[Coordinate] = set()
         center_x = self.random.randint(self.width // 4, (3 * self.width) // 4)
         corridor_half_width = max(1, min(2, self.width // 40))
 
@@ -131,15 +130,17 @@ class MinefieldModel(Model):
         if target_mines == 0:
             return
 
-        placed_mines: Set[Coordinate] = set()
+        placed_mines: set[Coordinate] = set()
         row_bands = min(8, max(4, self.height // 12))
         column_bands = min(8, max(4, self.width // 12))
         band_height = max(1, (self.height - spawn_clear_rows) // row_bands)
         band_width = max(1, self.width // column_bands)
 
-        band_buckets: Dict[Tuple[int, int], List[Coordinate]] = {}
+        band_buckets: dict[tuple[int, int], list[Coordinate]] = {}
         for candidate in candidates:
-            band_y = min((candidate[1] - spawn_clear_rows) // band_height, row_bands - 1)
+            band_y = min(
+                (candidate[1] - spawn_clear_rows) // band_height, row_bands - 1
+            )
             band_x = min(candidate[0] // band_width, column_bands - 1)
             band_buckets.setdefault((band_x, band_y), []).append(candidate)
 
@@ -208,7 +209,7 @@ class MinefieldModel(Model):
             self.schedule.add(follower)
             self.entry_points.append(start_position)
 
-    def _build_search_formation(self) -> List[int]:
+    def _build_search_formation(self) -> list[int]:
         """Build the compact post-rendezvous formation from slider spawn values."""
         active_columns = self.initial_drone_x[: self.drone_count]
         anchor_x = round(sum(active_columns) / len(active_columns))
@@ -240,7 +241,7 @@ class MinefieldModel(Model):
         return min(max(scaled_x, 0), self.width - 1)
 
     @staticmethod
-    def _evenly_spaced_indices(length: int, count: int) -> List[int]:
+    def _evenly_spaced_indices(length: int, count: int) -> list[int]:
         """Return roughly evenly spaced indices across a sorted column list."""
         if count == 1:
             return [length // 2]
@@ -273,7 +274,9 @@ class MinefieldModel(Model):
             self.running = False
 
         if self.running and not any(agent.is_active for agent in self.iter_drones()):
-            self.path_status = "No path found before all drones exhausted their batteries"
+            self.path_status = (
+                "No path found before all drones exhausted their batteries"
+            )
             self.running = False
 
         self.datacollector.collect(self)
@@ -360,14 +363,18 @@ class MinefieldModel(Model):
         candidate = max(
             drones,
             key=lambda drone: (
-                drone.pos[1] - self.free_flight_origin_y.get(drone.unique_id, drone.pos[1]),
+                drone.pos[1]
+                - self.free_flight_origin_y.get(drone.unique_id, drone.pos[1]),
                 drone.pos[1],
                 drone.pos[0],
             ),
         )
         if self.leader_agent is None:
             self.leader_agent = candidate
-        elif candidate is not self.leader_agent and candidate.pos[1] > self.leader_agent.pos[1]:
+        elif (
+            candidate is not self.leader_agent
+            and candidate.pos[1] > self.leader_agent.pos[1]
+        ):
             self.leadership_handoff(candidate)
         else:
             self.leader_agent.state = "SCANNING"
@@ -423,7 +430,9 @@ class MinefieldModel(Model):
             self.knowledge_base[neighbor] = UNSAFE_BUFFER
             self._sync_knowledge_cell(neighbor, UNSAFE_BUFFER)
 
-    def generate_final_path(self, goal: Optional[Coordinate] = None) -> List[Coordinate]:
+    def generate_final_path(
+        self, goal: Coordinate | None = None
+    ) -> list[Coordinate]:
         """Resolve and mark the winning route once a drone reaches the top edge."""
         goal = goal or self._select_top_goal()
         if goal is None:
@@ -438,7 +447,9 @@ class MinefieldModel(Model):
         path = self.generate_safe_path(goal)
         self.final_path = path
         if not path:
-            self.path_status = "No fully verified path found through explored safe cells"
+            self.path_status = (
+                "No fully verified path found through explored safe cells"
+            )
             return []
 
         for coordinate in path:
@@ -447,7 +458,7 @@ class MinefieldModel(Model):
         self.path_status = f"Safe path found with {len(path)} cells"
         return path
 
-    def _select_top_goal(self) -> Optional[Coordinate]:
+    def _select_top_goal(self) -> Coordinate | None:
         """Choose a safe goal candidate from the top edge."""
         top_positions = [
             drone.pos for drone in self.iter_drones() if drone.pos[1] == self.height - 1
@@ -458,9 +469,9 @@ class MinefieldModel(Model):
             return max(self.top_reached_positions, key=lambda coordinate: coordinate[1])
         return None
 
-    def moore_neighborhood(self, position: Coordinate) -> List[Coordinate]:
+    def moore_neighborhood(self, position: Coordinate) -> list[Coordinate]:
         """Return the inclusive Moore neighborhood for a grid position."""
-        neighbors: List[Coordinate] = []
+        neighbors: list[Coordinate] = []
         for dx in (-1, 0, 1):
             for dy in (-1, 0, 1):
                 candidate = (position[0] + dx, position[1] + dy)
@@ -531,7 +542,7 @@ class MinefieldModel(Model):
         contents = self.grid.get_cell_list_contents([position])
         return any(isinstance(agent, MineAgent) for agent in contents)
 
-    def get_battery_levels(self) -> Dict[int, int]:
+    def get_battery_levels(self) -> dict[int, int]:
         """Return the current battery level for each drone."""
         return {agent.unique_id: agent.battery for agent in self.iter_drones()}
 
@@ -543,7 +554,7 @@ class MinefieldModel(Model):
         """Accumulate mission time using scan or flight durations."""
         self.mission_time_seconds += seconds
 
-    def generate_safe_path(self, goal: Coordinate) -> List[Coordinate]:
+    def generate_safe_path(self, goal: Coordinate) -> list[Coordinate]:
         """Run A* only through fully verified safe cells."""
         if not self._is_verified_safe(goal):
             return []
@@ -556,15 +567,15 @@ class MinefieldModel(Model):
         if not start_candidates:
             return []
 
-        g_score: Dict[Coordinate, int] = {}
-        came_from: Dict[Coordinate, Coordinate] = {}
-        frontier: List[Tuple[int, int, Coordinate]] = []
+        g_score: dict[Coordinate, int] = {}
+        came_from: dict[Coordinate, Coordinate] = {}
+        frontier: list[tuple[int, int, Coordinate]] = []
 
         for start in start_candidates:
             g_score[start] = 0
             heapq.heappush(frontier, (self._heuristic(start, goal), 0, start))
 
-        closed: Set[Coordinate] = set()
+        closed: set[Coordinate] = set()
 
         while frontier:
             _, current_cost, current = heapq.heappop(frontier)
@@ -586,9 +597,9 @@ class MinefieldModel(Model):
 
         return []
 
-    def _safe_neighbors(self, position: Coordinate) -> List[Coordinate]:
+    def _safe_neighbors(self, position: Coordinate) -> list[Coordinate]:
         """Return Moore-neighbor cells that are fully verified safe."""
-        neighbors: List[Coordinate] = []
+        neighbors: list[Coordinate] = []
         for candidate in self.moore_neighborhood(position):
             if candidate == position:
                 continue
@@ -615,9 +626,9 @@ class MinefieldModel(Model):
 
     @staticmethod
     def _reconstruct_path(
-        came_from: Dict[Coordinate, Coordinate],
+        came_from: dict[Coordinate, Coordinate],
         current: Coordinate,
-    ) -> List[Coordinate]:
+    ) -> list[Coordinate]:
         """Rebuild an A* path from the predecessor map."""
         path = [current]
         while current in came_from:

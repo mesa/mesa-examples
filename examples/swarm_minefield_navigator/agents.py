@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
-from collections import deque
 import heapq
+from collections import deque
 from typing import Dict, Set, Tuple
 
 from mesa import Agent
 
-
-Coordinate = Tuple[int, int]
+Coordinate = tuple[int, int]
 
 
 SAFE = "SAFE"
@@ -218,7 +217,9 @@ class DroneAgent(Agent):
 
         east = self._offset_position((1, 0))
         west = self._offset_position((-1, 0))
-        lateral_moves = self._leader_choice(self._ordered_lateral_candidates(east, west))
+        lateral_moves = self._leader_choice(
+            self._ordered_lateral_candidates(east, west)
+        )
         if lateral_moves is not None:
             self.state = "AVOIDING"
             self.flank_direction = (lateral_moves[0] - self.pos[0], 0)
@@ -286,7 +287,9 @@ class DroneAgent(Agent):
         if self.leader_agent.state == "BACKTRACKING":
             rally_target = self.leader_agent.retreat_target or self.leader_agent.pos
             self.safety_override = True
-            if self.pos == rally_target or self._will_be_adjacent(self.pos, rally_target):
+            if self.pos == rally_target or self._will_be_adjacent(
+                self.pos, rally_target
+            ):
                 self.local_safe_memory.clear()
                 self.safety_override = False
                 return None
@@ -337,7 +340,9 @@ class DroneAgent(Agent):
         south = self._offset_position((0, -1))
 
         priority_moves = [north]
-        lateral_moves = [candidate for candidate in (east, west) if candidate is not None]
+        lateral_moves = [
+            candidate for candidate in (east, west) if candidate is not None
+        ]
         self.random.shuffle(lateral_moves)
         priority_moves.extend(lateral_moves)
         priority_moves.append(south)
@@ -345,7 +350,9 @@ class DroneAgent(Agent):
         move = self._tabu_aware_choice(priority_moves)
         if move is not None:
             return move
-        return self._override_step_toward((self.pos[0], min(self.pos[1] + 1, self.model.height - 1)))
+        return self._override_step_toward(
+            (self.pos[0], min(self.pos[1] + 1, self.model.height - 1))
+        )
 
     def _pick_best_rally_move(
         self,
@@ -426,12 +433,14 @@ class DroneAgent(Agent):
         require_known_safe: bool = False,
     ) -> Coordinate | None:
         """Return the first step of a local A* route toward the given target."""
-        frontier: list[Tuple[int, int, Coordinate]] = []
-        g_score: Dict[Coordinate, int] = {self.pos: 0}
-        came_from: Dict[Coordinate, Coordinate] = {}
-        closed: Set[Coordinate] = set()
+        frontier: list[tuple[int, int, Coordinate]] = []
+        g_score: dict[Coordinate, int] = {self.pos: 0}
+        came_from: dict[Coordinate, Coordinate] = {}
+        closed: set[Coordinate] = set()
 
-        heapq.heappush(frontier, (self._manhattan_distance(self.pos, target), 0, self.pos))
+        heapq.heappush(
+            frontier, (self._manhattan_distance(self.pos, target), 0, self.pos)
+        )
 
         while frontier:
             _, current_cost, current = heapq.heappop(frontier)
@@ -443,7 +452,9 @@ class DroneAgent(Agent):
                 return self._first_path_step(came_from, current)
 
             for neighbor in self._adjacent_moves_from(current):
-                if not self._is_valid_move(neighbor, require_known_safe=require_known_safe):
+                if not self._is_valid_move(
+                    neighbor, require_known_safe=require_known_safe
+                ):
                     continue
                 if self.role == "LEADER" and neighbor in self.model.dead_ends:
                     continue
@@ -459,7 +470,7 @@ class DroneAgent(Agent):
 
     def _first_path_step(
         self,
-        came_from: Dict[Coordinate, Coordinate],
+        came_from: dict[Coordinate, Coordinate],
         current: Coordinate,
     ) -> Coordinate | None:
         """Return the first move from the current drone position along a route."""
