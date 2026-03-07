@@ -1,3 +1,4 @@
+import os
 import random
 
 import geopandas as gpd
@@ -8,7 +9,7 @@ import rasterio
 from rasterio.transform import from_origin
 from shapely.geometry import Point
 
-from .agents import Household
+from agents import Household
 
 
 class SolarAdoption(mesa.Model):

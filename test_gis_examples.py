@@ -1,5 +1,6 @@
 import importlib
 import os
+import sys
 
 import pytest
 from mesa import Model
@@ -14,7 +15,13 @@ def get_models(directory):
                     os.sep, "."
                 )
 
+                # Append the example's directory to sys.path so its absolute imports work
+                sys.path.insert(0, os.path.abspath(root))
+
                 module = importlib.import_module(module_name)
+                
+                # Clean up sys.path
+                sys.path.pop(0)
                 for item in dir(module):
                     obj = getattr(module, item)
                     if (
