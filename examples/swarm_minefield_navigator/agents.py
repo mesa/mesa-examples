@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections import deque
 import heapq
-from typing import Deque, Dict, List, Optional, Set, Tuple
+from typing import Dict, Set, Tuple
 
 from mesa import Agent
 
@@ -86,13 +86,13 @@ class DroneAgent(Agent):
         self.battery = 600
         self.is_active = True
         self.state = "SCANNING"
-        self.flank_direction: Optional[Coordinate] = None
+        self.flank_direction: Coordinate | None = None
         self.preferred_direction = -1 if formation_slot < model.drone_count / 2 else 1
-        self.recent_path: Deque[Coordinate] = deque(maxlen=8)
-        self.last_position: Optional[Coordinate] = None
+        self.recent_path: deque[Coordinate] = deque(maxlen=8)
+        self.last_position: Coordinate | None = None
         self.local_safe_memory: set[Coordinate] = set()
-        self.retreat_target: Optional[Coordinate] = None
-        self.checkpoint_stack: List[Coordinate] = [] if role == "LEADER" else []
+        self.retreat_target: Coordinate | None = None
+        self.checkpoint_stack: list[Coordinate] = []
         self.safety_override = False
         self.frustration_counter = 0
         self.max_y_reached = 0
@@ -137,8 +137,8 @@ class DroneAgent(Agent):
             include_center=True,
             radius=1,
         )
-        discovered_mines: List[Coordinate] = []
-        scanned_safe: List[Coordinate] = []
+        discovered_mines: list[Coordinate] = []
+        scanned_safe: list[Coordinate] = []
         sensor_cells = set(neighborhood)
 
         for cell in neighborhood:
@@ -164,8 +164,8 @@ class DroneAgent(Agent):
 
     def _maybe_store_checkpoint(
         self,
-        discovered_mines: List[Coordinate],
-        neighborhood: List[Coordinate],
+        discovered_mines: list[Coordinate],
+        neighborhood: list[Coordinate],
     ) -> None:
         """Store fully clear 3x3 intersections as macro backtracking anchors."""
         if discovered_mines:
@@ -177,7 +177,7 @@ class DroneAgent(Agent):
         self.model.mark_checkpoint(self.pos)
         self.checkpoint_stack.append(self.pos)
 
-    def _decide_next_move(self) -> Optional[Coordinate]:
+    def _decide_next_move(self) -> Coordinate | None:
         """Dispatch movement logic based on drone role."""
         if self.state == "FREE_FLY":
             return self._free_fly_move()
@@ -199,7 +199,7 @@ class DroneAgent(Agent):
             return
         self.frustration_counter += 1
 
-    def _leader_move(self) -> Optional[Coordinate]:
+    def _leader_move(self) -> Coordinate | None:
         """Drive the leader north, flank around hazards, and retreat from dead ends."""
         if self.state == "BACKTRACKING":
             return self._backtracking_step()
@@ -228,9 +228,9 @@ class DroneAgent(Agent):
 
     def _ordered_lateral_candidates(
         self,
-        east: Optional[Coordinate],
-        west: Optional[Coordinate],
-    ) -> List[Optional[Coordinate]]:
+        east: Coordinate | None,
+        west: Coordinate | None,
+    ) -> list[Coordinate | None]:
         """Order east and west according to the preferred flank direction."""
         if self.flank_direction is None:
             self.flank_direction = self._choose_flank_direction()
@@ -238,7 +238,7 @@ class DroneAgent(Agent):
             return [east, west]
         return [west, east]
 
-    def _follower_move(self) -> Optional[Coordinate]:
+    def _follower_move(self) -> Coordinate | None:
         """Follower navigates safely toward its dynamic V-formation target."""
         if self.leader_agent is None or self.leader_agent.pos is None:
             return None
@@ -278,7 +278,7 @@ class DroneAgent(Agent):
             ),
         )
 
-    def _rally_move(self) -> Optional[Coordinate]:
+    def _rally_move(self) -> Coordinate | None:
         """Rally a follower toward the current leader, escaping traps if needed."""
         if self.leader_agent is None or self.leader_agent.pos is None:
             return None
@@ -329,7 +329,7 @@ class DroneAgent(Agent):
             self.safety_override = False
         return override_move
 
-    def _free_fly_move(self) -> Optional[Coordinate]:
+    def _free_fly_move(self) -> Coordinate | None:
         """Temporarily release formation constraints and search independently."""
         north = self._offset_position((0, 1))
         east = self._offset_position((1, 0))
@@ -349,10 +349,10 @@ class DroneAgent(Agent):
 
     def _pick_best_rally_move(
         self,
-        candidates: List[Coordinate],
+        candidates: list[Coordinate],
         target: Coordinate,
         prefer_farther: bool = False,
-    ) -> Optional[Coordinate]:
+    ) -> Coordinate | None:
         """Choose a rally move, preferring non-tabu steps and useful escape motion."""
         if not candidates:
             return None
@@ -382,7 +382,7 @@ class DroneAgent(Agent):
             ),
         )
 
-    def _override_step_toward(self, target: Coordinate) -> Optional[Coordinate]:
+    def _override_step_toward(self, target: Coordinate) -> Coordinate | None:
         """Ignore hazard knowledge and move directly toward the leader."""
         candidates = self._adjacent_moves()
         if not candidates:
@@ -402,9 +402,7 @@ class DroneAgent(Agent):
             return True
         if self.state == "RALLYING" and self.safety_override:
             return True
-        if self.state == "FREE_FLY":
-            return True
-        return False
+        return self.state == "FREE_FLY"
 
     def _remember_safe_position(self) -> None:
         """Store cells that this drone has physically occupied safely."""
@@ -426,9 +424,9 @@ class DroneAgent(Agent):
         self,
         target: Coordinate,
         require_known_safe: bool = False,
-    ) -> Optional[Coordinate]:
+    ) -> Coordinate | None:
         """Return the first step of a local A* route toward the given target."""
-        frontier: List[Tuple[int, int, Coordinate]] = []
+        frontier: list[Tuple[int, int, Coordinate]] = []
         g_score: Dict[Coordinate, int] = {self.pos: 0}
         came_from: Dict[Coordinate, Coordinate] = {}
         closed: Set[Coordinate] = set()
@@ -463,7 +461,7 @@ class DroneAgent(Agent):
         self,
         came_from: Dict[Coordinate, Coordinate],
         current: Coordinate,
-    ) -> Optional[Coordinate]:
+    ) -> Coordinate | None:
         """Return the first move from the current drone position along a route."""
         while current in came_from and came_from[current] != self.pos:
             current = came_from[current]
@@ -482,7 +480,7 @@ class DroneAgent(Agent):
                 )
         return current
 
-    def _avoiding_step(self) -> Optional[Coordinate]:
+    def _avoiding_step(self) -> Coordinate | None:
         """Wall-follow laterally until north reopens, otherwise retreat to a checkpoint."""
         north = self._offset_position((0, 1))
         north_move = self._leader_choice([north])
@@ -507,7 +505,7 @@ class DroneAgent(Agent):
 
         return self._start_backtracking()
 
-    def _start_backtracking(self) -> Optional[Coordinate]:
+    def _start_backtracking(self) -> Coordinate | None:
         """Select the most recent viable checkpoint and begin retreating."""
         self.state = "BACKTRACKING"
         self.flank_direction = None
@@ -519,7 +517,7 @@ class DroneAgent(Agent):
 
         return self._backtracking_step()
 
-    def _backtracking_step(self) -> Optional[Coordinate]:
+    def _backtracking_step(self) -> Coordinate | None:
         """Walk back toward the latest checkpoint through known-safe cells."""
         if self.retreat_target is None:
             self.state = "SCANNING"
@@ -555,7 +553,7 @@ class DroneAgent(Agent):
                 return True
         return False
 
-    def _select_retreat_checkpoint(self) -> Optional[Coordinate]:
+    def _select_retreat_checkpoint(self) -> Coordinate | None:
         """Return the nearest remaining checkpoint and remove it from the stack."""
         candidates = [
             checkpoint
@@ -577,8 +575,8 @@ class DroneAgent(Agent):
 
     def _leader_choice(
         self,
-        candidates: List[Optional[Coordinate]],
-    ) -> Optional[Coordinate]:
+        candidates: list[Coordinate | None],
+    ) -> Coordinate | None:
         """Choose a leader move while avoiding known dead-end branches."""
         valid_moves = [
             candidate
@@ -598,7 +596,7 @@ class DroneAgent(Agent):
         usable_moves = tabu_filtered or valid_moves
         return usable_moves[0]
 
-    def _is_leader_move_valid(self, position: Optional[Coordinate]) -> bool:
+    def _is_leader_move_valid(self, position: Coordinate | None) -> bool:
         """Return True if the leader can still consider the destination."""
         if position is None:
             return False
@@ -608,9 +606,9 @@ class DroneAgent(Agent):
 
     def _tabu_aware_choice(
         self,
-        candidates: List[Optional[Coordinate]],
+        candidates: list[Coordinate | None],
         require_known_safe: bool = False,
-    ) -> Optional[Coordinate]:
+    ) -> Coordinate | None:
         """Prefer moves outside the tabu list, but never freeze because of it."""
         valid_moves = [
             candidate
@@ -633,8 +631,8 @@ class DroneAgent(Agent):
 
     def _filter_immediate_reversal(
         self,
-        candidates: List[Coordinate],
-    ) -> List[Coordinate]:
+        candidates: list[Coordinate],
+    ) -> list[Coordinate]:
         """Block direct back-and-forth oscillation during normal navigation."""
         if self.last_position is None:
             return candidates
@@ -683,13 +681,13 @@ class DroneAgent(Agent):
             return state in {SAFE, FINAL_PATH}
         return True
 
-    def _adjacent_moves(self) -> List[Coordinate]:
+    def _adjacent_moves(self) -> list[Coordinate]:
         """Return all in-bounds Moore-adjacent moves excluding the current cell."""
         return self._adjacent_moves_from(self.pos)
 
-    def _adjacent_moves_from(self, origin: Coordinate) -> List[Coordinate]:
+    def _adjacent_moves_from(self, origin: Coordinate) -> list[Coordinate]:
         """Return all in-bounds Moore-adjacent moves from an arbitrary origin."""
-        moves: List[Coordinate] = []
+        moves: list[Coordinate] = []
         for dx in (-1, 0, 1):
             for dy in (-1, 0, 1):
                 if dx == 0 and dy == 0:
@@ -700,7 +698,7 @@ class DroneAgent(Agent):
                 moves.append(destination)
         return moves
 
-    def _offset_position(self, delta: Coordinate) -> Optional[Coordinate]:
+    def _offset_position(self, delta: Coordinate) -> Coordinate | None:
         """Return an in-bounds offset position or None if it leaves the grid."""
         destination = (self.pos[0] + delta[0], self.pos[1] + delta[1])
         if self.model.grid.out_of_bounds(destination):

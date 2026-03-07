@@ -11,8 +11,8 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from agents import DEAD_END, FINAL_PATH, MINE, SAFE, UNSAFE_BUFFER, DroneAgent, MineAgent
-from model import MinefieldModel
+from agents import DEAD_END, FINAL_PATH, MINE, SAFE, UNSAFE_BUFFER, DroneAgent, MineAgent  # noqa: E402
+from model import MinefieldModel  # noqa: E402
 
 
 class MinefieldModelTestCase(unittest.TestCase):
@@ -101,7 +101,7 @@ class MinefieldModelTestCase(unittest.TestCase):
 
     def test_generate_safe_path_allows_cells_adjacent_to_buffer(self) -> None:
         """A verified safe cell may be used even if a neighbor is UNSAFE_BUFFER."""
-        safe_path = self._mark_verified_vertical_corridor(10)
+        self._mark_verified_vertical_corridor(10)
         self.model.register_mine((12, 10))
 
         self.assertEqual(self.model.knowledge_base[(11, 10)], UNSAFE_BUFFER)
