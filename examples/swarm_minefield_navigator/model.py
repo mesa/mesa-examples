@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import heapq
-from typing import Dict, List, Optional, Set, Tuple
 from collections.abc import Iterable
 
 from agents import (
@@ -430,9 +429,7 @@ class MinefieldModel(Model):
             self.knowledge_base[neighbor] = UNSAFE_BUFFER
             self._sync_knowledge_cell(neighbor, UNSAFE_BUFFER)
 
-    def generate_final_path(
-        self, goal: Coordinate | None = None
-    ) -> list[Coordinate]:
+    def generate_final_path(self, goal: Coordinate | None = None) -> list[Coordinate]:
         """Resolve and mark the winning route once a drone reaches the top edge."""
         goal = goal or self._select_top_goal()
         if goal is None:
