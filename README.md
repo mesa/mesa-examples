@@ -71,12 +71,18 @@ This project is an agent-based model implemented using the Mesa framework in Pyt
 ### [Emperor's Dilemma](https://github.com/mesa/mesa-examples/tree/main/examples/emperor_dilemma)
 
 This project simulates how unpopular norms can dominate a society even when the vast majority of individuals privately reject them. It demonstrates the "illusion of consensus" where agents, driven by a fear of appearing disloyal, not only comply with a rule they hate but also aggressively enforce it on their neighbors. This phenomenon creates a "trap" of False Enforcement, where the loudest defenders of a norm are often its secret opponents.
+
 ### [Humanitarian Aid Distribution Model](https://github.com/mesa/mesa-examples/tree/main/examples/humanitarian_aid_distribution)
 
 This model simulates a humanitarian aid distribution scenario using a needs-based behavioral architecture. Beneficiaries have dynamic needs (water, food) and trucks distribute aid using a hybrid triage system.
+
 ### [Rumor Mill Model](https://github.com/mesa/mesa-examples/tree/main/examples/rumor_mill)
 
 A simple agent-based simulation showing how rumors spread through a population based on the spread chance and initial knowing percentage, implemented with the Mesa framework and adapted from NetLogo [Rumor mill](https://www.netlogoweb.org/launch#https://www.netlogoweb.org/assets/modelslib/Sample%20Models/Social%20Science/Rumor%20Mill.nlogox).
+
+### [Axelrod Culture Model](https://github.com/mesa/mesa-examples/tree/main/examples/axelrod_culture)
+
+An implementation of Axelrod's model of cultural dissemination. Agents on a grid hold multi-feature cultural profiles and interact with neighbors based on cultural similarity, producing emergent cultural regions. Demonstrates how local convergence and global polarization can coexist.
 
 
 ## Continuous Space Examples
