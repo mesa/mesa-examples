@@ -53,18 +53,33 @@ for example in examples:
 
         # If execution finishes successfully
         results["PASS"].append(example)
-        print("PASS\n")
-
-    except subprocess.TimeoutExpired:
-        # If the example runs longer than 15 seconds
-        # (many Mesa apps run continuously due to GUI loops)
-        results["TIMEOUT"].append(example)
-        print("TIMEOUT\n")
+        print("PASS (Python)\n")
 
     except Exception:
-        # Any other exception means the example crashed
-        results["FAIL"].append(example)
-        print("FAIL\n")
+        try:
+            # If python fails, try Solara
+            subprocess.run(
+                ["solara", "run", "app.py"],
+                cwd=example,
+                timeout=15,
+                check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+
+            results["PASS"].append(example)
+            print("PASS (solara)\n")
+
+        except subprocess.TimeoutExpired:
+            # If the example runs longer than 15 seconds
+            # (many Mesa apps run continuously due to GUI loops)
+            results["TIMEOUT"].append(example)
+            print("TIMEOUT\n")
+
+        except Exception:
+            # Any other exception means the example crashed
+            results["FAIL"].append(example)
+            print("FAIL\n")
 
 
 # Print final summary of results

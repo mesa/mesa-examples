@@ -6,7 +6,9 @@ PASS:
   examples\conways_game_of_life_fast
   examples\deffuant_weisbuch
   examples\dining_philosophers
+  examples\emperor_dilemma
   examples\forest_fire
+  examples\hex_ant
   examples\hotelling_law
   examples\humanitarian_aid_distribution
   examples\rumor_mill
@@ -14,6 +16,4 @@ PASS:
   examples\virus_antibody
   examples\warehouse
 FAIL:
-  examples\emperor_dilemma
-  examples\hex_ant
 TIMEOUT:
