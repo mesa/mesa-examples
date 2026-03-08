@@ -27,6 +27,10 @@ class CultureAgent(Agent):
         if sim == 0.0 or sim == 1.0:
             return
         if self.random.random() < sim:
-            differing = [i for i in range(len(self.culture)) if self.culture[i] != other.culture[i]]
+            differing = [
+                i
+                for i in range(len(self.culture))
+                if self.culture[i] != other.culture[i]
+            ]
             feature = self.random.choice(differing)
             self.culture[feature] = other.culture[feature]
