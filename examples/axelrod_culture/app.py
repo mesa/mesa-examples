@@ -1,15 +1,15 @@
 import hashlib
-
-import numpy as np
 import solara
-from axelrod_culture.model import AxelrodModel, number_of_cultural_regions
+import numpy as np
 from matplotlib.figure import Figure
+
 from mesa.visualization import SolaraViz, make_plot_component
+from axelrod_culture.model import AxelrodModel, number_of_cultural_regions
 
 
 def culture_to_color(culture):
     key = str(culture).encode()
-    h = hashlib.md5(key).hexdigest()
+    h = hashlib.sha256(key).hexdigest()
     return (int(h[0:2], 16) / 255, int(h[2:4], 16) / 255, int(h[4:6], 16) / 255)
 
 
@@ -32,38 +32,10 @@ RegionsPlot = make_plot_component({"Cultural Regions": "#e63946"})
 
 model_params = {
     "rng": {"type": "InputText", "value": 42, "label": "Random Seed"},
-    "width": {
-        "type": "SliderInt",
-        "value": 10,
-        "label": "Grid Width",
-        "min": 5,
-        "max": 20,
-        "step": 1,
-    },
-    "height": {
-        "type": "SliderInt",
-        "value": 10,
-        "label": "Grid Height",
-        "min": 5,
-        "max": 20,
-        "step": 1,
-    },
-    "F": {
-        "type": "SliderInt",
-        "value": 3,
-        "label": "Features (F)",
-        "min": 2,
-        "max": 10,
-        "step": 1,
-    },
-    "Q": {
-        "type": "SliderInt",
-        "value": 3,
-        "label": "Traits per feature (Q)",
-        "min": 2,
-        "max": 15,
-        "step": 1,
-    },
+    "width": {"type": "SliderInt", "value": 10, "label": "Grid Width", "min": 5, "max": 20, "step": 1},
+    "height": {"type": "SliderInt", "value": 10, "label": "Grid Height", "min": 5, "max": 20, "step": 1},
+    "f": {"type": "SliderInt", "value": 3, "label": "Features (F)", "min": 2, "max": 10, "step": 1},
+    "q": {"type": "SliderInt", "value": 3, "label": "Traits per feature (Q)", "min": 2, "max": 15, "step": 1},
 }
 
 model = AxelrodModel()
