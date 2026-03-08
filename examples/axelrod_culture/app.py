@@ -1,10 +1,10 @@
-import solara
-import numpy as np
 import hashlib
-from matplotlib.figure import Figure
 
-from mesa.visualization import SolaraViz, make_plot_component
+import numpy as np
+import solara
 from axelrod_culture.model import AxelrodModel, number_of_cultural_regions
+from matplotlib.figure import Figure
+from mesa.visualization import SolaraViz, make_plot_component
 
 
 def culture_to_color(culture):
