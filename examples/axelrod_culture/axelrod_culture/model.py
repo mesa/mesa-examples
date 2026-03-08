@@ -1,14 +1,25 @@
 """
 Axelrod Culture Model
 =====================
-Models how local cultural interactions produce global polarization.
-Each agent has F features, each with Q possible traits. Agents interact
-with neighbors with probability equal to cultural similarity, copying
-one differing trait if interaction occurs.
+
+Models how local cultural interactions can produce global polarization.
+Each agent has a "culture" consisting of f features, each taking one of
+q possible integer traits. At each step, an agent picks a random neighbor
+and interacts with probability equal to their cultural similarity. If they
+interact, the agent copies one of the neighbor's differing traits.
+
+Despite the tendency toward local convergence, stable cultural regions
+can persist -- a phenomenon Axelrod called the "culture problem":
+local homogenization coexisting with global diversity.
+
+Key result: the number of stable cultural regions decreases with f
+(more features -> more convergence) and increases with q (more traits
+per feature -> more diversity and fragmentation).
 
 Reference:
-    Axelrod, R. (1997). The dissemination of culture.
-    Journal of Conflict Resolution, 41(2), 203-226.
+    Axelrod, R. (1997). The dissemination of culture: A model with local
+    convergence and global polarization. Journal of Conflict Resolution,
+    41(2), 203-226.
 """
 
 from mesa import Model
@@ -19,10 +30,12 @@ from axelrod_culture.agents import CultureAgent
 
 
 def number_of_cultural_regions(model):
+    """Count distinct stable cultural regions using flood fill on the grid."""
     visited = set()
     regions = 0
     agent_by_pos = {
-        (int(a.cell.coordinate[0]), int(a.cell.coordinate[1])): a for a in model.agents
+        (int(a.cell.coordinate[0]), int(a.cell.coordinate[1])): a
+        for a in model.agents
     }
     for pos in agent_by_pos:
         if pos in visited:
@@ -33,29 +46,39 @@ def number_of_cultural_regions(model):
             cx, cy = queue.pop()
             for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                 npos = (cx + dx, cy + dy)
-                if npos not in visited and npos in agent_by_pos:
-                    if agent_by_pos[npos].culture == agent_by_pos[(cx, cy)].culture:
-                        visited.add(npos)
-                        queue.append(npos)
+                if npos not in visited and npos in agent_by_pos and agent_by_pos[npos].culture == agent_by_pos[(cx, cy)].culture:
+                    visited.add(npos)
+                    queue.append(npos)
         regions += 1
     return regions
 
 
 class AxelrodModel(Model):
-    def __init__(self, width=10, height=10, F=3, Q=3, rng=None):
+    """Axelrod's model of cultural dissemination on a grid.
+
+    Attributes:
+        width (int): Grid width
+        height (int): Grid height
+        f (int): Number of cultural features per agent
+        q (int): Number of possible traits per feature
+        grid: OrthogonalVonNeumannGrid containing agents
+    """
+
+    def __init__(self, width=10, height=10, f=3, q=3, rng=None):
         super().__init__(rng=rng)
+
         self.width = width
         self.height = height
-        self.F = F
-        self.Q = Q
+        self.f = f
+        self.q = q
 
-        self.grid = OrthogonalVonNeumannGrid(
-            (width, height), torus=False, random=self.random
-        )
+        self.grid = OrthogonalVonNeumannGrid((width, height), torus=False, random=self.random)
 
         cultures = [
-            [self.random.randrange(Q) for _ in range(F)] for _ in range(width * height)
+            [self.random.randrange(q) for _ in range(f)]
+            for _ in range(width * height)
         ]
+
         CultureAgent.create_agents(self, width * height, cultures)
 
         for agent, cell in zip(self.agents, self.grid.all_cells.cells):
@@ -69,12 +92,10 @@ class AxelrodModel(Model):
 
     def step(self):
         agent_list = list(self.agents)
-        # Run N random pairwise interactions per step (one per agent on average)
         for _ in range(self.width * self.height):
             agent = self.random.choice(agent_list)
             neighbors = [a for a in agent.cell.neighborhood.agents if a is not agent]
             if neighbors:
                 neighbor = self.random.choice(neighbors)
                 agent.interact_with(neighbor)
-
         self.datacollector.collect(self)
