@@ -1,16 +1,17 @@
+from typing import Any, Dict
+
 import mesa
 from mesa.visualization import SolaraViz, make_plot_component, make_space_component
-from typing import Dict, Any
 from smart_traffic_lights.agents import (
-    TrafficLightAgent,
     CarAgent,
-    LightState,
     Direction,
+    LightState,
+    TrafficLightAgent,
 )
 from smart_traffic_lights.model import TrafficModel
 
 
-def traffic_portrayal(agent: mesa.Agent) -> Dict[str, Any]:
+def traffic_portrayal(agent: mesa.Agent) -> dict[str, Any]:
     """
     Determines how agents are drawn on the grid.
 

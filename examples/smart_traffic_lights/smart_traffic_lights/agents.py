@@ -1,6 +1,7 @@
-import mesa
 import enum
 from typing import List
+
+import mesa
 
 
 class Direction(enum.Enum):
@@ -93,7 +94,7 @@ class IntersectionController(mesa.Agent):
         self,
         model: mesa.Model,
         smart: bool,
-        lights: List[TrafficLightAgent],
+        lights: list[TrafficLightAgent],
         sensor_range: int = 5,
         static_wait=15,
     ):
@@ -152,7 +153,9 @@ class IntersectionController(mesa.Agent):
                 north_queue = self.get_queue_density(north_light)
 
                 # If the current green light has a smaller queue than the red light, toggle
-                if east_light.state == LightState.GREEN and north_queue > east_queue:
-                    self.toggle_lights()
-                elif north_light.state == LightState.GREEN and east_queue > north_queue:
+                if (
+                    east_light.state == LightState.GREEN and north_queue > east_queue
+                ) or (
+                    north_light.state == LightState.GREEN and east_queue > north_queue
+                ):
                     self.toggle_lights()
