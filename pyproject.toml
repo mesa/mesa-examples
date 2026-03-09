@@ -72,7 +72,7 @@ select = [
     "UP", # upgrade
     "W", # style warnings
     "YTT", # sys.version
-    "D",   # docstring
+#    "D",  # docstring TODO
 ]
 # Ignore list taken from https://github.com/psf/black/blob/master/.flake8
 # E203	Whitespace before ':'
