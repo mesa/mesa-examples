@@ -1,7 +1,8 @@
 import mesa
-from mesa.discrete_space import Network
-from mesa.datacollection import DataCollector
 import networkx as nx
+from mesa.datacollection import DataCollector
+from mesa.discrete_space import Network
+
 from .agent import PersonAgent, State
 
 
@@ -95,7 +96,7 @@ class IllnessModel(mesa.Model):
 
     def update_state_counts(self) -> None:
         """Helper to count agents in a specific state."""
-        counts = {s: 0 for s in State}
+        counts = dict.fromkeys(State, 0)
         for agent in self.agents:
             counts[agent.state] += 1
         self._current_state_counts = counts
@@ -109,7 +110,6 @@ class IllnessModel(mesa.Model):
         return sum(1 for _, _, data in self.G.edges(data=True) if data.get("active"))
 
     def step(self) -> None:
-
         # Update global awareness
         infected = self.get_state_count(State.INFECTED)
         dead = self.get_state_count(State.DEAD)

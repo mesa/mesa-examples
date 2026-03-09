@@ -1,6 +1,5 @@
-from disease_on_network.model import IllnessModel
 import matplotlib.pyplot as plt
-
+from disease_on_network.model import IllnessModel
 
 ## With link dynamics
 

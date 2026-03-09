@@ -1,11 +1,12 @@
+from typing import Any, Dict
+
 import mesa
-from mesa.visualization import SolaraViz, make_space_component, make_plot_component
-from typing import Dict, Any
-from disease_on_network.model import IllnessModel
 from disease_on_network.agent import PersonAgent, State
+from disease_on_network.model import IllnessModel
+from mesa.visualization import SolaraViz, make_plot_component, make_space_component
 
 
-def agent_portrayal(agent: PersonAgent) -> Dict[str, Any]:
+def agent_portrayal(agent: PersonAgent) -> dict[str, Any]:
     """
     Provide rendering instructions for nodes based on disease state.
     """
@@ -67,4 +68,4 @@ app = SolaraViz(
     name="Epidemic Network Simulator",
 )
 
-#app
+# app

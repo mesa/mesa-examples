@@ -1,7 +1,8 @@
-import mesa
-from mesa.discrete_space import CellAgent
 from enum import IntEnum
 from typing import Dict
+
+import mesa
+from mesa.discrete_space import CellAgent
 
 
 class State(IntEnum):
@@ -38,7 +39,7 @@ class PersonAgent(CellAgent):
         self.mod_infect = mod_infect
         self.mod_recover = mod_recover
         self.mod_caution = mod_caution
-        self.link_opinions: Dict[int, bool] = {}
+        self.link_opinions: dict[int, bool] = {}
 
     def update_link_opinions(self, link_activity: float) -> None:
         """
@@ -108,7 +109,7 @@ class PersonAgent(CellAgent):
             self.state = State.DEAD
 
             # Set all existing link opinions to False
-            self.link_opinions = {nid: False for nid in self.link_opinions}
+            self.link_opinions = dict.fromkeys(self.link_opinions, False)
             return
 
         # Try recover
