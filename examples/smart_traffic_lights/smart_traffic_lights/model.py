@@ -53,7 +53,7 @@ class TrafficModel(mesa.Model):
         self.grid.place_agent(light_north, (center_x, center_y - 1))
 
         # Create Meta-Agent Controller
-        controller = IntersectionController(
+        IntersectionController(
             self, smart=smart_lights, lights=[light_east, light_north], sensor_range=6
         )
 
