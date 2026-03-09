@@ -5,7 +5,7 @@ from disease_on_network.model import IllnessModel
 
 print("###### Starting Simulation with link dynamics active ######")
 
-modelDynamic = IllnessModel(
+ModelDynamic = IllnessModel(
     num_nodes=500,
     avg_degree=8,
     p_transmission=0.2,
@@ -17,20 +17,20 @@ modelDynamic = IllnessModel(
 )
 
 for _ in range(150):
-    inf = modelDynamic.datacollector.get_model_vars_dataframe()["Infected"].iloc[-1]
-    dead = modelDynamic.datacollector.get_model_vars_dataframe()["Dead"].iloc[-1]
-    print(f"Step {modelDynamic.steps}: Infected count = {inf}, Death count = {dead}")
+    inf = ModelDynamic.datacollector.get_model_vars_dataframe()["Infected"].iloc[-1]
+    dead = ModelDynamic.datacollector.get_model_vars_dataframe()["Dead"].iloc[-1]
+    print(f"Step {ModelDynamic.steps}: Infected count = {inf}, Death count = {dead}")
 
     if inf == 0:
         break
-    modelDynamic.step()
+    ModelDynamic.step()
 
 
 ## Without link dynamics
 
 print("\n\n###### Starting Simulation with link dynamics inactive ######")
 
-modelStatic = IllnessModel(
+ModelStatic = IllnessModel(
     num_nodes=500,
     avg_degree=8,
     p_transmission=0.2,
@@ -42,13 +42,13 @@ modelStatic = IllnessModel(
 )
 
 for _ in range(150):
-    inf = modelStatic.datacollector.get_model_vars_dataframe()["Infected"].iloc[-1]
-    dead = modelStatic.datacollector.get_model_vars_dataframe()["Dead"].iloc[-1]
-    print(f"Step {modelStatic.steps}: Infected count = {inf}, Death count = {dead}")
+    inf = ModelStatic.datacollector.get_model_vars_dataframe()["Infected"].iloc[-1]
+    dead = ModelStatic.datacollector.get_model_vars_dataframe()["Dead"].iloc[-1]
+    print(f"Step {ModelStatic.steps}: Infected count = {inf}, Death count = {dead}")
 
     if inf == 0:
         break
-    modelStatic.step()
+    ModelStatic.step()
 
 
 ## Plot the results
@@ -56,17 +56,17 @@ for _ in range(150):
 fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, figsize=(10, 10))
 
 
-percentStatic = (
-    modelStatic.datacollector.get_model_vars_dataframe()["Infected"]
-    / modelStatic.num_nodes
+PercentStatic = (
+    ModelStatic.datacollector.get_model_vars_dataframe()["Infected"]
+    / ModelStatic.num_nodes
 )
-percentDynamic = (
-    modelDynamic.datacollector.get_model_vars_dataframe()["Infected"]
-    / modelDynamic.num_nodes
+PercentDynamic = (
+    ModelDynamic.datacollector.get_model_vars_dataframe()["Infected"]
+    / ModelDynamic.num_nodes
 )
 
-percentStatic.plot(ax=ax1, label="Without link dynamics", linewidth=2)
-percentDynamic.plot(ax=ax1, label="With link dynamics", linewidth=2)
+PercentStatic.plot(ax=ax1, label="Without link dynamics", linewidth=2)
+PercentDynamic.plot(ax=ax1, label="With link dynamics", linewidth=2)
 
 ax1.set_title("Comparison between fraction of Infected", fontsize=14, pad=15)
 ax1.set_xlabel("Time steps", fontsize=12)
@@ -74,16 +74,16 @@ ax1.set_ylabel("Fraction of Infected", fontsize=12)
 ax1.legend()
 ax1.grid(True)
 
-percentStatic = (
-    modelStatic.datacollector.get_model_vars_dataframe()["Dead"] / modelStatic.num_nodes
+PercentStatic = (
+    ModelStatic.datacollector.get_model_vars_dataframe()["Dead"] / ModelStatic.num_nodes
 )
-percentDynamic = (
-    modelDynamic.datacollector.get_model_vars_dataframe()["Dead"]
-    / modelDynamic.num_nodes
+PercentDynamic = (
+    ModelDynamic.datacollector.get_model_vars_dataframe()["Dead"]
+    / ModelDynamic.num_nodes
 )
 
-percentStatic.plot(ax=ax2, label="Without link dynamics", linewidth=2)
-percentDynamic.plot(ax=ax2, label="With link dynamics", linewidth=2)
+PercentStatic.plot(ax=ax2, label="Without link dynamics", linewidth=2)
+PercentDynamic.plot(ax=ax2, label="With link dynamics", linewidth=2)
 
 ax2.set_title("Comparison between fraction of Deaths", fontsize=14, pad=15)
 ax2.set_xlabel("Time steps", fontsize=12)
