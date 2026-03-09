@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 import mesa
 from mesa.visualization import SolaraViz, make_plot_component, make_space_component
