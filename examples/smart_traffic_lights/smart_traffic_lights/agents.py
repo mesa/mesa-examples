@@ -100,7 +100,7 @@ class IntersectionController(mesa.Agent):
         super().__init__(model)
         self.smart = smart
         self.static_wait = static_wait
-        self.lights = {l.direction: l for l in lights}  # Dictionary
+        self.lights = {light.direction: light for light in lights}  # Dictionary
         self.sensor_range = sensor_range
         self.timer = 0
         self.cooldown = 2  # Minimum steps before a light can change again
