@@ -1,10 +1,11 @@
 import mesa
+
 from .agents import (
-    TrafficLightAgent,
     CarAgent,
+    Direction,
     IntersectionController,
     LightState,
-    Direction,
+    TrafficLightAgent,
 )
 
 
@@ -77,7 +78,6 @@ class TrafficModel(mesa.Model):
         )
 
     def step(self):
-
         # Get cars by direction
         all_cars = self.agents_by_type[CarAgent]
         east_cars = all_cars.select(lambda a: a.direction == Direction.EAST)
