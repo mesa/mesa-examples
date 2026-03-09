@@ -5,11 +5,14 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
     packages = ["examples", "gis", "rl"]
 
+[tool.hatch.metadata]
+allow-direct-references = true
+
 [project]
 name = "mesa-models"
 description = "Importable Mesa models."
 license = {file = "LICENSE"}
-requires-python = ">=3.8"
+requires-python = ">=3.12"
 authors = [
     {name = "Project Mesa Team", email = "maintainers@projectmesa.dev"}
 ]
@@ -20,21 +23,28 @@ readme = "README.md"
 test = [
     "pytest",
     "scipy",
+    "mesa[rec] @ git+https://github.com/mesa/mesa@main",
 ]
 test_gis = [
     "pytest",
     "momepy",
     "pytest-cov",
+    "mesa[rec] @ git+https://github.com/mesa/mesa@main",
 ]
 rl_example = [
     "stable-baselines3",
     "seaborn",
-    "mesa",
+    "mesa @ git+https://github.com/mesa/mesa@main",
     "tensorboard"
 ]
 
+[tool.codespell]
+ignore-words-list = ["ist", "hart", "nD"]
+
 [tool.ruff]
+target-version = "py312"
 extend-include = ["*.ipynb"]
+extend-exclude = ["build"]
 
 [tool.ruff.lint]
 # See https://github.com/charliermarsh/ruff#rules for error code definitions.
@@ -62,7 +72,7 @@ select = [
     "UP", # upgrade
     "W", # style warnings
     "YTT", # sys.version
-#    "D",  # docstring TODO
+    "D",   # docstring
 ]
 # Ignore list taken from https://github.com/psf/black/blob/master/.flake8
 # E203	Whitespace before ':'
@@ -78,8 +88,7 @@ extend-ignore = [
   "PGH004", # Use specific rule codes when using `noqa` TODO
   "B905",   # `zip()` without an explicit `strict=` parameter
   "N802",   # Function name should be lowercase
-  "N999",   # Invalid module name. We should revisit this in the future, TODO
-  "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar` TODO
+  "N999",   # Invalid module name. We should revisit this in the future, TODO  
   "S310",   # Audit URL open for permitted schemes. Allowing use of `file:` or custom schemes is often unexpected.
   "S603",   # `subprocess` call: check for execution of untrusted input
   "ISC001", # ruff format asks to disable this feature
