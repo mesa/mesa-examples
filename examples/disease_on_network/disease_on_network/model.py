@@ -36,7 +36,7 @@ class IllnessModel(mesa.Model):
             initial_infected: Number of agents starting as Infected.
             rng: Random number generator.
         """
-        super().__init__(seed=seed)
+        super().__init__(rng=seed)
         self.num_nodes = num_nodes
         self.pt = p_transmission
         self.pr = p_recovery
