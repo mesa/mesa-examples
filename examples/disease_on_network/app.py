@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 import mesa
 from disease_on_network.agent import PersonAgent, State

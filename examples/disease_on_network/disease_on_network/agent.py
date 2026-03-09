@@ -1,5 +1,4 @@
 from enum import IntEnum
-from typing import Dict
 
 import mesa
 from mesa.discrete_space import CellAgent
