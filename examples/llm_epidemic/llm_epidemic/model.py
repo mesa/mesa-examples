@@ -70,15 +70,18 @@ class EpidemicModel(Model):
     def _update_counts(self) -> None:
         """Recount agent health states after each step."""
         self.susceptible_count = sum(
-            1 for a in self.agents
+            1
+            for a in self.agents
             if hasattr(a, "health_state") and a.health_state == "susceptible"
         )
         self.infected_count = sum(
-            1 for a in self.agents
+            1
+            for a in self.agents
             if hasattr(a, "health_state") and a.health_state == "infected"
         )
         self.recovered_count = sum(
-            1 for a in self.agents
+            1
+            for a in self.agents
             if hasattr(a, "health_state") and a.health_state == "recovered"
         )
 
