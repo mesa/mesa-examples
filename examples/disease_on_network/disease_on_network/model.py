@@ -48,7 +48,7 @@ class IllnessModel(mesa.Model):
 
         # Initialize graph (Erdos-Renyi)
         prob_link = avg_degree / num_nodes
-        self.G = nx.erdos_renyi_graph(n=self.num_nodes, p=prob_link)
+        self.G = nx.erdos_renyi_graph(n=self.num_nodes, p=prob_link, seed=self.random)
         nx.set_edge_attributes(self.G, True, "active")
 
         self.grid = Network(self.G, random=self.random)
