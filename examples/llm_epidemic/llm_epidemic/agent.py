@@ -1,7 +1,6 @@
 from mesa_llm.llm_agent import LLMAgent
 from mesa_llm.reasoning.cot import CoTReasoning
 
-
 SYSTEM_PROMPT = """You are a person living in a community during an epidemic outbreak.
 You must decide how to behave based on your current health status and what you observe
 around you. Your decisions directly affect your own health and the health of others.
@@ -100,7 +99,8 @@ class EpidemicAgent(LLMAgent):
         elif self.health_state == "susceptible" and not self.is_isolating:
             # Check for infected neighbors
             neighbors = [
-                a for a in self.model.agents
+                a
+                for a in self.model.agents
                 if a is not self
                 and hasattr(a, "health_state")
                 and a.health_state == "infected"

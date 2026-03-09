@@ -1,8 +1,6 @@
-import solara
+from llm_epidemic.model import EpidemicModel
 from mesa.visualization import SolaraViz, make_plot_component
 from mesa.visualization.components.matplotlib_components import make_mpl_space_component
-
-from llm_epidemic.model import EpidemicModel
 
 
 def agent_portrayal(agent):
@@ -11,9 +9,9 @@ def agent_portrayal(agent):
         return {"color": "gray", "size": 30}
 
     color_map = {
-        "susceptible": "#3498db",   # Blue
-        "infected": "#e74c3c",      # Red
-        "recovered": "#2ecc71",     # Green
+        "susceptible": "#3498db",  # Blue
+        "infected": "#e74c3c",  # Red
+        "recovered": "#2ecc71",  # Green
     }
     color = color_map.get(agent.health_state, "gray")
 
@@ -62,7 +60,11 @@ model_params = {
 
 SpaceComponent = make_mpl_space_component(agent_portrayal)
 SIRPlot = make_plot_component(
-    {"susceptible_count": "#3498db", "infected_count": "#e74c3c", "recovered_count": "#2ecc71"}
+    {
+        "susceptible_count": "#3498db",
+        "infected_count": "#e74c3c",
+        "recovered_count": "#2ecc71",
+    }
 )
 
 page = SolaraViz(
