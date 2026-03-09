@@ -60,12 +60,12 @@ class TrafficModel(mesa.Model):
         # Spawn Cars
 
         # Spawn East-bound cars on the horizontal road
-        for i in range(num_cars_east):
+        for _ in range(num_cars_east):
             car = CarAgent(self, Direction.EAST)
             self.grid.place_agent(car, (self.random.randrange(width), center_y))
 
         # Spawn North-bound cars on the vertical road
-        for i in range(num_cars_north):
+        for _ in range(num_cars_north):
             car = CarAgent(self, Direction.NORTH)
             self.grid.place_agent(car, (center_x, self.random.randrange(height)))
 
