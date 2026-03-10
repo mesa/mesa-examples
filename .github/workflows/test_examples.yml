@@ -57,4 +57,10 @@ jobs:
         pip install .[test]
         pip install -U "mesa[network] @ git+https://github.com/mesa/mesa@main"
     - name: Test with pytest
-      run: pytest -rA -Werror -Wdefault::PendingDeprecationWarning test_examples.py
+      run: pytest -rA -Werror -Wdefault::PendingDeprecationWarning --cov=examples --cov-report=xml --cov-report=term test_examples.py
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        files: ./coverage.xml
+        fail_ci_if_error: false
+
