@@ -89,4 +89,3 @@ class ColorPatches(mesa.Model):
         """
         self.agents.do("determine_opinion")
         self.agents.do("assume_opinion")
-
