@@ -72,10 +72,10 @@ class ColorPatches(mesa.Model):
         The agents next state is first determined before updating the grid
         """
         super().__init__()
-        self._grid = OrthogonalMooreGrid(
+        self.grid = OrthogonalMooreGrid(
             (width, height), torus=False, random=self.random
         )
-        for cell in self._grid.all_cells:
+        for cell in self.grid.all_cells:
             agent = ColorCell(self, ColorCell.OPINIONS[self.random.randrange(0, 16)])
             agent.move_to(cell)
 
@@ -90,7 +90,3 @@ class ColorPatches(mesa.Model):
         self.agents.do("determine_opinion")
         self.agents.do("assume_opinion")
 
-    @property
-    def grid(self):
-        """Provide backward compatibility for accessing the grid."""
-        return self._grid
