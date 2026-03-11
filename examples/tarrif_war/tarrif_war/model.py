@@ -1,8 +1,8 @@
-import numpy as np
 import mesa
+import numpy as np
 from mesa import DataCollector
 
-from .agent import State, Organization, Resident
+from .agent import Organization, Resident, State
 
 
 class TariffWarModel(mesa.Model):
@@ -41,7 +41,8 @@ class TariffWarModel(mesa.Model):
         # ── Agents ─────────────────────────────────────────────────────────────
         for country in self.countries:
             s = State(
-                self, country,
+                self,
+                country,
                 retaliation_intensity=retaliation_intensity,
                 lobbying_sensitivity=lobbying_sensitivity,
             )
@@ -50,7 +51,8 @@ class TariffWarModel(mesa.Model):
         for country in self.countries:
             for _ in range(n_firms_per_country):
                 Organization(
-                    self, country,
+                    self,
+                    country,
                     trade_stickiness=trade_stickiness,
                     expectation_adaptation_rate=expectation_adaptation_rate,
                     production_elasticity=production_elasticity,
@@ -62,8 +64,7 @@ class TariffWarModel(mesa.Model):
 
         # Bilateral trade flow matrix
         self.trade_flows = {
-            (c1, c2): 0.0
-            for c1 in self.countries for c2 in self.countries if c1 != c2
+            (c1, c2): 0.0 for c1 in self.countries for c2 in self.countries if c1 != c2
         }
 
         # ── DataCollector ──────────────────────────────────────────────────────
@@ -71,15 +72,18 @@ class TariffWarModel(mesa.Model):
             model_reporters={
                 # ── GDP (total firm production by country) ──
                 "USA_GDP": lambda m: sum(
-                    o.production for o in m.agents_by_type[Organization]
+                    o.production
+                    for o in m.agents_by_type[Organization]
                     if o.country == "USA"
                 ),
                 "China_GDP": lambda m: sum(
-                    o.production for o in m.agents_by_type[Organization]
+                    o.production
+                    for o in m.agents_by_type[Organization]
                     if o.country == "China"
                 ),
                 "NeutralAsia_GDP": lambda m: sum(
-                    o.production for o in m.agents_by_type[Organization]
+                    o.production
+                    for o in m.agents_by_type[Organization]
                     if o.country == "Neutral Asia"
                 ),
                 # ── Government size ratchet ──
@@ -87,8 +91,12 @@ class TariffWarModel(mesa.Model):
                     np.mean([s.gov_size for s in m.agents_by_type[State]])
                 ),
                 # ── Bilateral tariffs ──
-                "USA_China_Tariff": lambda m: m._get_state("USA").get_tariff_to("China"),
-                "China_USA_Tariff": lambda m: m._get_state("China").get_tariff_to("USA"),
+                "USA_China_Tariff": lambda m: m._get_state("USA").get_tariff_to(
+                    "China"
+                ),
+                "China_USA_Tariff": lambda m: m._get_state("China").get_tariff_to(
+                    "USA"
+                ),
                 # ── Expectation gap (recession spiral) ──
                 "Global_Expected_Demand": lambda m: float(
                     np.mean([o.expected_demand for o in m.agents_by_type[Organization]])
@@ -98,25 +106,50 @@ class TariffWarModel(mesa.Model):
                 ),
                 # ── CEE-SAC β by country (< 0 = pessimism spiral) ──
                 "Beta_USA": lambda m: float(
-                    np.mean([o.beta for o in m.agents_by_type[Organization]
-                              if o.country == "USA"])
+                    np.mean(
+                        [
+                            o.beta
+                            for o in m.agents_by_type[Organization]
+                            if o.country == "USA"
+                        ]
+                    )
                 ),
                 "Beta_China": lambda m: float(
-                    np.mean([o.beta for o in m.agents_by_type[Organization]
-                              if o.country == "China"])
+                    np.mean(
+                        [
+                            o.beta
+                            for o in m.agents_by_type[Organization]
+                            if o.country == "China"
+                        ]
+                    )
                 ),
                 "Beta_Neutral": lambda m: float(
-                    np.mean([o.beta for o in m.agents_by_type[Organization]
-                              if o.country == "Neutral Asia"])
+                    np.mean(
+                        [
+                            o.beta
+                            for o in m.agents_by_type[Organization]
+                            if o.country == "Neutral Asia"
+                        ]
+                    )
                 ),
                 # ── Lobbying power (endogenous ratchet) ──
                 "Lobby_USA": lambda m: float(
-                    np.mean([o.lobbying_power for o in m.agents_by_type[Organization]
-                              if o.country == "USA"])
+                    np.mean(
+                        [
+                            o.lobbying_power
+                            for o in m.agents_by_type[Organization]
+                            if o.country == "USA"
+                        ]
+                    )
                 ),
                 "Lobby_China": lambda m: float(
-                    np.mean([o.lobbying_power for o in m.agents_by_type[Organization]
-                              if o.country == "China"])
+                    np.mean(
+                        [
+                            o.lobbying_power
+                            for o in m.agents_by_type[Organization]
+                            if o.country == "China"
+                        ]
+                    )
                 ),
                 # ── Firm health: bankruptcy rate by country ──
                 "Bankruptcy_USA": lambda m: _bankruptcy_rate(m, "USA"),
@@ -133,7 +166,9 @@ class TariffWarModel(mesa.Model):
                 # ── Trade balance by country ──
                 "TradeBalance_USA": lambda m: m._get_state("USA").trade_balance,
                 "TradeBalance_China": lambda m: m._get_state("China").trade_balance,
-                "TradeBalance_Neutral": lambda m: m._get_state("Neutral Asia").trade_balance,
+                "TradeBalance_Neutral": lambda m: m._get_state(
+                    "Neutral Asia"
+                ).trade_balance,
             }
         )
 
@@ -156,7 +191,8 @@ class TariffWarModel(mesa.Model):
         """
         incoming = [
             s.get_tariff_to(country)
-            for s in self.agents_by_type[State] if s.country != country
+            for s in self.agents_by_type[State]
+            if s.country != country
         ]
         avg_in = float(np.mean(incoming)) if incoming else 0.05
         # USA-China bilateral conflict creates global uncertainty for everyone
@@ -177,7 +213,8 @@ class TariffWarModel(mesa.Model):
 
         incoming = [
             s.get_tariff_to(country)
-            for s in self.agents_by_type[State] if s.country != country
+            for s in self.agents_by_type[State]
+            if s.country != country
         ]
         avg_incoming = float(np.mean(incoming)) if incoming else 0.05
 
@@ -195,7 +232,8 @@ class TariffWarModel(mesa.Model):
         n_other = max(1, len(self.countries) - 1)
         consumer_cross = (
             sum(r.consumption * (1.0 - r.domestic_share) for r in foreign_residents)
-            / n_other * 0.10
+            / n_other
+            * 0.10
         )
 
         effective_demand = (
@@ -206,7 +244,7 @@ class TariffWarModel(mesa.Model):
 
     def _update_trade_flows(self) -> None:
         """Recompute bilateral trade flow weights and each State's trade balance."""
-        for (c_from, c_to) in self.trade_flows:
+        for c_from, c_to in self.trade_flows:
             orgs_from = [
                 o for o in self.agents_by_type[Organization] if o.country == c_from
             ]
@@ -237,6 +275,7 @@ class TariffWarModel(mesa.Model):
 
 
 # ── module-level reporter helpers (avoids lambda closures capturing wrong vars) ──
+
 
 def _bankruptcy_rate(model, country):
     firms = [o for o in model.agents_by_type[Organization] if o.country == country]
