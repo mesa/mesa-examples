@@ -1,15 +1,13 @@
 import matplotlib
-
-matplotlib.use("Agg")
 import matplotlib.style
-
-matplotlib.style.use("seaborn-v0_8-whitegrid")
-
 import solara
 from matplotlib.figure import Figure
 from mesa.visualization import SolaraViz
 from mesa.visualization.utils import update_counter
 from tarrif_war.model import TariffWarModel
+
+matplotlib.use("Agg")
+matplotlib.style.use("seaborn-v0_8-whitegrid")
 
 # ── Colour palette ─────────────────────────────────────────────────────────────
 COLORS = {
@@ -158,7 +156,7 @@ def TariffPlot(model):
             lw=0.9,
             linestyle="--",
             alpha=0.6,
-            label="2018–19 peak 25%",
+            label="2018-19 peak 25%",
         )
         ax.axhline(
             y=35,
@@ -173,7 +171,7 @@ def TariffPlot(model):
         ax.legend(fontsize=8)
 
     ax.set_title(
-        "Bilateral Tariffs – Ratchet & Back-and-Forth", fontsize=9, fontweight="bold"
+        "Bilateral Tariffs - Ratchet & Back-and-Forth", fontsize=9, fontweight="bold"
     )
     ax.set_xlabel("Step")
     fig.tight_layout()
@@ -203,7 +201,7 @@ def GovSizePlot(model):
         ax.legend(fontsize=8)
 
     ax.set_title(
-        "Average Government Size – Step-wise Ratchet", fontsize=9, fontweight="bold"
+        "Average Government Size - Step-wise Ratchet", fontsize=9, fontweight="bold"
     )
     ax.set_xlabel("Step")
     fig.tight_layout()
@@ -338,7 +336,7 @@ def FirmHealthPlot(model):
 @solara.component
 def WelfarePlot(model):
     """
-    Consumer welfare composite (consumption × tariff-price burden × unemployment).
+    Consumer welfare composite (consumption x tariff-price burden x unemployment).
     Neutral Asia residents should fare better; USA/China consumers suffer most.
     """
     update_counter.get()
@@ -366,7 +364,7 @@ def WelfarePlot(model):
         ax.legend(fontsize=8)
 
     ax.set_title(
-        "Consumer Welfare – Who Pays for the Trade War?", fontsize=9, fontweight="bold"
+        "Consumer Welfare - Who Pays for the Trade War?", fontsize=9, fontweight="bold"
     )
     ax.set_xlabel("Step")
     fig.tight_layout()
