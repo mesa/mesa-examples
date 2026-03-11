@@ -35,9 +35,9 @@ class ForestFire(mesa.Model):
 
         self.datacollector = mesa.DataCollector(
             {
-                "Fine": lambda m: np.sum(m.fire_state == FINE),
-                "On Fire": lambda m: np.sum(m.fire_state == ON_FIRE),
-                "Burned Out": lambda m: np.sum(m.fire_state == BURNED_OUT),
+                "Fine": lambda m: int(np.sum(m.fire_state == FINE)),
+                "On Fire": lambda m: int(np.sum(m.fire_state == ON_FIRE)),
+                "Burned Out": lambda m: int(np.sum(m.fire_state == BURNED_OUT)),
             }
         )
 
