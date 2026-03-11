@@ -1,5 +1,6 @@
 from mesa.discrete_space import FixedAgent
 
+
 class TreeCell(FixedAgent):
     """Tree cell used for visualization and grid coordinates."""
 
