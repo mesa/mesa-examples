@@ -48,7 +48,7 @@ def generate_vector(width, height):
     bounds = [0, 0, width * 1000, height * 1000]
     minx, miny, maxx, maxy = bounds
 
-    num_houses = 100
+    num_houses = 500
     points = []
     for i in range(num_houses):
         # Generate random points within the bounds

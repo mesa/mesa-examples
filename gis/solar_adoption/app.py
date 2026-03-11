@@ -5,25 +5,26 @@ from mesa_geo.visualization import make_geospace_component
 from model import SolarAdoption
 
 
-def adoption_draw(agent):
-    """Portrayal Method for canvas."""
-    portrayal = {}
-    if agent.has_solar:
-        portrayal["color"] = "gold"
-        portrayal["radius"] = 4
+from agents import Household
+
+def solar_portrayal(agent):
+    """Portrayal function for households and solar radiation cells."""
+    if isinstance(agent, Household):
+        portrayal = {}
+        if agent.has_solar:
+            portrayal["color"] = "gold"
+            portrayal["radius"] = 4
+        else:
+            portrayal["color"] = "grey"
+            portrayal["radius"] = 3
+        return portrayal
     else:
-        portrayal["color"] = "grey"
-        portrayal["radius"] = 3
-    return portrayal
-
-
-def raster_draw(cell):
-    """Portrayal function for solar radiation."""
-    val = getattr(cell, "radiation", 0)
-    r = int(255 * val)
-    g = int(255 * val)
-    b = 0
-    return {"color": f"rgba({r}, {g}, {b}, 0.5)"}
+        # It's a Raster Cell
+        val = getattr(agent, "radiation", 0)
+        r = int(255 * val)
+        g = int(255 * val)
+        b = 0
+        return (r, g, b, 128)
 
 
 model_params = {
@@ -40,8 +41,7 @@ page = SolaraViz(
     model_params=model_params,
     components=[
         make_geospace_component(
-            agent_portrayal=adoption_draw,
-            raster_portrayal=raster_draw,
+            solar_portrayal,
             zoom=12
         ),
         make_plot_component(["Adopted"]),

@@ -1,4 +1,3 @@
-import random
 import mesa_geo as mg
 
 
@@ -8,7 +7,7 @@ class Household(mg.GeoAgent):
     def __init__(self, model, geometry, crs, unique_id=None):
         """Create a new Household agent."""
         super().__init__(model, geometry, crs)
-        self.unique_id = unique_id if unique_id is not None else random.randint(1, 100000000)
+        self.unique_id = unique_id if unique_id is not None else self.model.random.randint(1, 100000000)
         self.has_solar = False
         self.solar_radiation = 0.0
 
@@ -34,7 +33,7 @@ class Household(mg.GeoAgent):
         prob_adopt = (self.model.social_weight * social_influence) + (self.model.economic_weight * economic_viability)
         prob_adopt += 0.01
 
-        if random.random() < prob_adopt:
+        if self.model.random.random() < prob_adopt:
             self.has_solar = True
             self.model.total_adopted += 1
 

@@ -1,5 +1,4 @@
 import os
-import random
 
 import geopandas as gpd
 import mesa
@@ -56,6 +55,10 @@ class SolarAdoption(mesa.Model):
         vector_path = os.path.join(script_dir, "data/households.geojson")
         
         gdf = gpd.read_file(vector_path)
+
+        # Sample so we respect the `num_houses` slider
+        if len(gdf) > self.num_houses:
+            gdf = gdf.sample(self.num_houses, random_state=self.random.randint(0, 100000))
 
         ac = mg.AgentCreator(Household, model=self)
         self.agents_added = ac.from_GeoDataFrame(gdf)

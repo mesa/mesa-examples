@@ -8,7 +8,13 @@ This example is specifically designed to showcase how `mesa-geo` integrates both
 
 ## How to Run
 
-To run the model, install the dependencies (`mesa`, `mesa-geo`, `geopandas`, `rasterio`, `solara`) and run:
+To run the model, first install the dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Then run the application:
 
 ```bash
 solara run app.py
