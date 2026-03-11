@@ -42,7 +42,7 @@ page = SolaraViz(
     components=[
         make_geospace_component(
             solar_portrayal,
-            zoom=12
+            zoom=10
         ),
         make_plot_component(["Adopted"]),
     ],
