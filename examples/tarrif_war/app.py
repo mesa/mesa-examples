@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import matplotlib
 
 matplotlib.use("Agg")
@@ -5,11 +6,25 @@ import matplotlib.style
 
 matplotlib.style.use("seaborn-v0_8-whitegrid")
 
+=======
+import matplotlib  # noqa: E402
+matplotlib.use("Agg")  # noqa: E402
+import matplotlib.style  # noqa: E402
+import numpy as np
+>>>>>>> 496a3cb (fix: replace Unicode chars with ASCII, fix E402 import order for ruff)
 import solara
 from matplotlib.figure import Figure
 from mesa.visualization import SolaraViz
 from mesa.visualization.utils import update_counter
+<<<<<<< HEAD
 from tarrif_war.model import TariffWarModel
+=======
+
+matplotlib.style.use("seaborn-v0_8-whitegrid")
+
+from tarrif_war.agent import Organization, Resident, State  # noqa: E402
+from tarrif_war.model import TariffWarModel  # noqa: E402
+>>>>>>> 496a3cb (fix: replace Unicode chars with ASCII, fix E402 import order for ruff)
 
 # ── Colour palette ─────────────────────────────────────────────────────────────
 COLORS = {
@@ -137,6 +152,7 @@ def TariffPlot(model):
     df = model.datacollector.get_model_vars_dataframe()
 
     if len(df) >= 2:
+<<<<<<< HEAD
         ax.plot(
             df.index,
             df["USA_China_Tariff"] * 100,
@@ -168,13 +184,24 @@ def TariffPlot(model):
             alpha=0.4,
             label="Model cap 35%",
         )
+=======
+        ax.plot(df.index, df["USA_China_Tariff"] * 100, color=COLORS["USA"],   lw=2,   label="USA → China")
+        ax.plot(df.index, df["China_USA_Tariff"] * 100, color=COLORS["China"], lw=2,   label="China → USA")
+        ax.axhline(y=3,  color="gray",  lw=0.8, linestyle=":", label="WTO baseline 3%")
+        ax.axhline(y=25, color="orange", lw=0.9, linestyle="--", alpha=0.6, label="2018-19 peak 25%")
+        ax.axhline(y=35, color="black", lw=0.7, linestyle="--", alpha=0.4, label="Model cap 35%")
+>>>>>>> 496a3cb (fix: replace Unicode chars with ASCII, fix E402 import order for ruff)
         ax.set_ylim(0, 40)
         ax.set_ylabel("Tariff Rate (%)")
         ax.legend(fontsize=8)
 
+<<<<<<< HEAD
     ax.set_title(
         "Bilateral Tariffs – Ratchet & Back-and-Forth", fontsize=9, fontweight="bold"
     )
+=======
+    ax.set_title("Bilateral Tariffs - Ratchet & Back-and-Forth", fontsize=9, fontweight="bold")
+>>>>>>> 496a3cb (fix: replace Unicode chars with ASCII, fix E402 import order for ruff)
     ax.set_xlabel("Step")
     fig.tight_layout()
     solara.FigureMatplotlib(fig)
@@ -202,9 +229,13 @@ def GovSizePlot(model):
         ax.set_ylabel("Gov Size (% of GDP)")
         ax.legend(fontsize=8)
 
+<<<<<<< HEAD
     ax.set_title(
         "Average Government Size – Step-wise Ratchet", fontsize=9, fontweight="bold"
     )
+=======
+    ax.set_title("Average Government Size - Step-wise Ratchet", fontsize=9, fontweight="bold")
+>>>>>>> 496a3cb (fix: replace Unicode chars with ASCII, fix E402 import order for ruff)
     ax.set_xlabel("Step")
     fig.tight_layout()
     solara.FigureMatplotlib(fig)
@@ -338,7 +369,7 @@ def FirmHealthPlot(model):
 @solara.component
 def WelfarePlot(model):
     """
-    Consumer welfare composite (consumption × tariff-price burden × unemployment).
+    Consumer welfare composite (consumption * tariff-price burden * unemployment).
     Neutral Asia residents should fare better; USA/China consumers suffer most.
     """
     update_counter.get()
@@ -365,9 +396,13 @@ def WelfarePlot(model):
         ax.set_ylabel("Consumer Welfare Index")
         ax.legend(fontsize=8)
 
+<<<<<<< HEAD
     ax.set_title(
         "Consumer Welfare – Who Pays for the Trade War?", fontsize=9, fontweight="bold"
     )
+=======
+    ax.set_title("Consumer Welfare - Who Pays for the Trade War?", fontsize=9, fontweight="bold")
+>>>>>>> 496a3cb (fix: replace Unicode chars with ASCII, fix E402 import order for ruff)
     ax.set_xlabel("Step")
     fig.tight_layout()
     solara.FigureMatplotlib(fig)

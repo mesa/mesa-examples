@@ -221,7 +221,7 @@ class Organization(mesa.Agent):
         return float(np.mean(rates)) if rates else 0.03
 
     def _update_expectations(self):
-        """CEE-SAC: α (long-run mean) and β (autocorrelation) update."""
+        """CEE-SAC: alpha (long-run mean) and β (autocorrelation) update."""
         lr = self.expectation_adaptation_rate
         history = np.array(self.demand_history[-10:])
         self.alpha = (1.0 - lr) * self.alpha + lr * float(np.mean(history))
@@ -258,7 +258,7 @@ class Organization(mesa.Agent):
         inv_target = 1.0 + float(np.clip(self.beta, -0.5, 0.5)) * 0.3
         self.investment = 0.85 * self.investment + 0.15 * inv_target
 
-        # Production target: expectations × tariff friction × investment
+        # Production target: expectations * tariff friction * investment
         out_tariff = self._avg_outgoing_tariff()
         friction = 1.0 - out_tariff * 0.55
         target = self.expected_demand * friction * self.investment
@@ -267,7 +267,7 @@ class Organization(mesa.Agent):
 
         self.actual_demand = self.model.get_demand_for(self.country)
 
-        # ── Realistic profit = revenue − (fixed overhead + variable costs) ────
+        # ── Realistic profit = revenue - (fixed overhead + variable costs) ────
         # Revenue: sector value-add pricing + small domestic protection from tariffs
         in_tariff = self._avg_incoming_tariff()
         sp = SECTOR_PARAMS[self.sector]

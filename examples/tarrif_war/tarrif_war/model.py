@@ -11,7 +11,7 @@ class TariffWarModel(mesa.Model):
 
     Emergent phenomena:
       1. Step-wise government expansion (Higgs Ratchet Effect)
-      2. Trade Diversion – Neutral Asia short-term gain, long-term loss
+      2. Trade Diversion - Neutral Asia short-term gain, long-term loss
       3. Self-fulfilling recession spiral (CEE-SAC β turns negative)
       4. Resource misallocation → global GDP contraction
       5. Firm bankruptcy → unemployment → consumer welfare collapse
