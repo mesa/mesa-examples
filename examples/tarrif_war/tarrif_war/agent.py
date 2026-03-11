@@ -1,5 +1,5 @@
-import mesa
 import numpy as np
+import mesa
 
 # ── Sector parameters ──────────────────────────────────────────────────────────
 # tariff_sens:   how much outgoing tariffs hurt this sector's exports
@@ -13,8 +13,8 @@ import numpy as np
 #                  commodity pricing (<1.0 prod_mult) — hit hardest by retaliation
 #   Manufacturing: moderate sensitivity, standard pricing
 SECTOR_PARAMS = {
-    "Tech": {"tariff_sens": 1.4, "lobby_eff": 1.3, "prod_mult": 1.15},
-    "Agriculture": {"tariff_sens": 0.6, "lobby_eff": 0.7, "prod_mult": 0.85},
+    "Tech":          {"tariff_sens": 1.4, "lobby_eff": 1.3, "prod_mult": 1.15},
+    "Agriculture":   {"tariff_sens": 0.6, "lobby_eff": 0.7, "prod_mult": 0.85},
     "Manufacturing": {"tariff_sens": 1.0, "lobby_eff": 1.0, "prod_mult": 1.00},
 }
 SECTORS = list(SECTOR_PARAMS.keys())
@@ -32,9 +32,7 @@ class State(mesa.Agent):
       - Ratchet: government expands +1.5 pp per escalation round, rarely shrinks
     """
 
-    def __init__(
-        self, model, country, retaliation_intensity=0.08, lobbying_sensitivity=0.25
-    ):
+    def __init__(self, model, country, retaliation_intensity=0.08, lobbying_sensitivity=0.25):
         super().__init__(model)
         self.country = country
         self.retaliation_intensity = retaliation_intensity
@@ -48,7 +46,7 @@ class State(mesa.Agent):
         self.tariffs = {}
 
         self.escalation_cooldown = 0
-        self.last_tariff_peak = 0.03  # starting from 3% baseline
+        self.last_tariff_peak = 0.03   # starting from 3% baseline
 
         # Trade balance (updated each step by the model)
         self.exports = 0.0
@@ -58,7 +56,7 @@ class State(mesa.Agent):
     def initialize_tariffs(self, countries):
         for c in countries:
             if c != self.country:
-                self.tariffs[c] = 0.03  # WTO MFN baseline ≈ 3%
+                self.tariffs[c] = 0.03   # WTO MFN baseline ≈ 3%
 
     def get_tariff_to(self, target):
         return self.tariffs.get(target, 0.03)
@@ -84,10 +82,7 @@ class State(mesa.Agent):
 
             # Crisis only starts after a 5-step warm-up period
             if self.model.global_crisis and self.model.steps >= 5:
-                if self.country in ("USA", "China") and other.country in (
-                    "USA",
-                    "China",
-                ):
+                if self.country in ("USA", "China") and other.country in ("USA", "China"):
                     if my_rate >= 0.30:
                         # Near ceiling: diplomatic pressure → partial back-off
                         # (mirrors Phase 1 deals, temporary truces)
@@ -110,9 +105,7 @@ class State(mesa.Agent):
                         self.escalation_cooldown = 8
             else:
                 # No crisis: tariffs drift down slowly, held up by lobbying floor
-                lobby_floor = (
-                    0.03 + self._total_lobbying() * self.lobbying_sensitivity * 0.04
-                )
+                lobby_floor = 0.03 + self._total_lobbying() * self.lobbying_sensitivity * 0.04
                 self.tariffs[other.country] = max(lobby_floor, my_rate * 0.988)
 
         # ── 2. Government size ratchet (Higgs Effect) ─────────────────────────
@@ -131,9 +124,7 @@ class State(mesa.Agent):
         else:
             # Peace: new floor is halfway between old baseline and peak (ratchet)
             self.baseline = 20.0 + (self.peak_size - 20.0) * 0.5
-            lobby_floor = (
-                self.baseline + self._total_lobbying() * self.lobbying_sensitivity * 0.3
-            )
+            lobby_floor = self.baseline + self._total_lobbying() * self.lobbying_sensitivity * 0.3
             self.gov_size = max(lobby_floor, self.gov_size * 0.980)
 
 
@@ -221,7 +212,7 @@ class Organization(mesa.Agent):
         return float(np.mean(rates)) if rates else 0.03
 
     def _update_expectations(self):
-        """CEE-SAC: alpha (long-run mean) and β (autocorrelation) update."""
+        """CEE-SAC: α (long-run mean) and β (autocorrelation) update."""
         lr = self.expectation_adaptation_rate
         history = np.array(self.demand_history[-10:])
         self.alpha = (1.0 - lr) * self.alpha + lr * float(np.mean(history))
@@ -258,7 +249,7 @@ class Organization(mesa.Agent):
         inv_target = 1.0 + float(np.clip(self.beta, -0.5, 0.5)) * 0.3
         self.investment = 0.85 * self.investment + 0.15 * inv_target
 
-        # Production target: expectations * tariff friction * investment
+        # Production target: expectations × tariff friction × investment
         out_tariff = self._avg_outgoing_tariff()
         friction = 1.0 - out_tariff * 0.55
         target = self.expected_demand * friction * self.investment
@@ -267,7 +258,7 @@ class Organization(mesa.Agent):
 
         self.actual_demand = self.model.get_demand_for(self.country)
 
-        # ── Realistic profit = revenue - (fixed overhead + variable costs) ────
+        # ── Realistic profit = revenue − (fixed overhead + variable costs) ────
         # Revenue: sector value-add pricing + small domestic protection from tariffs
         in_tariff = self._avg_incoming_tariff()
         sp = SECTOR_PARAMS[self.sector]
@@ -283,7 +274,8 @@ class Organization(mesa.Agent):
 
         # Lobbying accumulates with sector-specific efficiency
         self.lobbying_power = min(
-            2.0, self.lobbying_power * 0.93 + self.rent * 0.05 * self.lobby_efficiency
+            2.0,
+            self.lobbying_power * 0.93 + self.rent * 0.05 * self.lobby_efficiency
         )
 
         # Bankruptcy tracking
@@ -314,7 +306,7 @@ class Resident(mesa.Agent):
     def __init__(self, model, country, price_sensitivity=0.60):
         super().__init__(model)
         self.country = country
-        self.price_sensitivity = price_sensitivity  # 60% tariff pass-through to welfare
+        self.price_sensitivity = price_sensitivity   # 60% tariff pass-through to welfare
 
         self.income = 10.0 + self.random.uniform(-1.0, 1.0)
         self.consumption = self.income * 0.80
@@ -332,11 +324,7 @@ class Resident(mesa.Agent):
 
     def _local_unemployment(self):
         """Unemployment proxy: bankrupt firm share in this country."""
-        firms = [
-            o
-            for o in self.model.agents_by_type[Organization]
-            if o.country == self.country
-        ]
+        firms = [o for o in self.model.agents_by_type[Organization] if o.country == self.country]
         if not firms:
             return 0.0
         return sum(1 for o in firms if o.bankrupt) / len(firms)
@@ -354,13 +342,13 @@ class Resident(mesa.Agent):
         savings_rate = min(0.45, 0.20 + uncertainty * 0.18)
         self.savings = effective_income * savings_rate
 
-        self.consumption = max(
-            0.10, effective_income * (1.0 - savings_rate) / price_index
-        )
+        self.consumption = max(0.10, effective_income * (1.0 - savings_rate) / price_index)
         self.domestic_share = min(0.90, 0.60 + tariff * 0.25)
 
         # Welfare: consumption minus price burden minus unemployment disutility
         # Real household welfare loss ≈ 0.5-1.5% of income per 10% tariff increase
         self.welfare = (
-            self.consumption * (1.0 - tariff * 0.12) * (1.0 - unemployment * 0.25)
+            self.consumption
+            * (1.0 - tariff * 0.12)
+            * (1.0 - unemployment * 0.25)
         )
