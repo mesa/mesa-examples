@@ -11,15 +11,8 @@ class Household(mg.GeoAgent):
         self.has_solar = False
         self.solar_radiation = 0.0
 
-    def get_solar_potential(self):
-        """Fetch solar radiation from the underlying raster layer."""
-        # Find the raster cell where this agent is located
-        # We use the spatial relation.
-        # However, for simplicity, normally the environment computes this and assigns it, or the agent can query the map.
-        pass
 
     def step(self):
-        """Advance agent one step."""
         if self.has_solar:
             return
 
