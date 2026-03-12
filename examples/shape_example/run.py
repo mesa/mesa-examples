@@ -1,1 +1,0 @@
-from shape_example.app import page

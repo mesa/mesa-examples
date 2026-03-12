@@ -1,5 +1,4 @@
 from mesa.visualization import SolaraViz, make_space_component
-
 from shape_example.model import ShapeExample, Walker
 
 

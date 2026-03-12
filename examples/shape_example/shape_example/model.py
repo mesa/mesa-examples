@@ -20,9 +20,7 @@ class ShapeExample(mesa.Model):
         super().__init__()
         self.num_agents = num_agents
         self.headings = ((1, 0), (0, 1), (-1, 0), (0, -1))
-        self.grid = OrthogonalMooreGrid(
-            (width, height), torus=True, random=self.random
-        )
+        self.grid = OrthogonalMooreGrid((width, height), torus=True, random=self.random)
         self.make_walker_agents()
         self.running = True
 
