@@ -1,7 +1,0 @@
-{
-  "NotebookApp": {
-    "nbserver_extensions": {
-      "solara.server.jupyter.server_extension": true
-    }
-  }
-}
