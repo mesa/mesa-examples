@@ -1,7 +1,5 @@
-import solara
-from mesa.visualization import SolaraViz, make_plot_component
-
 from llm_prisoners_dilemma.model import PrisonersDilemmaModel
+from mesa.visualization import SolaraViz, make_plot_component
 
 
 def agent_portrayal(agent):
@@ -10,9 +8,9 @@ def agent_portrayal(agent):
         return {"color": "gray", "size": 40}
 
     color_map = {
-        "cooperate": "#2ecc71",   # Green
-        "defect":    "#e74c3c",   # Red
-        "none":      "#95a5a6",   # Gray (first round)
+        "cooperate": "#2ecc71",  # Green
+        "defect": "#e74c3c",  # Red
+        "none": "#95a5a6",  # Gray (first round)
     }
     color = color_map.get(agent.last_action, "gray")
 
@@ -52,7 +50,7 @@ CoopPlot = make_plot_component(
 ScorePlot = make_plot_component(
     {
         "total_cooperations": "#2ecc71",
-        "total_defections":   "#e74c3c",
+        "total_defections": "#e74c3c",
     }
 )
 

@@ -1,7 +1,6 @@
 from mesa_llm.llm_agent import LLMAgent
 from mesa_llm.reasoning.cot import CoTReasoning
 
-
 SYSTEM_PROMPT = """You are a player in an iterated Prisoner's Dilemma game.
 
 Each round you interact with a partner. You must choose one of two actions:
@@ -40,9 +39,9 @@ class PrisonerAgent(LLMAgent):
     # Payoff matrix
     PAYOFFS = {
         ("cooperate", "cooperate"): (3, 3),
-        ("cooperate", "defect"):    (0, 5),
-        ("defect",    "cooperate"): (5, 0),
-        ("defect",    "defect"):    (1, 1),
+        ("cooperate", "defect"): (0, 5),
+        ("defect", "cooperate"): (5, 0),
+        ("defect", "defect"): (1, 1),
     }
 
     def __init__(self, model) -> None:
@@ -69,8 +68,7 @@ class PrisonerAgent(LLMAgent):
         """Sync internal state for LLM observation."""
         total_rounds = self.cooperation_count + self.defection_count
         coop_rate = (
-            round(self.cooperation_count / total_rounds, 2)
-            if total_rounds > 0 else 0
+            round(self.cooperation_count / total_rounds, 2) if total_rounds > 0 else 0
         )
         self.internal_state = [
             f"score:{self.score}",
@@ -105,9 +103,7 @@ class PrisonerAgent(LLMAgent):
             action: This agent's action ('cooperate' or 'defect').
             partner_action: Partner's action ('cooperate' or 'defect').
         """
-        my_payoff, _ = self.PAYOFFS.get(
-            (action, partner_action), (0, 0)
-        )
+        my_payoff, _ = self.PAYOFFS.get((action, partner_action), (0, 0))
         self.score += my_payoff
         self.last_action = action
 
