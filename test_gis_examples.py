@@ -19,7 +19,7 @@ def get_models(directory):
                 sys.path.insert(0, os.path.abspath(root))
 
                 module = importlib.import_module(module_name)
-                
+
                 # Clean up sys.path
                 sys.path.pop(0)
                 for item in dir(module):

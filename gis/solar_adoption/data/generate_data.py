@@ -1,5 +1,6 @@
 import os
 import random
+
 import geopandas as gpd
 import numpy as np
 import rasterio
@@ -11,11 +12,12 @@ script_dir = os.path.dirname(__file__)
 raster_path = os.path.join(script_dir, "solar_radiation.tif")
 vector_path = os.path.join(script_dir, "households.geojson")
 
+
 def generate_raster():
     """Generate a procedural raster layer representing solar radiation."""
     width = 100
     height = 100
-    
+
     # Create a procedural 2D numpy array (e.g. gradient + noise) for solar radiation
     # Values from 0 (low radiation) to 1 (high radiation)
     y, x = np.mgrid[0:height, 0:width]
@@ -31,8 +33,8 @@ def generate_raster():
 
     with rasterio.open(
         raster_path,
-        'w',
-        driver='GTiff',
+        "w",
+        driver="GTiff",
         height=height,
         width=width,
         count=1,
@@ -43,6 +45,7 @@ def generate_raster():
         dataset.write(radiation_data)
     print(f"Generated {raster_path}")
     return transform, width, height
+
 
 def generate_vector(width, height):
     bounds = [0, 0, width * 1000, height * 1000]
@@ -60,6 +63,7 @@ def generate_vector(width, height):
     gdf = gpd.GeoDataFrame(geometry=points, crs="epsg:3857")
     gdf.to_file(vector_path, driver="GeoJSON")
     print(f"Generated {vector_path}")
+
 
 if __name__ == "__main__":
     t, w, h = generate_raster()

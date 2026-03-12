@@ -3,11 +3,6 @@ import os
 import geopandas as gpd
 import mesa
 import mesa_geo as mg
-import numpy as np
-import rasterio
-from rasterio.transform import from_origin
-from shapely.geometry import Point
-
 from agents import Household
 
 
@@ -41,11 +36,9 @@ class SolarAdoption(mesa.Model):
         """Load the raster layer representing solar radiation."""
         script_dir = os.path.dirname(__file__)
         raster_path = os.path.join(script_dir, "data/solar_radiation.tif")
-        
+
         self.raster_layer = mg.RasterLayer.from_file(
-            raster_path,
-            model=self,
-            attr_name="radiation"
+            raster_path, model=self, attr_name="radiation"
         )
         self.space.add_layer(self.raster_layer)
 
@@ -53,12 +46,14 @@ class SolarAdoption(mesa.Model):
         """Load Household agents from vector data."""
         script_dir = os.path.dirname(__file__)
         vector_path = os.path.join(script_dir, "data/households.geojson")
-        
+
         gdf = gpd.read_file(vector_path)
 
         # Sample so we respect the `num_houses` slider
         if len(gdf) > self.num_houses:
-            gdf = gdf.sample(self.num_houses, random_state=self.random.randint(0, 100000))
+            gdf = gdf.sample(
+                self.num_houses, random_state=self.random.randint(0, 100000)
+            )
 
         ac = mg.AgentCreator(Household, model=self)
         self.agents_added = ac.from_GeoDataFrame(gdf)
@@ -66,18 +61,18 @@ class SolarAdoption(mesa.Model):
         for ind, agent in enumerate(self.agents_added):
             agent.unique_id = ind
             x, y = agent.geometry.x, agent.geometry.y
-            
+
             try:
                 row, col = self.raster_layer.transform.inverse * (x, y)
                 row, col = int(row), int(col)
                 row = min(max(row, 0), self.raster_layer.height - 1)
                 col = min(max(col, 0), self.raster_layer.width - 1)
-                
+
                 val = self.raster_layer.cells[row][col].radiation
                 agent.solar_radiation = val
             except Exception:
                 agent.solar_radiation = 0.5
-                
+
         self.space.add_agents(self.agents_added)
 
     def step(self):
