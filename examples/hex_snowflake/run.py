@@ -1,3 +1,1 @@
-from hex_snowflake.server import server
-
-server.launch(open_browser=True)
+from hex_snowflake.app import page
