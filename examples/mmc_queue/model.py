@@ -33,6 +33,9 @@ class MMcQueue(Model):
     """
 
     def __init__(self, scenario=None, **kwargs):
+        if scenario is None:
+            scenario = MMcScenario(**kwargs)
+            kwargs = {}
         super().__init__(scenario=scenario, **kwargs)
 
         # Queue
