@@ -58,5 +58,3 @@ page = SolaraViz(
     model_params=model_params,
     name="Mesa Charts - Bank Reserves",
 )
-
-page
