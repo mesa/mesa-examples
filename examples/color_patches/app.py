@@ -32,25 +32,22 @@ grid_rows = 50
 grid_cols = 25
 
 
-def color_patch_draw(cell):
+def color_patch_draw(agent):
     """Portrayal function called each tick to describe how to draw a cell.
 
-    Reads the opinion state from model.opinion_grid rather than from an agent
-    attribute, because state now lives on the model as a NumPy array.
+    Mesa's draw_orthogonal_grid passes agent objects to this function directly.
+    We read the opinion state from model.opinion_grid (NumPy array) via
+    agent.model rather than from any attribute on the agent itself.
 
-    :param cell: the cell in the simulation
+    :param agent: the ColorCell agent at this grid position
     :return: the portrayal dictionary
     """
-    if cell is None:
+    if agent is None:
         raise AssertionError
 
-    # Retrieve the ColorCell agent sitting on this grid position.
-    agent = cell.agents[0] if cell.agents else None
-    model = agent.model if agent else None
-
-    x, y = cell.coordinate
-    # Look up the opinion state from the model-level NumPy array.
-    state = model.opinion_grid[x, y] if model else 0
+    # Read coordinate and state from the model-level NumPy array.
+    x, y = agent.cell.coordinate
+    state = int(agent.model.opinion_grid[x, y])
 
     return {
         "Shape": "rect",
