@@ -1,7 +1,6 @@
 import mesa
+from agent import Ant
 from mesa.discrete_space import HexGrid
-
-from .agent import Ant
 
 
 class AntForaging(mesa.Model):
