@@ -7,6 +7,7 @@ and run_until — no step() needed.
 from collections import deque
 
 from mesa import Model
+from mesa.experimental.scenarios import Scenario
 from mesa.time import Schedule
 
 try:
@@ -15,21 +16,24 @@ except ImportError:
     from agents import Customer, Server
 
 
+class MMcScenario(Scenario):
+    """Scenario for M/M/c queue experiments."""
+
+    arrival_rate: float = 1.0
+    service_rate: float = 0.5
+    n_servers: int = 2
+
+
 class MMcQueue(Model):
     """M/M/c queuing system.
 
     Args:
-        arrival_rate: Mean arrival rate (λ). Customers per time unit.
-        service_rate: Mean service rate per server (μ).
-        n_servers: Number of servers (c).
+        scenario: MMcScenario with arrival_rate (λ), service_rate (μ), n_servers (c).
         rng: Random number generator seed.
     """
 
-    def __init__(self, arrival_rate=1.0, service_rate=0.5, n_servers=2, **kwargs):
-        super().__init__(**kwargs)
-        self.arrival_rate = arrival_rate
-        self.service_rate = service_rate
-        self.n_servers = n_servers
+    def __init__(self, scenario=None, **kwargs):
+        super().__init__(scenario=scenario, **kwargs)
 
         # Queue
         self.queue = deque()
@@ -40,7 +44,10 @@ class MMcQueue(Model):
         self.total_system_time = 0.0
 
         # Create servers
-        self.servers = [Server(self, service_rate) for _ in range(n_servers)]
+        self.servers = [
+            Server(self, self.scenario.service_rate)
+            for _ in range(self.scenario.n_servers)
+        ]
 
         # Disable default step schedule — pure DES
         self._default_schedule.stop()
@@ -49,7 +56,7 @@ class MMcQueue(Model):
         self.schedule_recurring(
             self._customer_arrival,
             Schedule(
-                interval=lambda m: m.rng.exponential(1.0 / m.arrival_rate),
+                interval=lambda m: m.rng.exponential(1.0 / m.scenario.arrival_rate),
                 start=0.0,
             ),
         )
@@ -89,7 +96,9 @@ class MMcQueue(Model):
     def server_utilization(self):
         if self.time == 0:
             return 0.0
-        return sum(s.busy_time for s in self.servers) / (self.n_servers * self.time)
+        return sum(s.busy_time for s in self.servers) / (
+            self.scenario.n_servers * self.time
+        )
 
     @property
     def current_queue_length(self):
@@ -107,12 +116,13 @@ if __name__ == "__main__":
     N_SERVERS = 3
     SIM_TIME = 10_000.0
 
-    model = MMcQueue(
+    scenario = MMcScenario(
         arrival_rate=ARRIVAL_RATE,
         service_rate=SERVICE_RATE,
         n_servers=N_SERVERS,
         rng=42,
     )
+    model = MMcQueue(scenario=scenario)
     model.run_until(SIM_TIME)
 
     analytical = analytical_mmc(ARRIVAL_RATE, SERVICE_RATE, N_SERVERS)
