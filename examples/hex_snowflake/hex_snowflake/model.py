@@ -25,7 +25,7 @@ class HexSnowflake(mesa.Model):
         super().__init__(rng=rng)
 
         # Use a hexagonal grid where edges wrap around.
-        self.grid = HexGrid((width, height), capacity=1, torus=True, random=self.random)
+        self.grid = HexGrid((width, height), capacity=1, torus=True, random=self.rng)
 
         # Create a lightweight Cell agent at each position for visualization.
         for entry in self.grid.all_cells:
