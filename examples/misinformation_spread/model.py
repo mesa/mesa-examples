@@ -1,9 +1,8 @@
 import mesa
 import networkx as nx
+from agents import BelieverAgent, SkepticAgent, SpreaderAgent
 from mesa.discrete_space import Network
 from mesa_llm.reasoning.react import ReActReasoning
-
-from agents import BelieverAgent, SkepticAgent, SpreaderAgent
 from rulebased_agents import RuleBasedBeliever, RuleBasedSkeptic, RuleBasedSpreader
 
 
@@ -67,7 +66,7 @@ class MisinformationModel(mesa.Model):
                 internal_state={"personality": "believer", "cell": cell},
             )
 
-        for cell in all_cells[n_believers: n_believers + n_skeptics]:
+        for cell in all_cells[n_believers : n_believers + n_skeptics]:
             SkepticAgent.create_agents(
                 model=self,
                 n=1,
@@ -80,7 +79,7 @@ class MisinformationModel(mesa.Model):
                 internal_state={"personality": "skeptic", "cell": cell},
             )
 
-        for cell in all_cells[n_believers + n_skeptics:]:
+        for cell in all_cells[n_believers + n_skeptics :]:
             SpreaderAgent.create_agents(
                 model=self,
                 n=1,
@@ -183,10 +182,10 @@ class RuleBasedMisinformationModel(mesa.Model):
         for cell in all_cells[:n_believers]:
             RuleBasedBeliever(model=self, cell=cell)
 
-        for cell in all_cells[n_believers: n_believers + n_skeptics]:
+        for cell in all_cells[n_believers : n_believers + n_skeptics]:
             RuleBasedSkeptic(model=self, cell=cell)
 
-        for cell in all_cells[n_believers + n_skeptics:]:
+        for cell in all_cells[n_believers + n_skeptics :]:
             RuleBasedSpreader(model=self, cell=cell)
 
         self.datacollector = mesa.DataCollector(

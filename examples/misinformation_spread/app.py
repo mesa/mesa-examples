@@ -1,8 +1,8 @@
+import matplotlib
+import matplotlib.pyplot as plt
+import pandas as pd
 import solara
 import solara.lab
-import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib
 from model import MisinformationModel, RuleBasedMisinformationModel
 
 matplotlib.use("Agg")
