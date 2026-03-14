@@ -1,5 +1,7 @@
 """Configure visualization elements and instantiate a server"""
 
+import os
+
 import networkx as nx
 import solara
 from aco_tsp.model import AcoTspModel, TSPGraph
@@ -11,7 +13,9 @@ def circle_portrayal_example(agent):
     return {"node_size": 20, "width": 0.1}
 
 
-tsp_graph = TSPGraph.from_tsp_file("aco_tsp/data/kroA100.tsp")
+tsp_graph = TSPGraph.from_tsp_file(
+    os.path.join(os.path.dirname(__file__), "aco_tsp/data/kroA100.tsp")
+)
 model_params = {
     "num_agents": tsp_graph.num_cities,
     "tsp_graph": tsp_graph,
