@@ -16,20 +16,7 @@ on:
     - cron: '0 6 * * 1'  # Monday at 6:00 UTC
 
 jobs:
-  # build-stable:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/checkout@v4
-  #   - name: Set up Python
-  #     uses: actions/setup-python@v5
-  #     with:
-  #       python-version: "3.14"
-  #   - name: Install dependencies
-  #     run: pip install mesa[network] pytest
-  #   - name: Test with pytest
-  #     run: pytest -rA -Werror -Wdefault::PendingDeprecationWarning test_examples.py
-
-  build-pre:
+  build-stable:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -39,12 +26,12 @@ jobs:
         python-version: "3.14"
     - name: Install dependencies
       run: |
-        pip install mesa[network] --pre
+        pip install "mesa[network]<4"
         pip install .[test]
     - name: Test with pytest
       run: pytest -rA -Werror -Wdefault::PendingDeprecationWarning test_examples.py
 
-  build-main:
+  build-3-maintenance:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -55,6 +42,6 @@ jobs:
     - name: Install dependencies
       run: |
         pip install .[test]
-        pip install -U "mesa[network] @ git+https://github.com/mesa/mesa@main"
+        pip install -U "mesa[network] @ git+https://github.com/mesa/mesa@3.5.x-maintenance"
     - name: Test with pytest
       run: pytest -rA -Werror -Wdefault::PendingDeprecationWarning test_examples.py
