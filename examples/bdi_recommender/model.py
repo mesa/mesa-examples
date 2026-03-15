@@ -1,12 +1,21 @@
 import contextlib
 
-from agents import (
-    ClinicAgent,
-    DoctorAgent,
-    GymAgent,
-    NutritionCentreAgent,
-    UserAgent,
-)
+try:
+    from .agents import (
+        ClinicAgent,
+        DoctorAgent,
+        GymAgent,
+        NutritionCentreAgent,
+        UserAgent,
+    )
+except ImportError:
+    from agents import (
+        ClinicAgent,
+        DoctorAgent,
+        GymAgent,
+        NutritionCentreAgent,
+        UserAgent,
+    )
 from mesa import Model
 from mesa.datacollection import DataCollector
 from mesa.discrete_space import OrthogonalMooreGrid

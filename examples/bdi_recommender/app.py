@@ -9,16 +9,27 @@ Displays:
 """
 
 import solara
-from agents import (
-    ClinicAgent,
-    DoctorAgent,
-    GymAgent,
-    NutritionCentreAgent,
-    UserAgent,
-)
+
+try:
+    from .agents import (
+        ClinicAgent,
+        DoctorAgent,
+        GymAgent,
+        NutritionCentreAgent,
+        UserAgent,
+    )
+    from .model import BDIRecommenderModel
+except ImportError:
+    from agents import (
+        ClinicAgent,
+        DoctorAgent,
+        GymAgent,
+        NutritionCentreAgent,
+        UserAgent,
+    )
+    from model import BDIRecommenderModel
 from mesa.visualization import SolaraViz, SpaceRenderer
 from mesa.visualization.components import AgentPortrayalStyle
-from model import BDIRecommenderModel
 
 
 def agent_portrayal(agent):

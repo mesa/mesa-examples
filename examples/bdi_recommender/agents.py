@@ -15,7 +15,10 @@ from mesa.discrete_space import Cell, FixedAgent, Grid2DMovingAgent
 from mesa.experimental.mesa_signals import HasEmitters, Observable, computed_property
 
 if TYPE_CHECKING:
-    from model import BDIRecommenderModel
+    try:
+        from .model import BDIRecommenderModel
+    except ImportError:
+        from model import BDIRecommenderModel
 
 
 class BDIAgent(HasEmitters):
