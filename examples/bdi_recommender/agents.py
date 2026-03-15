@@ -44,7 +44,6 @@ class BDIAgent(HasEmitters):
         self.intentions: list[tuple[str, tuple]] = []
         self.incoming_queue: list[dict[str, Any]] = []
 
-
     @computed_property
     def goals(self) -> dict[str, float]:
         """Compute goals from beliefs and desires.
@@ -81,7 +80,10 @@ class BDIAgent(HasEmitters):
             for desire_name, priority in candidates.items():
                 # Check for blocking belief (e.g., "Not-pa" blocks "pa")
                 blocking_belief = f"Not-{desire_name}"
-                if blocking_belief in self.beliefs and self.beliefs[blocking_belief] > 0:
+                if (
+                    blocking_belief in self.beliefs
+                    and self.beliefs[blocking_belief] > 0
+                ):
                     continue  # Blocked by contradicting belief
                 goals[desire_name] = priority
 
@@ -249,7 +251,6 @@ class UserAgent(Grid2DMovingAgent, BDIAgent):
         if goals:
             self.get_recommendation(goals)
 
-
     def get_recommendation(self, goals: dict[str, float]):
         """Get health recommendation based on current goals.
 
@@ -289,8 +290,16 @@ class UserAgent(Grid2DMovingAgent, BDIAgent):
         dy = 0 if dest[1] == current[1] else (1 if dest[1] > current[1] else -1)
 
         if dx != 0 or dy != 0:
-            directions = {(-1, 0): "n", (1, 0): "s", (0, 1): "e", (0, -1): "w",
-                          (-1, 1): "ne", (-1, -1): "nw", (1, 1): "se", (1, -1): "sw"}
+            directions = {
+                (-1, 0): "n",
+                (1, 0): "s",
+                (0, 1): "e",
+                (0, -1): "w",
+                (-1, 1): "ne",
+                (-1, -1): "nw",
+                (1, 1): "se",
+                (1, -1): "sw",
+            }
             if direction := directions.get((dx, dy)):
                 self.move(direction)
 
@@ -440,4 +449,3 @@ class ClinicAgent(LocationAgent):
     """
 
     location_name = "Health Clinic"
-

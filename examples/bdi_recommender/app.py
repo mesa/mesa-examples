@@ -126,4 +126,3 @@ page = SolaraViz(
     name="BDI Recommender Agent",
 )
 page  # noqa
-
