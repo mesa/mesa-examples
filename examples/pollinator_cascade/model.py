@@ -59,7 +59,7 @@ class PollinatorCascadeModel(mesa.Model):
 
         # Bipartite graph - pollinators in set 0, plants in set 1
         # Each pair is connected with probability - connectivity
-        G = nx.bipartite.random_graph(
+        graph = nx.bipartite.random_graph(
             n_pollinators,
             n_plants,
             connectivity,
@@ -68,7 +68,7 @@ class PollinatorCascadeModel(mesa.Model):
 
         # Wrap the graph in Network space
         # This creates a Cell for every node that agents can live on
-        self.grid = Network(G, random=self.random)
+        self.grid = Network(graph, random=self.random)
 
         # Place pollinators on the first n_pollinators cells
         # Place plants on the remaining cells

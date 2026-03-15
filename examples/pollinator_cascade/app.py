@@ -150,5 +150,3 @@ page = SolaraViz(
     model_params=model_params,
     name="Pollinator-Plant Cascade Extinction Model",
 )
-
-page
