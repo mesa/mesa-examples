@@ -11,7 +11,6 @@ from mesa.visualization import SolaraViz, make_plot_component
 def circle_portrayal_example(agent):
     return {"node_size": 20, "width": 0.1}
 
-
 tsp_graph = TSPGraph.from_tsp_file(os.path.join(os.path.dirname(__file__), "aco_tsp/data/kroA100.tsp"))
 model_params = {
     "num_agents": tsp_graph.num_cities,
