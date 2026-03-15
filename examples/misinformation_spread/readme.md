@@ -9,15 +9,15 @@ was programmed to exhibit.
 ## Overview
 
 Agents are placed on an Erdos-Renyi graph and exposed to a misinformation
-claim. Each step, agents decide whether to believe and share the claim
-based on their personality type and how many times they have
+claim. Each step, agents decide whether to believe and share the claim 
+based on their personality type and how many times they have 
 previously encountered it. LLM agents accumulate a decision history
 across steps, allowing social pressure to build up over time.
 
 The key behavior is the S-curve effect: LLM-driven skeptics
 initially resist the claim for several steps, but repeated exposure
 gradually tips them toward belief. This pattern that emerges purely from
-prompt context and not hard-coded thresholds.
+prompt context and not hard-coded thresholds. 
 
 ## Installation
 ```bash
@@ -82,7 +82,7 @@ solara run app.py
 
 `ReActReasoning.plan()` wraps all output in `reasoning:` / `action:`
 fields regardless of prompt instructions, making structured two-line
-responses unparsable. This model bypasses `ReActReasoning` entirely and
+responses unparseable. This model bypasses `ReActReasoning` entirely and
 calls `litellm.completion()` directly, which produces clean
 `BELIEVE: yes / SHARE: yes` output that can be reliably parsed.
 

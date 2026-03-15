@@ -1,9 +1,10 @@
 import mesa
 import networkx as nx
-from agents import BelieverAgent, SkepticAgent, SpreaderAgent
 from mesa.discrete_space import Network
 from mesa_llm.reasoning.react import ReActReasoning
-from rulebased_agents import RuleBasedBeliever, RuleBasedSkeptic, RuleBasedSpreader
+
+from .agents import BelieverAgent, SkepticAgent, SpreaderAgent
+from .rulebased_agents import RuleBasedBeliever, RuleBasedSkeptic, RuleBasedSpreader
 
 
 class MisinformationModel(mesa.Model):
@@ -48,8 +49,8 @@ class MisinformationModel(mesa.Model):
         self.spread_count = 0
 
         n_total = n_believers + n_skeptics + n_spreaders
-        graph = nx.erdos_renyi_graph(n_total, connectivity, seed=42)
-        self.grid = Network(graph, random=self.random)
+        G = nx.erdos_renyi_graph(n_total, connectivity, seed=42)
+        self.grid = Network(G, random=self.random)
 
         all_cells = list(self.grid.all_cells)
 
@@ -66,7 +67,7 @@ class MisinformationModel(mesa.Model):
                 internal_state={"personality": "believer", "cell": cell},
             )
 
-        for cell in all_cells[n_believers : n_believers + n_skeptics]:
+        for cell in all_cells[n_believers: n_believers + n_skeptics]:
             SkepticAgent.create_agents(
                 model=self,
                 n=1,
@@ -79,7 +80,7 @@ class MisinformationModel(mesa.Model):
                 internal_state={"personality": "skeptic", "cell": cell},
             )
 
-        for cell in all_cells[n_believers + n_skeptics :]:
+        for cell in all_cells[n_believers + n_skeptics:]:
             SpreaderAgent.create_agents(
                 model=self,
                 n=1,
@@ -174,18 +175,18 @@ class RuleBasedMisinformationModel(mesa.Model):
         self.spread_count = 0
 
         n_total = n_believers + n_skeptics + n_spreaders
-        graph = nx.erdos_renyi_graph(n_total, connectivity, seed=42)
-        self.grid = Network(graph, random=self.random)
+        G = nx.erdos_renyi_graph(n_total, connectivity, seed=42)
+        self.grid = Network(G, random=self.random)
 
         all_cells = list(self.grid.all_cells)
 
         for cell in all_cells[:n_believers]:
             RuleBasedBeliever(model=self, cell=cell)
 
-        for cell in all_cells[n_believers : n_believers + n_skeptics]:
+        for cell in all_cells[n_believers: n_believers + n_skeptics]:
             RuleBasedSkeptic(model=self, cell=cell)
 
-        for cell in all_cells[n_believers + n_skeptics :]:
+        for cell in all_cells[n_believers + n_skeptics:]:
             RuleBasedSpreader(model=self, cell=cell)
 
         self.datacollector = mesa.DataCollector(

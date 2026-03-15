@@ -1,9 +1,9 @@
-import matplotlib
-import matplotlib.pyplot as plt
-import pandas as pd
 import solara
 import solara.lab
-from model import MisinformationModel, RuleBasedMisinformationModel
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib
+from .model import MisinformationModel, RuleBasedMisinformationModel
 
 matplotlib.use("Agg")
 
@@ -178,7 +178,7 @@ def Controls():
     solara.SliderInt("Steps", value=n_steps, min=1, max=30)
 
     solara.Text(
-        "LLM mode: 10 to 30s per step (Ollama llama3)",
+        "⚠️ LLM mode: ~10–30s per step (Ollama llama3)",
         style="color: #b45309; font-size:0.8rem; margin-top:8px",
     )
 
@@ -186,7 +186,7 @@ def Controls():
         is_running.set(True)
         status_message.set("Running rule-based model...")
         rb_data.set(run_model(use_llm=False))
-        status_message.set(f"Running LLM model ({n_steps.value} steps x ~15s each)...")
+        status_message.set(f"Running LLM model ({n_steps.value} steps × ~15s each)...")
         llm_data.set(run_model(use_llm=True))
         is_running.set(False)
         status_message.set("Done! Adjust parameters and re-run to compare.")
