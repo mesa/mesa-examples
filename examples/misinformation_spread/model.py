@@ -49,8 +49,8 @@ class MisinformationModel(mesa.Model):
         self.spread_count = 0
 
         n_total = n_believers + n_skeptics + n_spreaders
-        G = nx.erdos_renyi_graph(n_total, connectivity, seed=42)
-        self.grid = Network(G, random=self.random)
+        graph = nx.erdos_renyi_graph(n_total, connectivity, seed=42)
+        self.grid = Network(graph, random=self.random)
 
         all_cells = list(self.grid.all_cells)
 
@@ -175,8 +175,8 @@ class RuleBasedMisinformationModel(mesa.Model):
         self.spread_count = 0
 
         n_total = n_believers + n_skeptics + n_spreaders
-        G = nx.erdos_renyi_graph(n_total, connectivity, seed=42)
-        self.grid = Network(G, random=self.random)
+        graph = nx.erdos_renyi_graph(n_total, connectivity, seed=42)
+        self.grid = Network(graph, random=self.random)
 
         all_cells = list(self.grid.all_cells)
 

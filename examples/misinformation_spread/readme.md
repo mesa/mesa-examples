@@ -82,7 +82,7 @@ solara run app.py
 
 `ReActReasoning.plan()` wraps all output in `reasoning:` / `action:`
 fields regardless of prompt instructions, making structured two-line
-responses unparseable. This model bypasses `ReActReasoning` entirely and
+responses unparsable. This model bypasses `ReActReasoning` entirely and
 calls `litellm.completion()` directly, which produces clean
 `BELIEVE: yes / SHARE: yes` output that can be reliably parsed.
 
