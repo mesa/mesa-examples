@@ -1,7 +1,6 @@
 """Actions and agents for the ER simulation."""
 
 import mesa
-import numpy as np
 from mesa.experimental.actions import Action
 
 

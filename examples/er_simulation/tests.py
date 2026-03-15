@@ -28,8 +28,6 @@ def test_wait_times_are_positive():
     for _ in range(25):
         model.step()
 
-    discharged = [
-        p for p in model.agents_by_type[Patient] if p.status == "discharged"
-    ]
+    discharged = [p for p in model.agents_by_type[Patient] if p.status == "discharged"]
     for p in discharged:
         assert p.wait_time >= 0
