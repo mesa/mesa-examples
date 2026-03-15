@@ -1,6 +1,6 @@
+import litellm
 from mesa_llm.llm_agent import LLMAgent
 from mesa_llm.memory.st_lt_memory import STLTMemory
-import litellm
 
 
 class BelieverAgent(LLMAgent):
