@@ -26,7 +26,7 @@ jobs:
         python-version: "3.14"
     - name: Install dependencies
       run: |
-        pip install mesa[network] --pre
+        pip install "mesa[network]<4"
         pip install .[test]
     - name: Test with pytest
       run: pytest -rA -Werror -Wdefault::PendingDeprecationWarning test_examples.py
