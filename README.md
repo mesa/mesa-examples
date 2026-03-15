@@ -8,6 +8,7 @@ Those core examples are fully tested, updated and guaranteed to work with the Me
 This repository contains user examples and showcases that illustrate different features of Mesa. For more information on each model, see its own Readme and documentation.
 
 - Mesa examples that work on the Mesa and Mesa-Geo main development branches are available here on the [`main`](https://github.com/mesa/mesa-examples) branch.
+- Mesa examples that work with Mesa 3.x releases are available here on the [`mesa-3.x`](https://github.com/mesa/mesa-examples/tree/mesa-3.x) branch.
 - Mesa examples that work with Mesa 2.x releases and Mesa-Geo 0.8.x releases are available here on the [`mesa-2.x`](https://github.com/mesa/mesa-examples/tree/mesa-2.x) branch.
 
 To contribute to this repository, see [CONTRIBUTING.rst](https://github.com/mesa/mesa-examples/blob/main/CONTRIBUTING.rst).
@@ -17,6 +18,11 @@ This repo also contains a package that readily lets you import and run some of t
 $ # This will install the "mesa_models" package
 $ pip install -U -e git+https://github.com/mesa/mesa-examples#egg=mesa-models
 ```
+For Mesa 3.x examples, install:
+```console
+$ # This will install the "mesa_models" package
+$ pip install -U -e git+https://github.com/mesa/mesa-examples@mesa-3.x#egg=mesa-models
+```
 For Mesa 2.x examples, install:
 ```console
 $ # This will install the "mesa_models" package
@@ -24,7 +30,6 @@ $ pip install -U -e git+https://github.com/mesa/mesa-examples@mesa-2.x#egg=mesa-
 ```
 ```python
 from mesa_models.boltzmann_wealth_model.model import BoltzmannWealthModel
-
 ```
 You can see the available models at [setup.cfg](https://github.com/mesa/mesa-examples/blob/main/setup.cfg).
 
