@@ -44,10 +44,11 @@ class PrisonerAgent(LLMAgent):
         ("defect", "defect"): (1, 1),
     }
 
-    def __init__(self, model) -> None:
+    def __init__(self, model, llm_model: str = "gemini/gemini-2.0-flash") -> None:
         super().__init__(
             model=model,
             reasoning=CoTReasoning,
+            llm_model=llm_model,
             system_prompt=SYSTEM_PROMPT,
             vision=0,
             internal_state=["score:0", "last_action:none", "rounds_played:0"],

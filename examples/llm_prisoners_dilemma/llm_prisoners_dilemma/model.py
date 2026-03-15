@@ -44,7 +44,7 @@ class PrisonersDilemmaModel(Model):
 
         # Create agents
         for _ in range(num_agents):
-            agent = PrisonerAgent(model=self)
+            agent = PrisonerAgent(model=self, llm_model=llm_model)
             agent.memory = ShortTermMemory(agent=agent, n=5, display=False)
             agent._update_internal_state()
 
@@ -87,9 +87,16 @@ class PrisonersDilemmaModel(Model):
             agent1._update_internal_state()
             agent2._update_internal_state()
 
-            # Both decide independently (no communication during decision)
-            action1 = "cooperate"
-            action2 = "cooperate"
+            # Both agents reason independently using LLM
+            plan1 = agent1.reasoning.plan(obs=agent1.generate_obs())
+            plan2 = agent2.reasoning.plan(obs=agent2.generate_obs())
+
+            # Extract decisions from LLM plans
+            plan1_content = str(plan1.llm_plan.content) if hasattr(plan1.llm_plan, "content") else str(plan1.llm_plan)
+            plan2_content = str(plan2.llm_plan.content) if hasattr(plan2.llm_plan, "content") else str(plan2.llm_plan)
+
+            action1 = agent1._parse_action(plan1_content)
+            action2 = agent2._parse_action(plan2_content)
 
             # Apply outcomes
             agent1.apply_decision(action1, action2)
