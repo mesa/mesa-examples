@@ -1,4 +1,3 @@
-import mesa
 from mesa import Model
 from mesa.datacollection import DataCollector
 from mesa_llm.memory.st_memory import ShortTermMemory
@@ -104,12 +103,20 @@ class PrisonersDilemmaModel(Model):
             agent2._update_internal_state()
 
             # Both agents reason independently using LLM
-            plan1 = agent1.reasoning_instance.plan(obs=agent1.generate_obs())            
+            plan1 = agent1.reasoning_instance.plan(obs=agent1.generate_obs())
             plan2 = agent2.reasoning_instance.plan(obs=agent2.generate_obs())
 
             # Extract decisions from LLM plans
-            plan1_content = str(plan1.llm_plan.content) if hasattr(plan1.llm_plan, "content") else str(plan1.llm_plan)
-            plan2_content = str(plan2.llm_plan.content) if hasattr(plan2.llm_plan, "content") else str(plan2.llm_plan)
+            plan1_content = (
+                str(plan1.llm_plan.content)
+                if hasattr(plan1.llm_plan, "content")
+                else str(plan1.llm_plan)
+            )
+            plan2_content = (
+                str(plan2.llm_plan.content)
+                if hasattr(plan2.llm_plan, "content")
+                else str(plan2.llm_plan)
+            )
 
             action1 = agent1._parse_action(plan1_content)
             action2 = agent2._parse_action(plan2_content)

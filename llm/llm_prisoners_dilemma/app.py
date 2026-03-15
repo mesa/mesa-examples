@@ -1,7 +1,9 @@
+from dotenv import load_dotenv
 from llm_prisoners_dilemma.model import PrisonersDilemmaModel
 from mesa.visualization import SolaraViz, make_plot_component
-from dotenv import load_dotenv
+
 load_dotenv()
+
 
 def agent_portrayal(agent):
     """Color agents by their last action and score."""
