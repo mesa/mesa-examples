@@ -28,18 +28,14 @@ for step in range(STEPS):
     if (step + 1) % 10 == 0:
         alive_p = sum(1 for a in model.agents if hasattr(a, "energy") and a.alive)
         alive_pl = sum(1 for a in model.agents if hasattr(a, "health") and a.alive)
-        print(
-            f"Step {step + 1:3d} | "
-            f"Pollinators: {alive_p:3d} | "
-            f"Plants: {alive_pl:3d}"
-        )
+        print(f"Step {step + 1:3d} | Pollinators: {alive_p:3d} | Plants: {alive_pl:3d}")
 
 model_data = model.datacollector.get_model_vars_dataframe()
 
 print("\nModel run complete.")
-print(f"Final alive pollinators: " f"{model_data['Alive Pollinators'].iloc[-1]:.2%}")
-print(f"Final alive plants:      " f"{model_data['Alive Plants'].iloc[-1]:.2%}")
-print(f"Total plant deaths:      " f"{int(model_data['Cascade Depth'].iloc[-1])}")
+print(f"Final alive pollinators: {model_data['Alive Pollinators'].iloc[-1]:.2%}")
+print(f"Final alive plants:      {model_data['Alive Plants'].iloc[-1]:.2%}")
+print(f"Total plant deaths:      {int(model_data['Cascade Depth'].iloc[-1])}")
 
 
 def plot_results(model_data, extinction_schedule):

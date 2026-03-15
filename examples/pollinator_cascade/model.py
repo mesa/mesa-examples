@@ -1,7 +1,7 @@
 import mesa
 import networkx as nx
+from agents import Plant, Pollinator
 from mesa.discrete_space import Network
-from agents import Pollinator, Plant
 
 
 def compute_alive_pollinators(model):
