@@ -1,6 +1,7 @@
 from llm_prisoners_dilemma.model import PrisonersDilemmaModel
 from mesa.visualization import SolaraViz, make_plot_component
-
+from dotenv import load_dotenv
+load_dotenv()
 
 def agent_portrayal(agent):
     """Color agents by their last action and score."""
@@ -53,9 +54,10 @@ ScorePlot = make_plot_component(
         "total_defections": "#e74c3c",
     }
 )
+model = PrisonersDilemmaModel()
 
 page = SolaraViz(
-    PrisonersDilemmaModel,
+    model,
     components=[CoopPlot, ScorePlot],
     model_params=model_params,
     name="LLM Prisoner's Dilemma",

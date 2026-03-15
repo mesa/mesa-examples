@@ -1,4 +1,6 @@
+import mesa
 from mesa import Model
+from mesa.datacollection import DataCollector
 from mesa_llm.memory.st_memory import ShortTermMemory
 
 from .agent import PrisonerAgent
@@ -48,6 +50,20 @@ class PrisonersDilemmaModel(Model):
             agent.memory = ShortTermMemory(agent=agent, n=5, display=False)
             agent._update_internal_state()
 
+        # Data collection
+        self.datacollector = DataCollector(
+            model_reporters={
+                "cooperation_rate": "cooperation_rate",
+                "total_cooperations": "total_cooperations",
+                "total_defections": "total_defections",
+            },
+            agent_reporters={
+                "score": "score",
+                "last_action": "last_action",
+            },
+        )
+        self.datacollector.collect(self)
+
     def _pair_agents(self) -> list[tuple]:
         """
         Randomly pair agents for this round.
@@ -88,20 +104,12 @@ class PrisonersDilemmaModel(Model):
             agent2._update_internal_state()
 
             # Both agents reason independently using LLM
-            plan1 = agent1.reasoning.plan(obs=agent1.generate_obs())
-            plan2 = agent2.reasoning.plan(obs=agent2.generate_obs())
+            plan1 = agent1.reasoning_instance.plan(obs=agent1.generate_obs())            
+            plan2 = agent2.reasoning_instance.plan(obs=agent2.generate_obs())
 
             # Extract decisions from LLM plans
-            plan1_content = (
-                str(plan1.llm_plan.content)
-                if hasattr(plan1.llm_plan, "content")
-                else str(plan1.llm_plan)
-            )
-            plan2_content = (
-                str(plan2.llm_plan.content)
-                if hasattr(plan2.llm_plan, "content")
-                else str(plan2.llm_plan)
-            )
+            plan1_content = str(plan1.llm_plan.content) if hasattr(plan1.llm_plan, "content") else str(plan1.llm_plan)
+            plan2_content = str(plan2.llm_plan.content) if hasattr(plan2.llm_plan, "content") else str(plan2.llm_plan)
 
             action1 = agent1._parse_action(plan1_content)
             action2 = agent2._parse_action(plan2_content)
@@ -121,3 +129,4 @@ class PrisonersDilemmaModel(Model):
                 round_defections += 1
 
         self._update_stats(round_cooperations, round_defections)
+        self.datacollector.collect(self)
