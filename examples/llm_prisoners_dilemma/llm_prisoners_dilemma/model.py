@@ -92,8 +92,16 @@ class PrisonersDilemmaModel(Model):
             plan2 = agent2.reasoning.plan(obs=agent2.generate_obs())
 
             # Extract decisions from LLM plans
-            plan1_content = str(plan1.llm_plan.content) if hasattr(plan1.llm_plan, "content") else str(plan1.llm_plan)
-            plan2_content = str(plan2.llm_plan.content) if hasattr(plan2.llm_plan, "content") else str(plan2.llm_plan)
+            plan1_content = (
+                str(plan1.llm_plan.content)
+                if hasattr(plan1.llm_plan, "content")
+                else str(plan1.llm_plan)
+            )
+            plan2_content = (
+                str(plan2.llm_plan.content)
+                if hasattr(plan2.llm_plan, "content")
+                else str(plan2.llm_plan)
+            )
 
             action1 = agent1._parse_action(plan1_content)
             action2 = agent2._parse_action(plan2_content)
