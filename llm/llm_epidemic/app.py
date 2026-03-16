@@ -68,6 +68,7 @@ SIRPlot = make_plot_component(
 )
 
 from dotenv import load_dotenv
+
 load_dotenv()
 
 model = EpidemicModel()
