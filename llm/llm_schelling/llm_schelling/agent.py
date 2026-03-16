@@ -42,7 +42,9 @@ Respond with ONLY one word: 'happy' if you want to stay, or 'unhappy' if you wan
 
         # Count neighbors by group
         neighbors = list(self.cell.neighborhood.agents) if self.cell else []
-        same = sum(1 for n in neighbors if hasattr(n, "group") and n.group == self.group)
+        same = sum(
+            1 for n in neighbors if hasattr(n, "group") and n.group == self.group
+        )
         total = len(neighbors)
         different = total - same
 

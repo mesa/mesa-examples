@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import numpy as np
 import solara
 from llm_schelling.model import LLMSchellingModel
 from mesa.visualization import SolaraViz, make_plot_component
@@ -62,8 +61,14 @@ def SchellingGridPlot(model):
         x, y = agent.pos
         color = GROUP_COLORS[agent.group]
         marker = "o" if agent.is_happy else "x"
-        ax.plot(x + 0.5, y + 0.5, marker=marker, color=color,
-                markersize=8, markeredgewidth=2)
+        ax.plot(
+            x + 0.5,
+            y + 0.5,
+            marker=marker,
+            color=color,
+            markersize=8,
+            markeredgewidth=2,
+        )
 
     return solara.FigureMatplotlib(fig)
 
