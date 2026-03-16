@@ -1,4 +1,5 @@
 import mesa
+
 try:
     from .agent import Ant
 except ImportError:
