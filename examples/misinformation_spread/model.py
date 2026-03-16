@@ -2,7 +2,6 @@ import mesa
 import networkx as nx
 from mesa.discrete_space import Network
 
-
 try:
     from .agents import BelieverAgent, SkepticAgent, SpreaderAgent
     from .rulebased_agents import RuleBasedBeliever, RuleBasedSkeptic, RuleBasedSpreader
