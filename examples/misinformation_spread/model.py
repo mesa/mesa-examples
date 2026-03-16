@@ -61,7 +61,6 @@ class MisinformationModel(mesa.Model):
             BelieverAgent.create_agents(
                 model=self,
                 n=1,
-                reasoning=ReActReasoning,
                 llm_model="ollama/llama3",
                 system_prompt=(
                     "You are a social media user who tends to trust "
@@ -74,7 +73,6 @@ class MisinformationModel(mesa.Model):
             SkepticAgent.create_agents(
                 model=self,
                 n=1,
-                reasoning=ReActReasoning,
                 llm_model="ollama/llama3",
                 system_prompt=(
                     "You are a social media user who questions everything. "
@@ -87,7 +85,6 @@ class MisinformationModel(mesa.Model):
             SpreaderAgent.create_agents(
                 model=self,
                 n=1,
-                reasoning=ReActReasoning,
                 llm_model="ollama/llama3",
                 system_prompt=(
                     "You are a social media user who shares everything "
