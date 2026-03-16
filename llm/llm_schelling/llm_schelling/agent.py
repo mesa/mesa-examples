@@ -1,6 +1,9 @@
 from mesa_llm.llm_agent import LLMAgent
 from mesa_llm.reasoning.reasoning import Reasoning
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class SchellingAgent(LLMAgent):
     """
@@ -74,8 +77,8 @@ Respond with ONLY one word: 'happy' or 'unhappy'."""
                 for block in plan.llm_plan:
                     if hasattr(block, "text"):
                         response_text += block.text.lower()
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning("Failed to parse LLM response: %s", e)
 
         self.is_happy = "unhappy" not in response_text
         self.internal_state = [
