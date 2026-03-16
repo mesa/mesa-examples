@@ -55,7 +55,7 @@ class LLMOpinionDynamicsModel(mesa.Model):
         self.random.shuffle(cells)
         selected_cells = cells[:n_agents]
 
-        for cell in enumerate(selected_cells):
+        for cell in selected_cells:
             initial_opinion = self.random.uniform(0.0, 10.0)
             agent = OpinionAgent(
                 model=self,
