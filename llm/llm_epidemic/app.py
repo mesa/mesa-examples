@@ -73,4 +73,3 @@ page = SolaraViz(
     model_params=model_params,
     name="LLM Epidemic Model",
 )
-
