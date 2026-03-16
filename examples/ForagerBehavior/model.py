@@ -1,5 +1,6 @@
-import mesa
 import random
+
+import mesa
 
 
 class ForagerAgent(mesa.Agent):
@@ -40,8 +41,7 @@ class ForagerAgent(mesa.Agent):
 
 
 class ForagerModel(mesa.Model):
-    def __init__(self, n_agents=10, width=20, height=20,
-                 resource_density=0.3, seed=42):
+    def __init__(self, n_agents=10, width=20, height=20, resource_density=0.3, seed=42):
         super().__init__(seed=seed)
         self.grid = mesa.space.MultiGrid(width, height, torus=True)
         self.resources = {}
@@ -51,14 +51,19 @@ class ForagerModel(mesa.Model):
                     self.resources[(x, y)] = 20.0
         for _ in range(n_agents):
             agent = ForagerAgent(self)
-            self.grid.place_agent(agent, (
-                self.random.randrange(width),
-                self.random.randrange(height),
-            ))
+            self.grid.place_agent(
+                agent,
+                (
+                    self.random.randrange(width),
+                    self.random.randrange(height),
+                ),
+            )
         self.datacollector = mesa.DataCollector(
             agent_reporters={"energy": "energy", "state": "state"},
             model_reporters={
-                "searching": lambda m: sum(1 for a in m.agents if a.state == "searching"),
+                "searching": lambda m: sum(
+                    1 for a in m.agents if a.state == "searching"
+                ),
                 "resting": lambda m: sum(1 for a in m.agents if a.state == "resting"),
                 "total_resources": lambda m: sum(m.resources.values()),
             },
