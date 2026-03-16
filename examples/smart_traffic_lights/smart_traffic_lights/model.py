@@ -44,9 +44,7 @@ class TrafficModel(mesa.Model):
         self.height = height
 
         # Initialize the new discrete_space grid
-        self.grid = OrthogonalVonNeumannGrid(
-            (width, height), torus=True, capacity=None
-        )
+        self.grid = OrthogonalVonNeumannGrid((width, height), torus=True, capacity=None)
 
         # Build a lookup table mapping (x, y) to Cell objects
         self.cells = {cell.coordinate: cell for cell in self.grid.all_cells}
@@ -73,7 +71,7 @@ class TrafficModel(mesa.Model):
             car = CarAgent(self, Direction.EAST)
             pos = (self.random.randrange(width), center_y)
             car.cell = self.cells[pos]
-            
+
         # Spawn North-bound cars on the vertical road
         for _ in range(num_cars_north):
             car = CarAgent(self, Direction.NORTH)
@@ -96,8 +94,12 @@ class TrafficModel(mesa.Model):
 
         # Sort front-to-back: Cars with higher x (for East) or higher y (for North)
         # are "further ahead" and should move first to clear the path.
-        sorted_east = sorted(east_cars, key=lambda a: a.cell.coordinate[0], reverse=True)
-        sorted_north = sorted(north_cars, key=lambda a: a.cell.coordinate[1], reverse=True)
+        sorted_east = sorted(
+            east_cars, key=lambda a: a.cell.coordinate[0], reverse=True
+        )
+        sorted_north = sorted(
+            north_cars, key=lambda a: a.cell.coordinate[1], reverse=True
+        )
 
         # Execute movement in the specific order
         for car in sorted_east:
