@@ -4,8 +4,10 @@ import pandas as pd
 import solara
 import solara.lab
 
-from .model import MisinformationModel, RuleBasedMisinformationModel
-
+try:
+    from .model import MisinformationModel, RuleBasedMisinformationModel
+except ImportError:
+    from model import MisinformationModel, RuleBasedMisinformationModel
 matplotlib.use("Agg")
 
 # Reactive state

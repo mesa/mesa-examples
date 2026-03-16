@@ -3,8 +3,12 @@ import networkx as nx
 from mesa.discrete_space import Network
 from mesa_llm.reasoning.react import ReActReasoning
 
-from .agents import BelieverAgent, SkepticAgent, SpreaderAgent
-from .rulebased_agents import RuleBasedBeliever, RuleBasedSkeptic, RuleBasedSpreader
+try:
+    from .agents import BelieverAgent, SkepticAgent, SpreaderAgent
+    from .rulebased_agents import RuleBasedBeliever, RuleBasedSkeptic, RuleBasedSpreader
+except ImportError:
+    from agents import BelieverAgent, SkepticAgent, SpreaderAgent
+    from rulebased_agents import RuleBasedBeliever, RuleBasedSkeptic, RuleBasedSpreader
 
 
 class MisinformationModel(mesa.Model):
