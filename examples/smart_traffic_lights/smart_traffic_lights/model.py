@@ -13,14 +13,14 @@ def track_total_wait_time(model: mesa.Model) -> int:
     """
     Helper function for the DataCollector to compute total wait time.
     """
-    return sum(a.total_wait_time for a in model.agents if isinstance(a, CarAgent))
+    return sum(a.total_wait_time for a in model.agents_by_type[CarAgent])
 
 
 def track_red_light_wait_time(model: mesa.Model) -> int:
     """
     Helper function for the DataCollector to compute total wait time.
     """
-    return sum(a.red_light_wait_time for a in model.agents if isinstance(a, CarAgent))
+    return sum(a.red_light_wait_time for a in model.agents_by_type[CarAgent])
 
 
 class TrafficModel(mesa.Model):
@@ -40,17 +40,26 @@ class TrafficModel(mesa.Model):
         smart_lights: bool = False,
     ):
         super().__init__()
-        self.grid = mesa.space.MultiGrid(width, height, torus=True)
+        self.width = width
+        self.height = height
+
+        # Initialize the new discrete_space grid
+        self.grid = OrthogonalVonNeumannGrid(
+            (width, height), torus=True, capacity=None
+        )
+
+        # Build a lookup table mapping (x, y) to Cell objects
+        self.cells = {cell.coordinate: cell for cell in self.grid.all_cells}
 
         # Setup intersection (center of the grid)
         center_x, center_y = width // 2, height // 2
 
         # Create Traffic Lights
         light_east = TrafficLightAgent(self, LightState.GREEN, Direction.EAST)
-        self.grid.place_agent(light_east, (center_x - 1, center_y))
+        light_east.cell = self.cells[(center_x - 1, center_y)]
 
         light_north = TrafficLightAgent(self, LightState.RED, Direction.NORTH)
-        self.grid.place_agent(light_north, (center_x, center_y - 1))
+        light_north.cell = self.cells[(center_x, center_y - 1)]
 
         # Create Meta-Agent Controller
         IntersectionController(
@@ -62,15 +71,17 @@ class TrafficModel(mesa.Model):
         # Spawn East-bound cars on the horizontal road
         for _ in range(num_cars_east):
             car = CarAgent(self, Direction.EAST)
-            self.grid.place_agent(car, (self.random.randrange(width), center_y))
-
+            pos = (self.random.randrange(width), center_y)
+            car.cell = self.cells[pos]
+            
         # Spawn North-bound cars on the vertical road
         for _ in range(num_cars_north):
             car = CarAgent(self, Direction.NORTH)
-            self.grid.place_agent(car, (center_x, self.random.randrange(height)))
+            pos = (center_x, self.random.randrange(height))
+            car.cell = self.cells[pos]
 
         # Setup Data Collection
-        self.datacollector = mesa.DataCollector(
+        self.datacollector = DataCollector(
             model_reporters={
                 "Total_Wait_Time": track_total_wait_time,
                 "Total_Red_Light_Wait_Time": track_red_light_wait_time,
@@ -85,8 +96,8 @@ class TrafficModel(mesa.Model):
 
         # Sort front-to-back: Cars with higher x (for East) or higher y (for North)
         # are "further ahead" and should move first to clear the path.
-        sorted_east = sorted(east_cars, key=lambda a: a.pos[0], reverse=True)
-        sorted_north = sorted(north_cars, key=lambda a: a.pos[1], reverse=True)
+        sorted_east = sorted(east_cars, key=lambda a: a.cell.coordinate[0], reverse=True)
+        sorted_north = sorted(north_cars, key=lambda a: a.cell.coordinate[1], reverse=True)
 
         # Execute movement in the specific order
         for car in sorted_east:
