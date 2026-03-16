@@ -1,5 +1,8 @@
 import mesa
-from .agent import Ant
+try:
+    from .agent import Ant
+except ImportError:
+    from agent import Ant
 from mesa.discrete_space import HexGrid
 
 
