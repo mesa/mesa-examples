@@ -1,7 +1,7 @@
 import mesa
 import networkx as nx
 from mesa.discrete_space import Network
-from mesa_llm.reasoning.react import ReActReasoning
+
 
 try:
     from .agents import BelieverAgent, SkepticAgent, SpreaderAgent
