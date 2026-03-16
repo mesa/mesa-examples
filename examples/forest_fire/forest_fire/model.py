@@ -13,6 +13,7 @@ ON_FIRE = 1
 BURNED_OUT = 2
 EMPTY = -1
 
+
 class ForestFire(mesa.Model):
     """Simple Forest Fire model."""
 
@@ -27,7 +28,7 @@ class ForestFire(mesa.Model):
 
         # Set up model objects
         self.grid = OrthogonalMooreGrid((width, height), capacity=1, random=self.random)
-        
+
         # Environment state stored in NumPy array instead of patch agents.
         # TreeCell agents are kept only as lightweight wrappers for visualization.
         # State array
@@ -44,9 +45,9 @@ class ForestFire(mesa.Model):
         # Place a tree in each cell with Prob = density
         for cell in self.grid.all_cells:
             # Create a tree wrapper
-            tree = TreeCell(self, cell)
+            TreeCell(self, cell)
             # self.grid.place_agent(tree, cell)  # Not needed/supported in OrthogonalMooreGrid
-            
+
             x, y = cell.coordinate
             if self.random.random() < density:
                 self.fire_state[x, y] = FINE
@@ -59,9 +60,9 @@ class ForestFire(mesa.Model):
 
     def step(self):
         """Advance the model by one step."""
-        
+
         new_fire_state = self.fire_state.copy()
-        
+
         for cell in self.grid.all_cells:
             x, y = cell.coordinate
             if self.fire_state[x, y] == ON_FIRE:
@@ -72,7 +73,7 @@ class ForestFire(mesa.Model):
                 new_fire_state[x, y] = BURNED_OUT
 
         self.fire_state = new_fire_state
-        
+
         # collect data
         self.datacollector.collect(self)
 
