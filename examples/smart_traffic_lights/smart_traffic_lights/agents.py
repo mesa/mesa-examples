@@ -1,7 +1,6 @@
 import enum
-
 import mesa
-
+from mesa.discrete_space import CellAgent
 
 class Direction(enum.Enum):
     EAST = (1, 0)
@@ -13,7 +12,7 @@ class LightState(enum.Enum):
     GREEN = 1
 
 
-class TrafficLightAgent(mesa.Agent):
+class TrafficLightAgent(CellAgent):
     """
     An agent representing a single traffic light.
 
@@ -32,7 +31,7 @@ class TrafficLightAgent(mesa.Agent):
         pass
 
 
-class CarAgent(mesa.Agent):
+class CarAgent(CellAgent):
     """
     An agent representing a car in the grid.
 
@@ -59,9 +58,10 @@ class CarAgent(mesa.Agent):
 
         can_move = True
         stopped_by_red_light = False
-        cell_contents = self.model.grid.get_cell_list_contents([next_pos])
+        
+        next_cell = self.model.cells[next_pos]
 
-        for obj in cell_contents:
+        for obj in next_cell.agents:
             if isinstance(obj, CarAgent):
                 can_move = False
                 break
@@ -73,7 +73,8 @@ class CarAgent(mesa.Agent):
                     break
 
         if can_move:
-            self.model.grid.move_agent(self, next_pos)
+            # Moving the agent is now just reassigning the cell!
+            self.cell = next_cell
         else:
             self.total_wait_time += 1
             if stopped_by_red_light:
@@ -112,16 +113,18 @@ class IntersectionController(mesa.Agent):
         count = 0
         # Look backwards from the light based on the direction it controls
         dx, dy = light.direction.value
+        light_x, light_y = light.cell.coordinate
+        
         for i in range(1, self.sensor_range + 1):
-            check_x = (light.pos[0] - dx * i) % self.model.grid.width
-            check_y = (light.pos[1] - dy * i) % self.model.grid.height
-
+            check_x = (light_x - dx * i) % self.model.width
+            check_y = (light_y - dy * i) % self.model.height
             check_pos = (check_x, check_y)
-            if any(
-                isinstance(a, CarAgent)
-                for a in self.model.grid.get_cell_list_contents([check_pos])
-            ):
+            
+            # Look up the cell at check_pos using our lookup dictionary
+            check_cell = self.model.cells[check_pos]
+            if any(isinstance(a, CarAgent) for a in check_cell.agents):
                 count += 1
+                
         return count
 
     def toggle_lights(self):
