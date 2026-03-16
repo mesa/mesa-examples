@@ -1,4 +1,5 @@
 from mesa import Model
+from mesa.datacollection import DataCollector
 from mesa.discrete_space import OrthogonalMooreGrid
 from mesa_llm.memory.st_memory import ShortTermMemory
 
@@ -67,6 +68,16 @@ class EpidemicModel(Model):
             agent.cell = cell
             agent.pos = cell.coordinate
 
+        # Data collection
+        self.datacollector = DataCollector(
+            model_reporters={
+                "susceptible_count": "susceptible_count",
+                "infected_count": "infected_count",
+                "recovered_count": "recovered_count",
+            }
+        )
+        self.datacollector.collect(self)
+
     def _update_counts(self) -> None:
         """Recount agent health states after each step."""
         self.susceptible_count = sum(
@@ -93,3 +104,4 @@ class EpidemicModel(Model):
                 agent._update_health()
 
         self._update_counts()
+        self.datacollector.collect(self)
