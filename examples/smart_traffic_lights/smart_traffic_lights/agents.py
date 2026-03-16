@@ -54,8 +54,11 @@ class CarAgent(CellAgent):
         """
 
         # Calculate the next coordinate based on direction
-        next_x = (self.pos[0] + self.direction.value[0]) % self.model.grid.width
-        next_y = (self.pos[1] + self.direction.value[1]) % self.model.grid.height
+        current_x, current_y = self.cell.coordinate
+
+        # Calculate the next coordinate based on direction (wrapping around torus)
+        next_x = (current_x + self.direction.value[0]) % self.model.width
+        next_y = (current_y + self.direction.value[1]) % self.model.height
         next_pos = (next_x, next_y)
 
         can_move = True
