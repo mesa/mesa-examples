@@ -1,11 +1,8 @@
-import solara
+from agents import Household
 from mesa.visualization import Slider, SolaraViz, make_plot_component
 from mesa_geo.visualization import make_geospace_component
-
 from model import SolarAdoption
 
-
-from agents import Household
 
 def solar_portrayal(agent):
     """Portrayal function for households and solar radiation cells."""
@@ -40,10 +37,7 @@ page = SolaraViz(
     name="Solar Adoption",
     model_params=model_params,
     components=[
-        make_geospace_component(
-            solar_portrayal,
-            zoom=9
-        ),
+        make_geospace_component(solar_portrayal, zoom=9),
         make_plot_component(["Adopted"]),
     ],
 )
