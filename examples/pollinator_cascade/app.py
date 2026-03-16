@@ -1,11 +1,10 @@
 import solara
+from agents import Plant, Pollinator
 from matplotlib.figure import Figure
 from mesa.visualization import SolaraViz, make_plot_component
 from mesa.visualization.components import AgentPortrayalStyle
 from mesa.visualization.utils import update_counter
-
 from model import PollinatorCascadeModel
-from agents import Pollinator, Plant
 
 model_params = {
     "n_pollinators": {
@@ -151,4 +150,3 @@ page = SolaraViz(
     model_params=model_params,
     name="Pollinator-Plant Cascade Extinction Model",
 )
-
