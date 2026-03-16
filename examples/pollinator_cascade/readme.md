@@ -53,7 +53,7 @@ solara run app.py
   each step. Specialists (high specialization) pay higher energy costs,
   making them more vulnerable to cascade failures.
 - `Plant` — health tracks the fraction of alive pollinator partners.
-  Resilient plants decline slower and survive longer into the cascade,
+  Resilient plants decline slower and survive longer into the cascade, 
   staggering deaths across many steps.
 
 **Network:**

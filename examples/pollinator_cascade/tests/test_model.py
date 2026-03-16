@@ -1,5 +1,5 @@
 import pytest
-from agents import Plant, Pollinator
+from agents import Pollinator, Plant
 from model import PollinatorCascadeModel
 
 
