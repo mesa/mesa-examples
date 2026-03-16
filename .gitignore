@@ -1,9 +1,6 @@
-.venv
+﻿.venv
 .venv313
-__pycache__
-*.pyc
-.venv313
-venv/
 .venv313/
+venv/
 __pycache__/
 *.pyc
