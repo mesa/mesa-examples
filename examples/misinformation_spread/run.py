@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 from model import MisinformationModel, RuleBasedMisinformationModel
 
-
 STEPS = 3
 SEED = 42
 
