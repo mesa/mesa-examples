@@ -1,6 +1,8 @@
 import enum
+
 import mesa
 from mesa.discrete_space import CellAgent
+
 
 class Direction(enum.Enum):
     EAST = (1, 0)
@@ -58,7 +60,7 @@ class CarAgent(CellAgent):
 
         can_move = True
         stopped_by_red_light = False
-        
+
         next_cell = self.model.cells[next_pos]
 
         for obj in next_cell.agents:
@@ -114,17 +116,17 @@ class IntersectionController(mesa.Agent):
         # Look backwards from the light based on the direction it controls
         dx, dy = light.direction.value
         light_x, light_y = light.cell.coordinate
-        
+
         for i in range(1, self.sensor_range + 1):
             check_x = (light_x - dx * i) % self.model.width
             check_y = (light_y - dy * i) % self.model.height
             check_pos = (check_x, check_y)
-            
+
             # Look up the cell at check_pos using our lookup dictionary
             check_cell = self.model.cells[check_pos]
             if any(isinstance(a, CarAgent) for a in check_cell.agents):
                 count += 1
-                
+
         return count
 
     def toggle_lights(self):
