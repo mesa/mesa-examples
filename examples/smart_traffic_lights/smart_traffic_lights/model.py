@@ -1,4 +1,6 @@
 import mesa
+from mesa import DataCollector
+from mesa.discrete_space import OrthogonalVonNeumannGrid
 
 from .agents import (
     CarAgent,
