@@ -1,8 +1,10 @@
+from dotenv import load_dotenv
 from llm_epidemic.model import EpidemicModel
 from mesa.visualization import SolaraViz, make_plot_component
 from mesa.visualization.components.matplotlib_components import make_mpl_space_component
-from dotenv import load_dotenv
+
 load_dotenv()
+
 
 def agent_portrayal(agent):
     """Color agents based on their health state."""
@@ -67,7 +69,6 @@ SIRPlot = make_plot_component(
         "recovered_count": "#2ecc71",
     }
 )
-
 
 
 model = EpidemicModel()
