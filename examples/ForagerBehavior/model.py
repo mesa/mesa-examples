@@ -41,8 +41,14 @@ class ForagerAgent(mesa.Agent):
 
 
 class ForagerModel(mesa.Model):
-    def __init__(self, n_agents=10, width=20, height=20, resource_density=0.3, seed=42):
-        super().__init__(seed=seed)
+        def __init__(
+            self,
+            n_agents=10,
+            width=20,
+            height=20,
+            resource_density=0.3,
+        ):
+            super().__init__()
         self.grid = mesa.space.MultiGrid(width, height, torus=True)
         self.resources = {}
         for x in range(width):
