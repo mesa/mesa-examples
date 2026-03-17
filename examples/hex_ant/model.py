@@ -56,10 +56,12 @@ class AntForaging(mesa.Model):
         """Setup initial food clusters and the central nest."""
         # Create the Nest in the center
         center = (self.grid.width // 2, self.grid.height // 2)
+        pheromone_home = self._layer_array("pheromone_home")
+        home = self._layer_array("home")
         # Spike the 'home' pheromone at the nest so ants can find it initially
-        self.grid.pheromone_home[center] = 1.0
+        pheromone_home[center] = 1.0
         # Mark the home location
-        self.grid.home[center] = 1
+        home[center] = 1
 
         # Scatter some Food Sources
         # Create 3 big clusters of food
@@ -101,8 +103,13 @@ class AntForaging(mesa.Model):
         """
         Apply evaporation to a pheromone layer.
         """
-        np_layer = self.grid.property_layers[layer_name]
+        np_layer = self._layer_array(layer_name)
         np_layer *= 1.0 - self.evaporation_rate
 
         # Clamp to 0 to prevent negative values
         np_layer[np_layer < 0.001] = 0
+
+    def _layer_array(self, layer_name):
+        """Return a mutable NumPy-like backing array for a property layer."""
+        layer = getattr(self.grid, layer_name)
+        return layer.data if hasattr(layer, "set_cells") else layer

@@ -20,8 +20,8 @@ DEAD_END = "DEAD_END"
 class MineAgent(Agent):
     """Static mine hidden on the grid until a drone scans its cell."""
 
-    def __init__(self, unique_id: int, model) -> None:
-        super().__init__(unique_id, model)
+    def __init__(self, model) -> None:
+        super().__init__(model)
 
     def step(self) -> None:
         """Mines are inert and are not scheduled."""
@@ -30,8 +30,8 @@ class MineAgent(Agent):
 class KnowledgeCellAgent(Agent):
     """Visualization-only overlay for the shared mesh-network state."""
 
-    def __init__(self, unique_id: int, model, cell_state: str) -> None:
-        super().__init__(unique_id, model)
+    def __init__(self, model, cell_state: str) -> None:
+        super().__init__(model)
         self.cell_state = cell_state
 
     def set_state(self, cell_state: str) -> None:
@@ -45,8 +45,8 @@ class KnowledgeCellAgent(Agent):
 class CheckpointAgent(Agent):
     """Visualization-only checkpoint marker for leader retreat anchors."""
 
-    def __init__(self, unique_id: int, model) -> None:
-        super().__init__(unique_id, model)
+    def __init__(self, model) -> None:
+        super().__init__(model)
 
     def step(self) -> None:
         """Checkpoint markers are not scheduled."""
@@ -55,8 +55,8 @@ class CheckpointAgent(Agent):
 class DeadEndAgent(Agent):
     """Visualization-only marker for collapsed dead-end branches."""
 
-    def __init__(self, unique_id: int, model) -> None:
-        super().__init__(unique_id, model)
+    def __init__(self, model) -> None:
+        super().__init__(model)
 
     def step(self) -> None:
         """Dead-end markers are not scheduled."""
@@ -67,7 +67,6 @@ class DroneAgent(Agent):
 
     def __init__(
         self,
-        unique_id: int,
         model,
         formation_slot: int,
         origin_x: int,
@@ -75,7 +74,7 @@ class DroneAgent(Agent):
         leader_agent=None,
         formation_offset: Coordinate = (0, 0),
     ) -> None:
-        super().__init__(unique_id, model)
+        super().__init__(model)
         self.formation_slot = formation_slot
         self.origin_x = origin_x
         self.role = role

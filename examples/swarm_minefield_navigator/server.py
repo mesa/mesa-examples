@@ -4,21 +4,36 @@ from __future__ import annotations
 
 import socket
 
-from agents import (
-    FINAL_PATH,
-    MINE,
-    SAFE,
-    UNSAFE_BUFFER,
-    CheckpointAgent,
-    DeadEndAgent,
-    DroneAgent,
-    KnowledgeCellAgent,
-    MineAgent,
-)
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, TextElement
 from mesa.visualization.UserParam import Slider, StaticText
-from model import MinefieldModel
+
+if __package__:
+    from .agents import (
+        FINAL_PATH,
+        MINE,
+        SAFE,
+        UNSAFE_BUFFER,
+        CheckpointAgent,
+        DeadEndAgent,
+        DroneAgent,
+        KnowledgeCellAgent,
+        MineAgent,
+    )
+    from .model import MinefieldModel
+else:  # pragma: no cover - direct script compatibility
+    from agents import (
+        FINAL_PATH,
+        MINE,
+        SAFE,
+        UNSAFE_BUFFER,
+        CheckpointAgent,
+        DeadEndAgent,
+        DroneAgent,
+        KnowledgeCellAgent,
+        MineAgent,
+    )
+    from model import MinefieldModel
 
 
 def find_available_port(start_port: int = 8521, attempts: int = 20) -> int:

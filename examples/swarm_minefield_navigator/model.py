@@ -5,24 +5,106 @@ from __future__ import annotations
 import heapq
 from collections.abc import Iterable
 
-from agents import (
-    DEAD_END,
-    FINAL_PATH,
-    MINE,
-    SAFE,
-    UNSAFE_BUFFER,
-    CheckpointAgent,
-    DeadEndAgent,
-    DroneAgent,
-    KnowledgeCellAgent,
-    MineAgent,
-)
+if __package__:
+    from .agents import (
+        DEAD_END,
+        FINAL_PATH,
+        MINE,
+        SAFE,
+        UNSAFE_BUFFER,
+        CheckpointAgent,
+        DeadEndAgent,
+        DroneAgent,
+        KnowledgeCellAgent,
+        MineAgent,
+    )
+else:  # pragma: no cover - direct script compatibility
+    from agents import (
+        DEAD_END,
+        FINAL_PATH,
+        MINE,
+        SAFE,
+        UNSAFE_BUFFER,
+        CheckpointAgent,
+        DeadEndAgent,
+        DroneAgent,
+        KnowledgeCellAgent,
+        MineAgent,
+    )
 from mesa import Model
 from mesa.datacollection import DataCollector
-from mesa.space import MultiGrid
-from mesa.time import RandomActivation
 
 Coordinate = tuple[int, int]
+
+
+class SimpleMultiGrid:
+    """Minimal grid adapter for swarm navigation across Mesa versions."""
+
+    def __init__(self, width: int, height: int, torus: bool = False) -> None:
+        self.width = width
+        self.height = height
+        self.torus = torus
+        self._cells: dict[Coordinate, list[object]] = {
+            (x_coord, y_coord): []
+            for x_coord in range(width)
+            for y_coord in range(height)
+        }
+
+    def out_of_bounds(self, position: Coordinate) -> bool:
+        x_coord, y_coord = position
+        return not (0 <= x_coord < self.width and 0 <= y_coord < self.height)
+
+    def place_agent(self, agent, position: Coordinate) -> None:
+        if self.out_of_bounds(position):
+            raise IndexError(f"Position {position} is outside the grid")
+        self._cells[position].append(agent)
+        agent.pos = position
+
+    def move_agent(self, agent, position: Coordinate) -> None:
+        if self.out_of_bounds(position):
+            raise IndexError(f"Position {position} is outside the grid")
+        current_position = getattr(agent, "pos", None)
+        if current_position is not None:
+            self._cells[current_position].remove(agent)
+        self._cells[position].append(agent)
+        agent.pos = position
+
+    def remove_agent(self, agent) -> None:
+        current_position = getattr(agent, "pos", None)
+        if current_position is None:
+            return
+        self._cells[current_position].remove(agent)
+        agent.pos = None
+
+    def get_cell_list_contents(
+        self,
+        cell_list: list[Coordinate] | tuple[Coordinate, ...],
+    ) -> list[object]:
+        contents: list[object] = []
+        for position in cell_list:
+            contents.extend(self._cells.get(position, []))
+        return contents
+
+    def get_neighborhood(
+        self,
+        position: Coordinate,
+        moore: bool = True,
+        include_center: bool = False,
+        radius: int = 1,
+    ) -> list[Coordinate]:
+        neighbors: list[Coordinate] = []
+        x_coord, y_coord = position
+        for dx in range(-radius, radius + 1):
+            for dy in range(-radius, radius + 1):
+                if not include_center and dx == 0 and dy == 0:
+                    continue
+                if not moore and abs(dx) + abs(dy) > radius:
+                    continue
+                candidate = (x_coord + dx, y_coord + dy)
+                if self.out_of_bounds(candidate):
+                    continue
+                neighbors.append(candidate)
+        return neighbors
 
 
 class MinefieldModel(Model):
@@ -41,14 +123,13 @@ class MinefieldModel(Model):
         drone_4_x: int = 55,
         seed: int | None = None,
     ) -> None:
-        super().__init__(seed=seed)
+        super().__init__(rng=seed)
         self.width = width
         self.height = height
         self.drone_count = drone_count
         self.mine_density = max(0.05, min(0.10, mine_density))
         self.num_mines = min(500, max(0, int(num_mines)))
-        self.grid = MultiGrid(width, height, False)
-        self.schedule = RandomActivation(self)
+        self.grid = SimpleMultiGrid(width, height, False)
         self.knowledge_base: dict[Coordinate, str] = {}
         self.discovered_map = self.knowledge_base
         self.verification_queue: set[Coordinate] = set()
@@ -173,14 +254,13 @@ class MinefieldModel(Model):
                 placed_mines.add(position)
 
         for position in placed_mines:
-            mine = MineAgent(self.next_id(), self)
+            mine = MineAgent(self)
             self.grid.place_agent(mine, position)
 
     def _place_drones(self) -> None:
         """Create one leader and three followers in a V-formation architecture."""
         leader_start = (self.initial_drone_x[0], 0)
         leader = DroneAgent(
-            unique_id=self.next_id(),
             model=self,
             formation_slot=0,
             origin_x=self.search_origin_x[0],
@@ -189,14 +269,12 @@ class MinefieldModel(Model):
             formation_offset=(0, 0),
         )
         self.grid.place_agent(leader, leader_start)
-        self.schedule.add(leader)
         self.entry_points.append(leader_start)
         self.leader_agent = leader
 
         for slot in range(1, min(self.drone_count, 4)):
             start_position = (self.initial_drone_x[slot], 0)
             follower = DroneAgent(
-                unique_id=self.next_id(),
                 model=self,
                 formation_slot=slot,
                 origin_x=self.search_origin_x[slot],
@@ -205,7 +283,6 @@ class MinefieldModel(Model):
                 formation_offset=self.follower_offsets[slot - 1],
             )
             self.grid.place_agent(follower, start_position)
-            self.schedule.add(follower)
             self.entry_points.append(start_position)
 
     def _build_search_formation(self) -> list[int]:
@@ -255,7 +332,7 @@ class MinefieldModel(Model):
         if not self.running:
             return
 
-        self.schedule.step()
+        self.agents.shuffle_do("step")
         self._update_free_flight()
         self._evaluate_leadership()
         self.update_formation_status()
@@ -394,7 +471,7 @@ class MinefieldModel(Model):
 
     def iter_drones(self) -> Iterable[DroneAgent]:
         """Yield active and inactive drone agents from the scheduler."""
-        for agent in self.schedule.agents:
+        for agent in self.agents:
             if isinstance(agent, DroneAgent):
                 yield agent
 
@@ -481,7 +558,7 @@ class MinefieldModel(Model):
         """Create or update a background visualization overlay for knowledge."""
         marker = self.knowledge_cell_agents.get(position)
         if marker is None:
-            marker = KnowledgeCellAgent(self.next_id(), self, cell_state)
+            marker = KnowledgeCellAgent(self, cell_state)
             self.knowledge_cell_agents[position] = marker
             self.grid.place_agent(marker, position)
             return
@@ -500,7 +577,7 @@ class MinefieldModel(Model):
             return
         self.checkpoints.append(position)
         self.checkpoint_positions.add(position)
-        marker = CheckpointAgent(self.next_id(), self)
+        marker = CheckpointAgent(self)
         self.checkpoint_agents[position] = marker
         self.grid.place_agent(marker, position)
 
@@ -510,7 +587,7 @@ class MinefieldModel(Model):
             return
         self.dead_ends.add(position)
         self.knowledge_base[position] = DEAD_END
-        marker = DeadEndAgent(self.next_id(), self)
+        marker = DeadEndAgent(self)
         self.dead_end_agents[position] = marker
         self.grid.place_agent(marker, position)
 
