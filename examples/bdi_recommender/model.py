@@ -100,9 +100,7 @@ class BDIRecommenderModel(Model):
             agent_reporters={
                 "beliefs": lambda a: dict(a.beliefs) if hasattr(a, "beliefs") else {},
                 "trust": lambda a: a.trust if hasattr(a, "trust") else 0,
-                "goals": lambda a: (
-                    dict(a.goals) if hasattr(a, "goals") and callable(a.goals) else {}
-                ),
+                "goals": lambda a: (dict(a.goals) if hasattr(a, "goals") else {}),
             }
         )
 
