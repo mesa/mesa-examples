@@ -1,3 +1,5 @@
+from concurrent.futures import ThreadPoolExecutor
+
 from mesa import Model
 from mesa.datacollection import DataCollector
 from mesa_llm.memory.st_memory import ShortTermMemory
@@ -21,7 +23,6 @@ class PrisonersDilemmaModel(Model):
 
     Attributes:
         num_agents (int): Number of agents in the simulation.
-        round_number (int): Current round number.
         cooperation_rate (float): Fraction of cooperative actions this round.
         total_cooperations (int): Cumulative cooperation count.
         total_defections (int): Cumulative defection count.
@@ -38,7 +39,6 @@ class PrisonersDilemmaModel(Model):
         super().__init__()
 
         self.num_agents = num_agents
-        self.round_number = 0
         self.cooperation_rate = 0.0
         self.total_cooperations = 0
         self.total_defections = 0
@@ -84,56 +84,43 @@ class PrisonersDilemmaModel(Model):
         total = round_cooperations + round_defections
         self.cooperation_rate = round_cooperations / total if total > 0 else 0.0
 
+    def _get_agent_action(self, agent) -> tuple:
+        """Fetch a single agent's LLM decision. Designed for concurrent execution."""
+        agent._update_internal_state()
+        plan = agent.reasoning_instance.plan(obs=agent.generate_obs())
+        content = str(plan.llm_plan.content) if hasattr(plan.llm_plan, "content") else str(plan.llm_plan)
+        return agent, agent._parse_action(content)
+
     def step(self) -> None:
         """
         Advance the model by one round.
 
-        Each agent reasons about their decision, then pairs are revealed
-        and payoffs applied simultaneously.
+        All agents reason concurrently (ThreadPoolExecutor) so LLM calls
+        are parallelised and no agent observes another's mid-step state
+        changes before decisions are locked in. Outcomes are applied only
+        after every agent has committed to an action.
         """
-        self.round_number += 1
+        super().step()
         pairs = self._pair_agents()
+        paired_agents = [a for pair in pairs for a in pair]
 
+        # Phase 1 — all agents think in parallel (no dirty reads, no UI freeze)
+        with ThreadPoolExecutor(max_workers=len(paired_agents)) as executor:
+            agent_actions = dict(executor.map(self._get_agent_action, paired_agents))
+
+        # Phase 2 — apply outcomes simultaneously after all decisions are locked
         round_cooperations = 0
         round_defections = 0
 
         for agent1, agent2 in pairs:
-            # Both agents update their state before deciding
-            agent1._update_internal_state()
-            agent2._update_internal_state()
+            action1 = agent_actions[agent1]
+            action2 = agent_actions[agent2]
 
-            # Both agents reason independently using LLM
-            plan1 = agent1.reasoning_instance.plan(obs=agent1.generate_obs())
-            plan2 = agent2.reasoning_instance.plan(obs=agent2.generate_obs())
-
-            # Extract decisions from LLM plans
-            plan1_content = (
-                str(plan1.llm_plan.content)
-                if hasattr(plan1.llm_plan, "content")
-                else str(plan1.llm_plan)
-            )
-            plan2_content = (
-                str(plan2.llm_plan.content)
-                if hasattr(plan2.llm_plan, "content")
-                else str(plan2.llm_plan)
-            )
-
-            action1 = agent1._parse_action(plan1_content)
-            action2 = agent2._parse_action(plan2_content)
-
-            # Apply outcomes
             agent1.apply_decision(action1, action2)
             agent2.apply_decision(action2, action1)
 
-            if action1 == "cooperate":
-                round_cooperations += 1
-            else:
-                round_defections += 1
-
-            if action2 == "cooperate":
-                round_cooperations += 1
-            else:
-                round_defections += 1
+            round_cooperations += (action1 == "cooperate") + (action2 == "cooperate")
+            round_defections += (action1 == "defect") + (action2 == "defect")
 
         self._update_stats(round_cooperations, round_defections)
         self.datacollector.collect(self)

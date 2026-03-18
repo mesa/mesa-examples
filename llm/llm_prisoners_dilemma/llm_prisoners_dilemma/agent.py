@@ -1,3 +1,5 @@
+import re
+
 from mesa_llm.llm_agent import LLMAgent
 from mesa_llm.reasoning.cot import CoTReasoning
 
@@ -16,7 +18,11 @@ Payoff matrix (your score, partner score):
 
 Your goal is to maximize your total score over multiple rounds.
 Consider your partner's history when making decisions.
-Think carefully about trust, reputation, and long-term strategy."""
+Think carefully about trust, reputation, and long-term strategy.
+
+IMPORTANT: You MUST end your response with exactly one of these two lines:
+<ACTION>: COOPERATE
+<ACTION>: DEFECT"""
 
 
 class PrisonerAgent(LLMAgent):
@@ -82,7 +88,9 @@ class PrisonerAgent(LLMAgent):
         """
         Extract cooperate/defect decision from LLM response.
 
-        Falls back to cooperate if no clear decision found.
+        Looks for the mandatory <ACTION>: COOPERATE or <ACTION>: DEFECT tag
+        that the system prompt requires at the end of every response.
+        Falls back to cooperate if the tag is missing or malformed.
 
         Args:
             plan_content: Raw LLM response text.
@@ -90,10 +98,9 @@ class PrisonerAgent(LLMAgent):
         Returns:
             Either 'cooperate' or 'defect'.
         """
-        content = plan_content.lower()
-        # Check for defect first as it's the more specific term
-        if "defect" in content:
-            return "defect"
+        match = re.search(r"<ACTION>\s*:\s*(COOPERATE|DEFECT)", plan_content, re.IGNORECASE)
+        if match:
+            return match.group(1).lower()
         return "cooperate"
 
     def apply_decision(self, action: str, partner_action: str) -> None:
