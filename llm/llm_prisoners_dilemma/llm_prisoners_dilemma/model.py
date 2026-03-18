@@ -88,7 +88,11 @@ class PrisonersDilemmaModel(Model):
         """Fetch a single agent's LLM decision. Designed for concurrent execution."""
         agent._update_internal_state()
         plan = agent.reasoning_instance.plan(obs=agent.generate_obs())
-        content = str(plan.llm_plan.content) if hasattr(plan.llm_plan, "content") else str(plan.llm_plan)
+        content = (
+            str(plan.llm_plan.content)
+            if hasattr(plan.llm_plan, "content")
+            else str(plan.llm_plan)
+        )
         return agent, agent._parse_action(content)
 
     def step(self) -> None:

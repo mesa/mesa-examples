@@ -98,7 +98,9 @@ class PrisonerAgent(LLMAgent):
         Returns:
             Either 'cooperate' or 'defect'.
         """
-        match = re.search(r"<ACTION>\s*:\s*(COOPERATE|DEFECT)", plan_content, re.IGNORECASE)
+        match = re.search(
+            r"<ACTION>\s*:\s*(COOPERATE|DEFECT)", plan_content, re.IGNORECASE
+        )
         if match:
             return match.group(1).lower()
         return "cooperate"
