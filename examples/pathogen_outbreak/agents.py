@@ -29,7 +29,7 @@ class Citizen(CellAgent):
                 else:
                     self.state = "immune"
 
-        cell_state = "healthy"
+   
 
         if self.state == "healthy":
             neighbors = [a for cell in self.cell.connections.values() 
