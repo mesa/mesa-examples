@@ -1,9 +1,9 @@
 import random
 
-from mesa import Agent
+from mesa.discrete_space import CellAgent
 
 
-class Citizen(Agent):
+class Citizen(CellAgent):
     def __init__(self, model):
         super().__init__(model)
 
@@ -31,18 +31,15 @@ class Citizen(Agent):
 
         cell_state = "healthy"
 
-        cell_neigh = self.model.grid.get_neighbors(
-            self.pos, moore=True, include_center=False
-        )
+        if self.state == "healthy":
+            neighbors = [a for cell in self.cell.connections.values() 
+                        for a in cell.agents]
+            for i in neighbors:
+                if i.state == "infected":
+                    if random.random() > 0.40:
+                        self.state = "infected"
+                    break
 
-        for i in cell_neigh:
-            if i.state == "infected":
-                cell_state = "infected"
-
-        if self.state == "healthy" and cell_state == "infected":
-            chances = random.random()
-            if chances > 0.40:
-                self.state = "infected"
 
     def quarantine(self):
         if self.state != "dead":
@@ -52,34 +49,30 @@ class Citizen(Agent):
                 infected_pos = []
                 for i in self.model.agents:
                     if i.state == "infected":
-                        infected_pos.append(i.pos)
+                        infected_pos.append(i.cell.coordinate)
 
-                possible_ops = self.model.grid.get_neighborhood(
-                    self.pos, moore=False, include_center=False
-                )
+                possible_ops = self.cell.connections.values()
                 emptys = []
                 for i in possible_ops:
-                    if self.model.grid.is_cell_empty(i):
+                    if i.is_empty:
                         emptys.append(i)
 
                 if len(emptys) > 0:
                     best_cell = max(
                         emptys,
-                        key=lambda pos: min(
-                            abs(pos[0] - i[0]) + abs(pos[1] - i[1])
-                            for i in infected_pos
-                        ),
+                        key=lambda cell: min(
+                        abs(cell.coordinate[0] - i[0]) + abs(cell.coordinate[1] - i[1])
+                        for i in infected_pos
+                    ),
                     )
-                    self.model.grid.move_agent(self, best_cell)
+                    self.move_to(best_cell)
 
     def move(self):
         if self.state != "dead":
-            possible_ops = self.model.grid.get_neighborhood(
-                self.pos, moore=False, include_center=False
-            )
+            possible_ops = self.cell.connections.values()
             emptys = []
             for i in possible_ops:
-                if self.model.grid.is_cell_empty(i):
+                if i.is_empty:
                     emptys.append(i)
             if len(emptys) > 0:
-                self.model.grid.move_agent(self, self.random.choice(emptys))
+                self.move_to(self.random.choice(emptys))

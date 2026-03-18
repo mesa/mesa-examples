@@ -1,7 +1,7 @@
-import random
-from .agents import Citizen
+
+from agents import Citizen
 from mesa import DataCollector, Model
-from mesa.spaces import MultiGrid
+from mesa.discrete_space import OrthogonalMooreGrid
 
 
 def c_healthy(model):
@@ -38,7 +38,7 @@ class PathogenModel(Model):
         self.infected_count = 0
         self.quarantine_status = False
 
-        self.grid = MultiGrid(width, height, False)
+        self.grid = OrthogonalMooreGrid((width, height), capacity=None, torus=False)
 
         self.datacollector = DataCollector(
             model_reporters={
@@ -52,9 +52,8 @@ class PathogenModel(Model):
 
         for _ in range(n):
             agent = Citizen(self)
-            self.grid.place_agent(
-                agent, (random.randrange(width), random.randrange(height))
-            )
+            cell = self.random.choice(list(self.grid.all_cells.cells))
+            agent.move_to(cell)
 
         for i in range(infn):
             self.agents[i].state = "infected"
