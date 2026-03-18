@@ -34,4 +34,3 @@ class HexSnowflake(mesa.Model):
         """
         self.agents.do("determine_state")
         self.agents.do("assume_state")
-
