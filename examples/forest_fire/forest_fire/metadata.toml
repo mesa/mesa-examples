@@ -1,0 +1,23 @@
+title = "Forest Fire Model"
+
+abstract = """
+A simple cellular automaton model of fire spreading through a forest.
+Trees grow randomly, and fire spreads to neighboring trees. Demonstrates
+self-organized criticality and emergent behavior from simple local rules.
+"""
+
+authors = ["Wilensky, U."]
+
+domain = ["ecology", "complex systems"]
+
+space = "Grid"
+
+time = "Discrete"
+
+complexity = "Basic"
+
+keywords = ["forest fire", "cellular automaton", "self-organized criticality", "fire spread"]
+
+mesa = ">=3.0"
+
+doi = ""
