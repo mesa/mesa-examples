@@ -79,7 +79,7 @@ class CarAgent(CellAgent):
 
         if can_move:
             # Moving the agent is now just reassigning the cell!
-            self.cell = next_cell
+            self.move_to(next_cell)
         else:
             self.total_wait_time += 1
             if stopped_by_red_light:
