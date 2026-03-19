@@ -30,10 +30,13 @@ class PersonAgent(CellAgent):
         """Check neighbors — if any are Infected, maybe become Exposed."""
         for neighbor_cell in self.cell.connections.values():
             for neighbor in neighbor_cell.agents:
-                if isinstance(neighbor, PersonAgent) and neighbor.state == "I":
-                    if self.random.random() < self.model.transmission_rate:
-                        self.state = "E"
-                        return
+                if (
+                    isinstance(neighbor, PersonAgent)
+                    and neighbor.state == "I"
+                    and self.random.random() < self.model.transmission_rate
+                ):
+                    self.state = "E"
+                    return
 
     def _progress_to_infected(self):
         """After incubation period, become Infected."""
