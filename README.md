@@ -80,9 +80,6 @@ This project simulates how unpopular norms can dominate a society even when the 
 
 This model simulates a humanitarian aid distribution scenario using a needs-based behavioral architecture. Beneficiaries have dynamic needs (water, food) and trucks distribute aid using a hybrid triage system.
 
-### [Hierarchical Organization Model](https://github.com/mesa/mesa-examples/tree/main/examples/hierarchical_organization)
-
-An agent-based model demonstrating a three-level organizational hierarchy — Employees, Departments, and an Organization. Shows how explicit bottom-up activation works in Mesa 3.x and how external shocks propagate through a structured system.
 
 ### [Rumor Mill Model](https://github.com/mesa/mesa-examples/tree/main/examples/rumor_mill)
 
