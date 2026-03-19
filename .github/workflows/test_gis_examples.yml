@@ -23,7 +23,7 @@ jobs:
   #   - name: Set up Python
   #     uses: actions/setup-python@v5
   #     with:
-  #       python-version: "3.12"
+  #       python-version: "3.14"
   #   - name: Install dependencies
   #     run: pip install mesa pytest
   #   - name: Test with pytest
@@ -36,7 +36,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.12"
+        python-version: "3.14"
     - name: Install dependencies
       run: |
         pip install mesa-geo --pre
@@ -51,7 +51,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.12"
+        python-version: "3.14"
     - name: Install dependencies
       run: |
         pip install -U "mesa-geo @ git+https://github.com/mesa/mesa-geo@main"
