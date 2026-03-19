@@ -24,7 +24,7 @@ Reference:
 
 from mesa import Model
 from mesa.datacollection import DataCollector
-from mesa.discrete_space import CellAgent, OrthogonalVonNeumannGrid
+from mesa.discrete_space import OrthogonalVonNeumannGrid
 
 from .agents import CultureAgent
 
@@ -34,8 +34,7 @@ def number_of_cultural_regions(model):
     visited = set()
     regions = 0
     agent_by_pos = {
-        (int(a.cell.coordinate[0]), int(a.cell.coordinate[1])): a
-        for a in model.agents
+        (int(a.cell.coordinate[0]), int(a.cell.coordinate[1])): a for a in model.agents
     }
     for pos in agent_by_pos:
         if pos in visited:
@@ -76,7 +75,9 @@ class AxelrodModel(Model):
         self.f = f
         self.q = q
 
-        self.grid = OrthogonalVonNeumannGrid((width, height), torus=False, random=self.random)
+        self.grid = OrthogonalVonNeumannGrid(
+            (width, height), torus=False, random=self.random
+        )
 
         # Create one agent per cell with a unique random culture
         for cell in self.grid.all_cells:
