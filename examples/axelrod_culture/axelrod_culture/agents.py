@@ -36,7 +36,9 @@ class CultureAgent(CellAgent):
             return
         if self.random.random() < sim:
             differing = [
-                i for i in range(len(self.culture)) if self.culture[i] != other.culture[i]
+                i
+                for i in range(len(self.culture))
+                if self.culture[i] != other.culture[i]
             ]
             feature = self.random.choice(differing)
             self.culture[feature] = other.culture[feature]
