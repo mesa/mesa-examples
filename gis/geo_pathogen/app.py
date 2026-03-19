@@ -1,10 +1,10 @@
 from mesa.visualization import SolaraViz, make_plot_component
 from mesa_geo.visualization import make_geospace_component
-from model import dis_Model
-from agents import citizen
+from model import Geo_Model
+from agents import Citizen
 
 def citizen_draw(agent):
-    if not isinstance(agent, citizen):
+    if not isinstance(agent, Citizen):
         return {"color": "Gray", "fillOpacity": 0.1, "weight": 1}
     
     if agent.state == "healthy":
@@ -43,7 +43,7 @@ model_params = {
     }
 }
 
-model = dis_Model(n=100, infn=5)
+model = Geo_Model(n=100, infn=5)
 
 renderer = make_geospace_component(citizen_draw)
 

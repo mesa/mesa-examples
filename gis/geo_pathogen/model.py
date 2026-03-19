@@ -1,7 +1,7 @@
 from mesa import Model
 from mesa import DataCollector
 from pathlib import Path
-from agents import citizen, CountryAgent
+from agents import Citizen, CountryAgent
 import mesa_geo as mg
 from shapely.geometry import Point
 from shapely.ops import unary_union
@@ -9,22 +9,22 @@ from shapely.ops import unary_union
 def c_healthy(model):
 
     return sum(1 for i in model.agents 
-               if isinstance(i, citizen) and i.state == "healthy")
+               if isinstance(i, Citizen) and i.state == "healthy")
 
 
 def c_infected(model):
-    return sum(1 for i in model.agents if isinstance(i, citizen) and i.state == "infected")
+    return sum(1 for i in model.agents if isinstance(i, Citizen) and i.state == "infected")
 
 
 def c_immune(model):
-    return sum(1 for i in model.agents if isinstance(i, citizen) and i.state == "immune")
+    return sum(1 for i in model.agents if isinstance(i, Citizen) and i.state == "immune")
 
 
 def c_dead(model):
-    return sum(1 for i in model.agents if isinstance(i, citizen) and i.state == "dead")
+    return sum(1 for i in model.agents if isinstance(i, Citizen) and i.state == "dead")
 
 
-class dis_Model(Model):
+class Geo_Model(Model):
 
     def __init__(
         self,
@@ -72,11 +72,11 @@ class dis_Model(Model):
             bounds = country.geometry.bounds
             x = self.random.uniform(bounds[0], bounds[2])
             y = self.random.uniform(bounds[1], bounds[3])
-            agent = citizen(self, Point(x, y), self.space.crs)
+            agent = Citizen(self, Point(x, y), self.space.crs)
             self.space.add_agents(agent)
         self.asia_boundary = unary_union([c.geometry for c in self.countries])
         self.space.add_agents(self.countries)
-        citizens = [a for a in self.agents if isinstance(a, citizen)]
+        citizens = [a for a in self.agents if isinstance(a, Citizen)]
         toinfect = min(infn, len(citizens))
         for i in range(toinfect):
             citizens[i].state = "infected"
@@ -91,24 +91,7 @@ class dis_Model(Model):
 
         self.datacollector.collect(self)
 
-        self.agents_by_type[citizen].shuffle_do("step")
-        # see_on_terminal(self)
+        self.agents_by_type[Citizen].shuffle_do("step")
 
 
-def see_on_terminal(model):
-    hthy = 0
-    inf = 0
-    im = 0
-    ded = 0
-    for i in model.agents:
-        if i.state == "healthy":
-            hthy += 1
-        elif i.state == "infected":
-            inf += 1
-        elif i.state == "immune":
-            im += 1
-        elif i.state == "dead":
-            ded += 1
-
-    print(f"Step {model.steps}: H={hthy}, I={inf}, R={im}, D={ded}")
 

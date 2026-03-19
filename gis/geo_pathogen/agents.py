@@ -3,7 +3,7 @@ from shapely.geometry import Point
 import random
 
 
-class citizen(mg.GeoAgent):
+class Citizen(mg.GeoAgent):
 
     def __init__(self, model, geometry, crs):
         super().__init__(model, geometry, crs)
@@ -36,7 +36,7 @@ class citizen(mg.GeoAgent):
         cell_neigh = self.model.space.get_neighbors_within_distance(self, self.model.exposure)
 
         for i in cell_neigh:
-            if isinstance(i, citizen) and i.state == "infected":
+            if isinstance(i, Citizen) and i.state == "infected":
                 cell_state = "infected"
 
         if self.state == "healthy" and cell_state == "infected":
@@ -50,7 +50,7 @@ class citizen(mg.GeoAgent):
             return
         infected = [
             a for a in self.model.agents
-            if isinstance(a, citizen) and a.state == "infected"
+            if isinstance(a, Citizen) and a.state == "infected"
         ]
         if not infected:
             self.move()
