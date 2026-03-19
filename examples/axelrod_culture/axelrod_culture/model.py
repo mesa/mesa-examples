@@ -24,7 +24,7 @@ Reference:
 
 from mesa import Model
 from mesa.datacollection import DataCollector
-from mesa.discrete_space import OrthogonalVonNeumannGrid
+from mesa.discrete_space import CellAgent, OrthogonalVonNeumannGrid
 
 from .agents import CultureAgent
 
@@ -78,12 +78,10 @@ class AxelrodModel(Model):
 
         self.grid = OrthogonalVonNeumannGrid((width, height), torus=False, random=self.random)
 
-        # Create agents individually to ensure each gets its own unique culture
-        cells = list(self.grid.all_cells.cells)
-        for i, cell in enumerate(cells):
+        # Create one agent per cell with a unique random culture
+        for cell in self.grid.all_cells:
             culture = [self.random.randrange(q) for _ in range(f)]
-            agent = CultureAgent(self, culture)
-            agent.cell = cell
+            CultureAgent(self, culture, cell)
 
         self.datacollector = DataCollector(
             model_reporters={"Cultural Regions": number_of_cultural_regions}

@@ -1,7 +1,7 @@
-from mesa import Agent
+from mesa.discrete_space import CellAgent
 
 
-class CultureAgent(Agent):
+class CultureAgent(CellAgent):
     """An agent with a cultural profile made of f features, each with q possible traits.
 
     Two agents interact with probability equal to their cultural similarity
@@ -12,9 +12,10 @@ class CultureAgent(Agent):
         culture (list[int]): List of f integers, each in range [0, q)
     """
 
-    def __init__(self, model, culture):
+    def __init__(self, model, culture, cell):
         super().__init__(model)
         self.culture = list(culture)
+        self.cell = cell
 
     def similarity(self, other):
         """Return fraction of features shared with another agent (0.0 to 1.0)."""

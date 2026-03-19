@@ -54,4 +54,4 @@ page = SolaraViz(
     model_params=model_params,
     name="Axelrod Culture Model",
 )
-page  
+page  # noqa: B018
