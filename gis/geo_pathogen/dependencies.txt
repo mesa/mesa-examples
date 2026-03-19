@@ -1,0 +1,3 @@
+mesa >= 3.5
+solara
+matplotlib
