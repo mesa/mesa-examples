@@ -22,15 +22,20 @@ class CultureAgent(Agent):
         return matches / len(self.culture)
 
     def interact_with(self, other):
-        """Interact with another agent based on cultural similarity."""
+        """Interact with another agent based on cultural similarity.
+
+        Interaction probability equals cultural similarity. If interaction
+        occurs, copy one differing feature from the other agent.
+
+        Note: sim == 1.0 guard prevents IndexError from empty differing list.
+        sim == 0.0 guard skips interactions with no common ground.
+        """
         sim = self.similarity(other)
         if sim == 0.0 or sim == 1.0:
             return
         if self.random.random() < sim:
             differing = [
-                i
-                for i in range(len(self.culture))
-                if self.culture[i] != other.culture[i]
+                i for i in range(len(self.culture)) if self.culture[i] != other.culture[i]
             ]
             feature = self.random.choice(differing)
             self.culture[feature] = other.culture[feature]
