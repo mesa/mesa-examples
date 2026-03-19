@@ -1,10 +1,10 @@
+import random
+
 import mesa_geo as mg
 from shapely.geometry import Point
-import random
 
 
 class Citizen(mg.GeoAgent):
-
     def __init__(self, model, geometry, crs):
         super().__init__(model, geometry, crs)
 
@@ -13,7 +13,6 @@ class Citizen(mg.GeoAgent):
         self.compliant = random.random() < self.model.compliance_rate
 
     def step(self):
-
         if self.model.quarantine_status and self.compliant:
             self.quarantine()
         else:
@@ -33,7 +32,9 @@ class Citizen(mg.GeoAgent):
 
         cell_state = "healthy"
 
-        cell_neigh = self.model.space.get_neighbors_within_distance(self, self.model.exposure)
+        cell_neigh = self.model.space.get_neighbors_within_distance(
+            self, self.model.exposure
+        )
 
         for i in cell_neigh:
             if isinstance(i, Citizen) and i.state == "infected":
@@ -45,11 +46,11 @@ class Citizen(mg.GeoAgent):
                 self.state = "infected"
 
     def quarantine(self):
-       
         if self.state == "dead" or self.state == "infected":
             return
         infected = [
-            a for a in self.model.agents
+            a
+            for a in self.model.agents
             if isinstance(a, Citizen) and a.state == "infected"
         ]
         if not infected:
@@ -58,23 +59,24 @@ class Citizen(mg.GeoAgent):
         nearest = min(infected, key=lambda a: self.geometry.distance(a.geometry))
         dx = self.geometry.x - nearest.geometry.x
         dy = self.geometry.y - nearest.geometry.y
-        dist = max((dx**2 + dy**2)**0.5, 1)
+        dist = max((dx**2 + dy**2) ** 0.5, 1)
         scale = self.model.mobility_range / dist
-        np = Point(
-            self.geometry.x + dx * scale,
-            self.geometry.y + dy * scale
-        )
+        np = Point(self.geometry.x + dx * scale, self.geometry.y + dy * scale)
         if self.model.asia_boundary.contains(np):
-                self.geometry = np
+            self.geometry = np
 
     def move(self):
         if self.state != "dead":
-
-            change_x = self.random.randint(-self.model.mobility_range, self.model.mobility_range)
-            change_y = self.random.randint(-self.model.mobility_range, self.model.mobility_range)
+            change_x = self.random.randint(
+                -self.model.mobility_range, self.model.mobility_range
+            )
+            change_y = self.random.randint(
+                -self.model.mobility_range, self.model.mobility_range
+            )
             np = Point(self.geometry.x + change_x, self.geometry.y + change_y)
             if self.model.asia_boundary.contains(np):
                 self.geometry = np
+
 
 class CountryAgent(mg.GeoAgent):
     def __init__(self, model, geometry, crs):

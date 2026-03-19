@@ -1,12 +1,13 @@
+from agents import Citizen
 from mesa.visualization import SolaraViz, make_plot_component
 from mesa_geo.visualization import make_geospace_component
 from model import GeoModel
-from agents import Citizen
+
 
 def citizen_draw(agent):
     if not isinstance(agent, Citizen):
         return {"color": "Gray", "fillOpacity": 0.1, "weight": 1}
-    
+
     if agent.state == "healthy":
         return {"color": "Green", "radius": 3}
     elif agent.state == "infected":
@@ -15,6 +16,7 @@ def citizen_draw(agent):
         return {"color": "Blue", "radius": 3}
     elif agent.state == "dead":
         return {"color": "Black", "radius": 3}
+
 
 model_params = {
     "compliance": {
@@ -40,7 +42,7 @@ model_params = {
         "min": 1,
         "max": 20,
         "step": 1,
-    }
+    },
 }
 
 model = GeoModel(n=100, infn=5)

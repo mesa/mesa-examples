@@ -1,23 +1,28 @@
-from mesa import Model
-from mesa import DataCollector
 from pathlib import Path
-from agents import Citizen, CountryAgent
+
 import mesa_geo as mg
+from agents import Citizen, CountryAgent
+from mesa import DataCollector, Model
 from shapely.geometry import Point
 from shapely.ops import unary_union
 
-def c_healthy(model):
 
-    return sum(1 for i in model.agents 
-               if isinstance(i, Citizen) and i.state == "healthy")
+def c_healthy(model):
+    return sum(
+        1 for i in model.agents if isinstance(i, Citizen) and i.state == "healthy"
+    )
 
 
 def c_infected(model):
-    return sum(1 for i in model.agents if isinstance(i, Citizen) and i.state == "infected")
+    return sum(
+        1 for i in model.agents if isinstance(i, Citizen) and i.state == "infected"
+    )
 
 
 def c_immune(model):
-    return sum(1 for i in model.agents if isinstance(i, Citizen) and i.state == "immune")
+    return sum(
+        1 for i in model.agents if isinstance(i, Citizen) and i.state == "immune"
+    )
 
 
 def c_dead(model):
@@ -25,18 +30,16 @@ def c_dead(model):
 
 
 class GeoModel(Model):
-
     def __init__(
         self,
         n=100,
         infn=5,
-       
         quarantine_threshold_strt=25,
         quarantine_threshold_stp=5,
         compliance=0.25,
-        exposure_distance = 5,
-        mobility_range = 5
-        ):
+        exposure_distance=5,
+        mobility_range=5,
+    ):
         super().__init__()
         self.compliance_rate = compliance
         self.quarantine_thresh_up = quarantine_threshold_strt
@@ -44,7 +47,7 @@ class GeoModel(Model):
         self.infected_count = 0
         self.quarantine_status = False
         self.exposure = exposure_distance
-        self.space = mg.GeoSpace(crs="EPSG:4326" ,warn_crs_conversion=False)
+        self.space = mg.GeoSpace(crs="EPSG:4326", warn_crs_conversion=False)
         self.mobility_range = mobility_range
         self.datacollector = DataCollector(
             model_reporters={
@@ -56,15 +59,14 @@ class GeoModel(Model):
             }
         )
 
-          
         ac_countries = mg.AgentCreator(CountryAgent, model=self)
         self.countries = ac_countries.from_file(
-            Path(__file__).resolve().parent / "country_data/ne_110m_admin_0_countries.shp"
+            Path(__file__).resolve().parent
+            / "country_data/ne_110m_admin_0_countries.shp"
         )
 
         self.countries = [
-            c for c in self.countries
-            if c.CONTINENT in ["Asia", "Europe"]
+            c for c in self.countries if c.CONTINENT in ["Asia", "Europe"]
         ]
 
         for _ in range(n):
@@ -92,6 +94,3 @@ class GeoModel(Model):
         self.datacollector.collect(self)
 
         self.agents_by_type[Citizen].shuffle_do("step")
-
-
-
