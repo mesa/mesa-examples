@@ -1,6 +1,6 @@
 from mesa.visualization import SolaraViz, make_plot_component
 from mesa_geo.visualization import make_geospace_component
-from model import Geo_Model
+from model import GeoModel
 from agents import Citizen
 
 def citizen_draw(agent):
@@ -43,7 +43,7 @@ model_params = {
     }
 }
 
-model = Geo_Model(n=100, infn=5)
+model = GeoModel(n=100, infn=5)
 
 renderer = make_geospace_component(citizen_draw)
 

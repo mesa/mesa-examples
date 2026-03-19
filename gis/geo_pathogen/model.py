@@ -24,7 +24,7 @@ def c_dead(model):
     return sum(1 for i in model.agents if isinstance(i, Citizen) and i.state == "dead")
 
 
-class Geo_Model(Model):
+class GeoModel(Model):
 
     def __init__(
         self,
