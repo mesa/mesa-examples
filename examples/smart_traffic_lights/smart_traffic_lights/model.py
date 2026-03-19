@@ -72,13 +72,15 @@ class TrafficModel(mesa.Model):
         for _ in range(num_cars_east):
             car = CarAgent(self, Direction.EAST)
             pos = (self.random.randrange(width), center_y)
-            car.cell = self.cells[pos]
+            car_cell = self.cells[pos]
+            car.move_to(car_cell)
 
         # Spawn North-bound cars on the vertical road
         for _ in range(num_cars_north):
             car = CarAgent(self, Direction.NORTH)
             pos = (center_x, self.random.randrange(height))
-            car.cell = self.cells[pos]
+            car_cell = self.cells[pos]
+            car.move_to(car_cell)
 
         # Setup Data Collection
         self.datacollector = DataCollector(
