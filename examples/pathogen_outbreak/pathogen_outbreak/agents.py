@@ -27,17 +27,15 @@ class Citizen(CellAgent):
                 else:
                     self.state = "immune"
 
-   
-
         if self.state == "healthy":
-            neighbors = [a for cell in self.cell.connections.values() 
-                        for a in cell.agents]
+            neighbors = [
+                a for cell in self.cell.connections.values() for a in cell.agents
+            ]
             for i in neighbors:
                 if i.state == "infected":
                     if self.random.random() > 0.40:
                         self.state = "infected"
                     break
-
 
     def quarantine(self):
         if self.state != "dead":
@@ -59,9 +57,10 @@ class Citizen(CellAgent):
                     best_cell = max(
                         emptys,
                         key=lambda cell: min(
-                        abs(cell.coordinate[0] - i[0]) + abs(cell.coordinate[1] - i[1])
-                        for i in infected_pos
-                    ),
+                            abs(cell.coordinate[0] - i[0])
+                            + abs(cell.coordinate[1] - i[1])
+                            for i in infected_pos
+                        ),
                     )
                     self.move_to(best_cell)
 
