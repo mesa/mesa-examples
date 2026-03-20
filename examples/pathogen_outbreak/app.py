@@ -1,5 +1,5 @@
 from mesa.visualization import SolaraViz, make_plot_component, make_space_component
-from model import PathogenModel
+from pathogen_outbreak.model import PathogenModel
 
 
 def make_agent(agent):

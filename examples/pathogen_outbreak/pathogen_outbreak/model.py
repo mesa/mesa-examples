@@ -1,5 +1,4 @@
-
-from agents import Citizen
+from pathogen_outbreak.agents import Citizen
 from mesa import DataCollector, Model
 from mesa.discrete_space import OrthogonalMooreGrid
 
@@ -58,6 +57,8 @@ class PathogenModel(Model):
         for i in range(infn):
             self.agents[i].state = "infected"
 
+        self.datacollector.collect(self)
+ 
     def step(self):
         self.infected_count = c_infected(self)
 

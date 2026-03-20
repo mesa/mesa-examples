@@ -22,7 +22,7 @@ analyzing changes in infection, death and immunity rates.
 
 ## How It Works
 
-1. **Initialization** — citizens are placed randomly on a MultiGrid.
+1. **Initialization** — citizens are placed randomly on a Grid(OrthogonalMooreGrid).
    A configurable number are set initially as infected.
 2. **Disease Spread** — each step, healthy agents check their neighbours including diagonals.
    If any are infected, there is a configurable chance of transmission.
@@ -37,7 +37,7 @@ analyzing changes in infection, death and immunity rates.
    - Infected agents - compliant ones, freeze in place, simulating isolation or a lockdowned zone
 5. **Recovery** — after 10 steps of infection, agents recover to full
    immunity or die with the probability of 10%. Dead agents remain
-   on the grid as red circles/squares(this is an intentional mechanic) as a visual indicator to assess how compliance affects the compliant as well as non-compliant groups.
+   on the grid as red circles/squares(this is an intentional mechanic) as a visual indicator to assess how compliance affects the compliant as well as non-compliant groups.It is to be noted that dead agents block movement as well.
 
 ## Interesting Cases to Observe
 

@@ -1,5 +1,3 @@
-import random
-
 from mesa.discrete_space import CellAgent
 
 
@@ -9,7 +7,7 @@ class Citizen(CellAgent):
 
         self.state = "healthy"
         self.stage = 0
-        self.compliant = random.random() < self.model.compliance_rate
+        self.compliant = self.random.random() < self.model.compliance_rate
 
     def step(self):
         if self.model.quarantine_status and self.compliant:
@@ -20,7 +18,7 @@ class Citizen(CellAgent):
         if self.state == "infected":
             self.stage += 1
             if self.stage > 9:
-                chance_of_death = random.random()
+                chance_of_death = self.random.random()
 
                 if chance_of_death < 0.1:
                     self.state = "dead"
@@ -36,7 +34,7 @@ class Citizen(CellAgent):
                         for a in cell.agents]
             for i in neighbors:
                 if i.state == "infected":
-                    if random.random() > 0.40:
+                    if self.random.random() > 0.40:
                         self.state = "infected"
                     break
 
