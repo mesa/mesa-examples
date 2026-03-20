@@ -1,4 +1,5 @@
 import math
+
 from mesa.experimental.continuous_space import ContinuousSpaceAgent
 
 
@@ -47,7 +48,9 @@ class Prey(ContinuousSpaceAgent):
 class Predator(ContinuousSpaceAgent):
     "a predator agent which moves randomly but also hunts nearby prey"
 
-    def __init__(self, space, model, pos, speed=1.5, energy=0):  # it need faster than prey to catch it
+    def __init__(
+        self, space, model, pos, speed=1.5, energy=0
+    ):  # it need faster than prey to catch it
         super().__init__(space, model)
         self.position = pos
         self.speed = speed
@@ -69,8 +72,12 @@ class Predator(ContinuousSpaceAgent):
         self.random_move()
         self.energy -= 1  # predator lose energy each step
 
-        neighbors, distances = self.get_neighbors_in_radius(radius=2.0)  # it get the nearby agents within a certain radius
-        prey_neighbors = [obj for obj in neighbors if isinstance(obj, Prey)]  # it filter the nearby agents to find the prey
+        neighbors, distances = self.get_neighbors_in_radius(
+            radius=2.0
+        )  # it get the nearby agents within a certain radius
+        prey_neighbors = [
+            obj for obj in neighbors if isinstance(obj, Prey)
+        ]  # it filter the nearby agents to find the prey
 
         if prey_neighbors:
             prey_to_eat = self.random.choice(prey_neighbors)

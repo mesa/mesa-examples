@@ -1,6 +1,6 @@
 import mesa
-from mesa.experimental.continuous_space import ContinuousSpace
 from agents import Predator, Prey
+from mesa.experimental.continuous_space import ContinuousSpace
 
 
 class PredatorPreyModel(mesa.Model):
@@ -52,12 +52,16 @@ class PredatorPreyModel(mesa.Model):
         self.data_collector = mesa.DataCollector(
             model_reporters={
                 "Prey": lambda m: sum(1 for a in m.agents if isinstance(a, Prey)),
-                "Predators": lambda m: sum(1 for a in m.agents if isinstance(a, Predator)),
+                "Predators": lambda m: sum(
+                    1 for a in m.agents if isinstance(a, Predator)
+                ),
             }
         )
 
     def step(self):
         # advancing to next step,model need to collect data before the agents take their actions
-        self.data_collector.collect(self)  # collect the data for the current step of the simulation
+        self.data_collector.collect(
+            self
+        )  # collect the data for the current step of the simulation
         # Mesa 4.0 native agent activation (replaces the old scheduler)
         self.agents.shuffle_do("step")
