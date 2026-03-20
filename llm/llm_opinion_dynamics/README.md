@@ -51,6 +51,30 @@ Run the visualization:
 solara run app.py
 ```
 
+## Visualization
+
+The Solara dashboard shows three live panels:
+
+| Panel | What it shows |
+|-------|--------------|
+| **Agent Opinion Grid** | Heatmap of agent opinions on the spatial grid (red = against, green = for) |
+| **Opinion Trajectories** | Per-agent opinion over time — reveals convergence, divergence, and stable minorities |
+| **Population Dynamics** | Mean opinion + variance — declining variance signals emergent consensus |
+
+**Initial state (Step 0):**
+
+![Initial opinions — random spread across the grid](llm_opinion_dynamics_initial.png)
+
+**After 4 steps of LLM-driven persuasion:**
+
+![Step 4 — two agents converged to 3.8, variance dropped from 15 to 7](llm_opinion_dynamics_dashboard.png)
+
+Notable emergent behaviors visible above:
+- Agents 2 & 3 independently converged to **3.8** — emergent clustering, no hardcoded rule
+- Agent 4 started at **9.6**, was persuaded by a neighbor at **0.5**, and moved to **2.0** in one step
+- Agent 1 (spatially isolated, top of grid) held at **9.8** throughout — isolation preserves extreme opinions
+- Variance declined from ~15 → ~7 across 4 steps
+
 ## Relationship to Classical Models
 
 | Feature | Deffuant-Weisbuch | LLM Opinion Dynamics |
