@@ -126,7 +126,7 @@ class MisinformationModel(mesa.Model):
                 )
 
     def step(self):
-        print(f"\n--- Model step {self.steps} ---")
+        print(f"\n--- Model step {self.time} ---")
         self.agents.shuffle_do("step")
         self._propagate_sharing()
         self.datacollector.collect(self)
@@ -210,6 +210,6 @@ class RuleBasedMisinformationModel(mesa.Model):
         self.datacollector.collect(self)
 
     def step(self):
-        print(f"\n--- Rule-based step {self.steps} ---")
+        print(f"\n--- Rule-based step {self.time} ---")
         self.agents.shuffle_do("step")
         self.datacollector.collect(self)

@@ -1,20 +1,24 @@
 import litellm
 from mesa_llm.llm_agent import LLMAgent
-from mesa_llm.memory.st_lt_memory import STLTMemory
 
 
 class BelieverAgent(LLMAgent):
     """
     Tends to trust and share information easily.
     Belief strengthens with repeated exposure to the claim.
+
+    Note: This model uses litellm.completion() directly rather than
+    ReActReasoning because ReActReasoning hardwires output to a
+    reasoning: / action: format that cannot be overridden by prompt
+    instructions. Direct litellm calls allow clean structured two-line
+    responses (BELIEVE: yes / SHARE: yes) that can be reliably parsed.
+    Decision history is managed manually via self.history to avoid the
+    ghost latency caused by STLTMemory's background LLM calls when its
+    short-term buffer fills up.
     """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.memory = STLTMemory(
-            agent=self,
-            llm_model="ollama/llama3",
-        )
         self.believes = False
         self.shared = False
         self.times_exposed = 0
@@ -90,10 +94,6 @@ class SkepticAgent(LLMAgent):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.memory = STLTMemory(
-            agent=self,
-            llm_model="ollama/llama3",
-        )
         self.believes = False
         self.shared = False
         self.times_exposed = 0
@@ -170,10 +170,6 @@ class SpreaderAgent(LLMAgent):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.memory = STLTMemory(
-            agent=self,
-            llm_model="ollama/llama3",
-        )
         self.believes = False
         self.shared = False
         self.times_exposed = 0
@@ -213,7 +209,7 @@ class SpreaderAgent(LLMAgent):
                     f'"{self.model.misinformation_claim}"\n\n'
                     f"{history_text}"
                     f"Last step you shared: {prior}. "
-                    f"This is going viral — {self.times_exposed} exposures already. "
+                    f"This is going viral - {self.times_exposed} exposures already. "
                     f"Do you keep sharing?\n\n"
                     "Respond with ONLY these two lines:\n"
                     "BELIEVE: yes\n"
