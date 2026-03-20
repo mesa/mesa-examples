@@ -18,7 +18,9 @@ class MisinformationModel(mesa.Model):
             "chemicals from the nearby factory."
         )
 
-        self.grid = OrthogonalMooreGrid((width, height), capacity=1, torus=True, random=self.random)
+        self.grid = OrthogonalMooreGrid(
+            (width, height), capacity=1, torus=True, random=self.random
+        )
 
         agent_configs = [
             {
@@ -110,12 +112,8 @@ class MisinformationModel(mesa.Model):
                 "believers": lambda m: sum(
                     1 for a in m.agents if a.stance == "believer"
                 ),
-                "skeptics": lambda m: sum(
-                    1 for a in m.agents if a.stance == "skeptic"
-                ),
-                "neutrals": lambda m: sum(
-                    1 for a in m.agents if a.stance == "neutral"
-                ),
+                "skeptics": lambda m: sum(1 for a in m.agents if a.stance == "skeptic"),
+                "neutrals": lambda m: sum(1 for a in m.agents if a.stance == "neutral"),
                 "avg_belief": lambda m: sum(a.belief_score for a in m.agents)
                 / len(m.agents),
             },
@@ -228,12 +226,8 @@ class RuleBasedModel(mesa.Model):
                 "believers": lambda m: sum(
                     1 for a in m.agents if a.stance == "believer"
                 ),
-                "skeptics": lambda m: sum(
-                    1 for a in m.agents if a.stance == "skeptic"
-                ),
-                "neutrals": lambda m: sum(
-                    1 for a in m.agents if a.stance == "neutral"
-                ),
+                "skeptics": lambda m: sum(1 for a in m.agents if a.stance == "skeptic"),
+                "neutrals": lambda m: sum(1 for a in m.agents if a.stance == "neutral"),
                 "avg_belief": lambda m: sum(a.belief_score for a in m.agents)
                 / len(m.agents),
             },

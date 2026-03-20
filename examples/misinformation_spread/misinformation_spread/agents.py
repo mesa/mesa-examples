@@ -4,8 +4,8 @@ from mesa_llm.llm_agent import LLMAgent
 from mesa_llm.reasoning.react import ReActReasoning
 
 from misinformation_spread.tools import (  # noqa: F401 — import so @tool registers them
-    check_neighbors,
     challenge_rumor,
+    check_neighbors,
     spread_rumor,
     update_belief,
 )
@@ -55,12 +55,12 @@ class CitizenAgent(LLMAgent, HasCell, BasicMovement):
         # The plan object stores tool calls at plan.llm_plan.tool_calls,
         # where each entry is a ChatCompletionMessageToolCall with
         # .function.name for the tool name.
-        tool_calls = getattr(getattr(plan, 'llm_plan', None), 'tool_calls', None)
+        tool_calls = getattr(getattr(plan, "llm_plan", None), "tool_calls", None)
         if tool_calls:
             called_tools = {tc.function.name for tc in tool_calls}
-            if 'spread_rumor' in called_tools:
+            if "spread_rumor" in called_tools:
                 self.belief_score = min(1.0, self.belief_score + 0.05)
-            elif 'challenge_rumor' in called_tools:
+            elif "challenge_rumor" in called_tools:
                 self.belief_score = max(0.0, self.belief_score - 0.05)
 
             # Update stance based on new score
@@ -80,11 +80,7 @@ class RuleBasedAgent(mesa.Agent, HasCell, BasicMovement):
         self.belief_score = initial_belief
 
     def step(self):
-        neighbors = [
-            agent
-            for cell in self.cell.neighborhood
-            for agent in cell.agents
-        ]
+        neighbors = [agent for cell in self.cell.neighborhood for agent in cell.agents]
 
         for neighbor in neighbors:
             if neighbor.stance == "believer":

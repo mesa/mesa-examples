@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-
 from misinformation_spread.model import MisinformationModel
 
 
@@ -13,12 +12,16 @@ def main():
         model.step()
 
         for agent in model.agents:
-            print(f"  {agent.name:8s} | stance: {agent.stance:8s} | belief: {agent.belief_score:.2f}")
+            print(
+                f"  {agent.name:8s} | stance: {agent.stance:8s} | belief: {agent.belief_score:.2f}"
+            )
 
         believers = sum(1 for a in model.agents if a.stance == "believer")
         skeptics = sum(1 for a in model.agents if a.stance == "skeptic")
         neutrals = sum(1 for a in model.agents if a.stance == "neutral")
-        print(f"\n  Summary: {believers} believers, {skeptics} skeptics, {neutrals} neutrals")
+        print(
+            f"\n  Summary: {believers} believers, {skeptics} skeptics, {neutrals} neutrals"
+        )
 
     # Plot model-level results
     model_data = model.datacollector.get_model_vars_dataframe()
@@ -41,7 +44,9 @@ def main():
     print("\n--- Final Belief Scores ---")
     last_step = agent_data.xs(num_steps - 1, level="Step")
     for agent_id, row in last_step.iterrows():
-        print(f"  Agent {agent_id:3d} | stance: {row['stance']:8s} | belief: {row['belief_score']:.2f}")
+        print(
+            f"  Agent {agent_id:3d} | stance: {row['stance']:8s} | belief: {row['belief_score']:.2f}"
+        )
 
 
 if __name__ == "__main__":

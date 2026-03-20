@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-
 from misinformation_spread.model import RuleBasedModel
 
 
@@ -22,7 +21,9 @@ def main():
         believers = sum(1 for a in model.agents if a.stance == "believer")
         skeptics = sum(1 for a in model.agents if a.stance == "skeptic")
         neutrals = sum(1 for a in model.agents if a.stance == "neutral")
-        print(f"  Summary: {believers} believers, {skeptics} skeptics, {neutrals} neutrals\n")
+        print(
+            f"  Summary: {believers} believers, {skeptics} skeptics, {neutrals} neutrals\n"
+        )
 
     # Plot results
     model_data = model.datacollector.get_model_vars_dataframe()
