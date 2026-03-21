@@ -1,8 +1,7 @@
+from agents import GovernmentAgent, PersonAgent, State
 from mesa import Model
 from mesa.datacollection import DataCollector
 from mesa.discrete_space import OrthogonalMooreGrid
-
-from agents import GovernmentAgent, PersonAgent, State
 
 
 class SEIRModel(Model):
@@ -66,9 +65,7 @@ class SEIRModel(Model):
                     if a.state == State.SUSCEPTIBLE
                 ),
                 "Exposed": lambda m: sum(
-                    1
-                    for a in m.agents_by_type[PersonAgent]
-                    if a.state == State.EXPOSED
+                    1 for a in m.agents_by_type[PersonAgent] if a.state == State.EXPOSED
                 ),
                 "Infected": lambda m: sum(
                     1
