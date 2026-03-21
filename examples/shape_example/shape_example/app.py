@@ -12,10 +12,10 @@ from model import ShapeExample
 def agent_portrayal(agent):
     """Render each walker as an arrow pointing in its heading direction."""
     heading_to_angle = {
-        (1, 0): 0,    # right
-        (0, 1): 90,   # up
-        (-1, 0): 180, # left
-        (0, -1): 270, # down
+        (1, 0): 0,  # right
+        (0, 1): 90,  # up
+        (-1, 0): 180,  # left
+        (0, -1): 270,  # down
     }
     return {
         "color": "#1D9E75",

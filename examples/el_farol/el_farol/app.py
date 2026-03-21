@@ -8,7 +8,6 @@ Run with:
 import mesa.visualization
 from model import ElFarolBar
 
-
 model_params = {
     "num_agents": {
         "type": "SliderInt",

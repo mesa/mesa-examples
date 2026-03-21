@@ -1,6 +1,5 @@
 import mesa
 import numpy as np
-
 from agents import BarCustomer
 
 
