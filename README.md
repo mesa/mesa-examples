@@ -79,6 +79,11 @@ This project simulates how unpopular norms can dominate a society even when the 
 ### [Humanitarian Aid Distribution Model](https://github.com/mesa/mesa-examples/tree/main/examples/humanitarian_aid_distribution)
 
 This model simulates a humanitarian aid distribution scenario using a needs-based behavioral architecture. Beneficiaries have dynamic needs (water, food) and trucks distribute aid using a hybrid triage system.
+
+### [SEIR Epidemic Model with Vaccination Policy](https://github.com/mesa/mesa-examples/tree/main/examples/seir_vaccination)
+
+A grid-based epidemic model where people spread disease through contact and a government meta-agent steps in with vaccination campaigns when infection rates get too high. Good for exploring how individual-level transmission leads to population-level waves, and how top-down policy interventions change the curve.
+
 ### [Rumor Mill Model](https://github.com/mesa/mesa-examples/tree/main/examples/rumor_mill)
 
 A simple agent-based simulation showing how rumors spread through a population based on the spread chance and initial knowing percentage, implemented with the Mesa framework and adapted from NetLogo [Rumor mill](https://www.netlogoweb.org/launch#https://www.netlogoweb.org/assets/modelslib/Sample%20Models/Social%20Science/Rumor%20Mill.nlogox).
