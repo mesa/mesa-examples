@@ -1,5 +1,6 @@
 import mesa
 
+
 # We use mesa.Agent for now to ensure it runs on your current version
 class OpinionAgent(mesa.Agent):
     def __init__(self, model):
@@ -8,6 +9,7 @@ class OpinionAgent(mesa.Agent):
     def process_opinion(self, msg):
         # This is your reactive trigger
         print(f"Agent {self.unique_id} reacting to info: {msg}")
+
 
 class ReactiveLLMModel(mesa.Model):
     def __init__(self):
@@ -21,12 +23,13 @@ class ReactiveLLMModel(mesa.Model):
         if self.steps % 5 == 0:
             msg = "New architectural standard in Mesa 4.0!"
             self.agents.do("process_opinion", msg)
-        
+
         # 2. Tell all agents to move or update (if you have a step method in OpinionAgent)
-        # Since your OpinionAgent doesn't have a 'step' method yet, 
+        # Since your OpinionAgent doesn't have a 'step' method yet,
         # you can just let the model handle the 'do' logic above.
         # If you add a 'step' method to OpinionAgent later, use:
         # self.agents.do("step")
+
 
 # This block allows you to run it directly in your terminal
 if __name__ == "__main__":

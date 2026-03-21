@@ -29,9 +29,9 @@ This example is built to showcase the **Mesa 4.0 "Clean Slate"** API:
 2. **Run the Model**:
    `python model.py`
 
-3. (Planned) Run the visualization: 
+3. (Planned) Run the visualization:
    `solara run app.py`
-   
+
 ## References
 * Mesa 4.0 Discussion #2972 (Performance Benchmarking)
 * Mesa Examples Guidelines #390
