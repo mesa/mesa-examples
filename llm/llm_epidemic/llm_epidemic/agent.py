@@ -97,16 +97,20 @@ class EpidemicAgent(LLMAgent):
                 self.is_isolating = False
 
         elif self.health_state == "susceptible" and not self.is_isolating:
-            # Check for infected neighbors
-            neighbors = [
-                a
-                for a in self.model.agents
-                if a is not self
-                and hasattr(a, "health_state")
-                and a.health_state == "infected"
-                and not a.is_isolating
-            ]
-            infection_probability = min(0.1 * len(neighbors), 0.8)
+            # Check for infected agents in spatial neighborhood (Moore radius=1).
+            # vision=2 lets the LLM observe a wider area; infection requires
+            # direct contact with an immediate neighbor.
+            infected_neighbors = []
+            if hasattr(self, "cell") and self.cell is not None:
+                for neighbor_cell in self.cell.connections.values():
+                    for agent in neighbor_cell.agents:
+                        if (
+                            hasattr(agent, "health_state")
+                            and agent.health_state == "infected"
+                            and not agent.is_isolating
+                        ):
+                            infected_neighbors.append(agent)
+            infection_probability = min(0.3 * len(infected_neighbors), 0.9)
             if self.model.random.random() < infection_probability:
                 self.health_state = "infected"
                 self.internal_state = [f"health_state:{self.health_state}"]
