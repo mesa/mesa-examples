@@ -215,10 +215,10 @@ class UserAgent(Grid2DMovingAgent, BDIAgent):
             msg: Message dict with 'sender' and 'content' keys
         """
         sender = msg.get("sender")
-        if sender and sender.trust > 0.5:
+        if sender and sender.trust > self.trust:
             # Accept proposal from trusted sender
             belief_update = msg.get("content", {})
-            self.update_beliefs(belief_update)
+            self.update_beliefs(belief_update, sender_trust=sender.trust)
 
             # Send acceptance
             response = {
@@ -230,17 +230,20 @@ class UserAgent(Grid2DMovingAgent, BDIAgent):
             sender.receive_message(response)
         # If not trusted, silently reject (no response)
 
-    def update_beliefs(self, belief_update: dict[str, float]):
+    def update_beliefs(
+        self, belief_update: dict[str, float], sender_trust: float = 0.5
+    ):
         """Update beliefs with new information.
 
         Args:
             belief_update: Dict of belief name -> new value
+            sender_trust: Trust level of the agent who sent the update
         """
         new_beliefs = self.beliefs.copy()
 
         for belief, value in belief_update.items():
             # Weight by sender's trust
-            weighted_value = min(value, self.doctor.trust if self.doctor else 0.5)
+            weighted_value = min(value, sender_trust)
             new_beliefs[belief] = weighted_value
 
         self.beliefs = new_beliefs
