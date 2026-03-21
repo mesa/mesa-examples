@@ -40,14 +40,22 @@ This produces **emergent negotiation dynamics** — reputation building, trust s
 
 ![Initial state — no history, agents have not yet played](prisoners_dilemma_initial.png)
 
-**After Round 1 of LLM reasoning:**
+**After 5 rounds of LLM-driven reasoning:**
 
-![Round 1 — all agents defect (Nash equilibrium without trust history)](prisoners_dilemma_dashboard.png)
+![5 rounds — cooperation collapses after exploitation, mutual defection locks in](prisoners_dilemma_dashboard.png)
 
-Key emergent behavior observed:
-- **Round 1: 100% defection** — with no history, the LLM correctly identifies defection as the Nash equilibrium strategy. No agent has reason to trust a stranger.
-- This mirrors what game theory predicts for the one-shot Prisoner's Dilemma
-- In longer runs, agents with shared history begin signaling trustworthiness and cooperation emerges — a pattern no fixed strategy like tit-for-tat can replicate with genuine reasoning
+**What this run demonstrates — emergent game theory from pure LLM reasoning:**
+
+| Round | Cooperation Rate | What happened |
+|-------|-----------------|---------------|
+| 1 | 0.5 | One agent tried cooperation to build trust; the other defected and exploited it |
+| 2 | 0.5 | Cooperating agent gave a second chance, exploiter defected again |
+| 3+ | 0.0 | Exploited agent switched to permanent defection — "I cooperated twice, got burned twice, I'm done" |
+| 4–5 | 0.0 | Stable mutual defection — the Nash equilibrium lock-in |
+
+**Why this matters:** This is the core result from Axelrod's *Evolution of Cooperation* (1984) — agents that try cooperation, get exploited, and retaliate with defection — reproduced here with **zero hardcoded strategy**. No tit-for-tat rule, no punishment parameter, no threshold. The LLM reasoned its way to this behavior by reflecting on its interaction history at each step.
+
+This is something a fixed-strategy model simply cannot do: the agent articulates *why* it switched, references past betrayal in its reasoning chain, and makes a strategic decision grounded in language rather than math.
 
 ## How to Run
 
