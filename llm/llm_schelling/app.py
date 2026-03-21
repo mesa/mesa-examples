@@ -11,11 +11,11 @@ if sys.stdout.encoding != "utf-8":
 if sys.stderr.encoding != "utf-8":
     sys.stderr.reconfigure(encoding="utf-8")
 
-import matplotlib.pyplot as plt
-import solara
-from llm_schelling.model import LLMSchellingModel
-from mesa.visualization import SolaraViz
-from mesa.visualization.utils import update_counter
+import matplotlib.pyplot as plt  # noqa: E402
+import solara  # noqa: E402
+from llm_schelling.model import LLMSchellingModel  # noqa: E402
+from mesa.visualization import SolaraViz  # noqa: E402
+from mesa.visualization.utils import update_counter  # noqa: E402
 
 GROUP_COLORS = {0: "#2196F3", 1: "#FF5722"}  # Blue, Orange
 

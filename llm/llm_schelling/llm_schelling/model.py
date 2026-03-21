@@ -50,7 +50,7 @@ class LLMSchellingModel(mesa.Model):
             model_reporters={
                 "happy": lambda m: sum(1 for a in m.agents if a.is_happy),
                 "unhappy": lambda m: sum(1 for a in m.agents if not a.is_happy),
-                "segregation_index": lambda m: self._segregation_index(m),
+                "segregation_index": self._segregation_index,
             }
         )
 
