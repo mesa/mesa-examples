@@ -1,4 +1,5 @@
 from mesa.visualization import SolaraViz, make_plot_component, make_space_component
+from mesa.visualization.components.portrayal_components import AgentPortrayalStyle
 
 from agents import State
 from model import SEIRModel
@@ -13,10 +14,10 @@ STATE_COLORS = {
 
 
 def agent_portrayal(agent):
-    return {
-        "color": STATE_COLORS.get(agent.state, "grey"),
-        "size": 20,
-    }
+    return AgentPortrayalStyle(
+        color=STATE_COLORS.get(agent.state, "grey"),
+        size=20,
+    )
 
 
 model_params = {
