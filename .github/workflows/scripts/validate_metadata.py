@@ -1,8 +1,9 @@
 """Validate metadata.toml files in all examples."""
 
 import sys
-import tomllib
 from pathlib import Path
+
+import tomllib
 
 REQUIRED_FIELDS = [
     "title",
