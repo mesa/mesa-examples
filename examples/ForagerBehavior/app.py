@@ -1,5 +1,6 @@
-from mesa.visualization import SolaraViz, make_plot_component, make_space_component
-from model import ForagerModel
+import mesa
+from mesa.visualization import SolaraViz, make_space_component, make_plot_component
+from model import ForagerModel, ForagerAgent
 
 
 def agent_portrayal(agent):
@@ -26,8 +27,20 @@ model_params = {
         "max": 0.8,
         "step": 0.1,
     },
-    "width": {"type": "SliderInt", "value": 20, "min": 10, "max": 40, "step": 5},
-    "height": {"type": "SliderInt", "value": 20, "min": 10, "max": 40, "step": 5},
+    "width": {
+        "type": "SliderInt",
+        "value": 20,
+        "min": 10,
+        "max": 40,
+        "step": 5,
+    },
+    "height": {
+        "type": "SliderInt",
+        "value": 20,
+        "min": 10,
+        "max": 40,
+        "step": 5,
+    },
 }
 
 page = SolaraViz(
