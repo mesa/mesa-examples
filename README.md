@@ -83,6 +83,8 @@ This model simulates a humanitarian aid distribution scenario using a needs-base
 
 A simple agent-based simulation showing how rumors spread through a population based on the spread chance and initial knowing percentage, implemented with the Mesa framework and adapted from NetLogo [Rumor mill](https://www.netlogoweb.org/launch#https://www.netlogoweb.org/assets/modelslib/Sample%20Models/Social%20Science/Rumor%20Mill.nlogox).
 
+### [BDI Recommender Agent](https://github.com/mesa/mesa-examples/tree/main/examples/bdi_recommender)
+This is a mesa implementation of BDI Recommender Agent from [NetLogo Modeling Commons](https://modelingcommons.org/browse/one_model/4602).
 
 ## Continuous Space Examples
 _No user examples available yet._
