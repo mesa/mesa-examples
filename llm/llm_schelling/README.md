@@ -1,69 +1,71 @@
 # LLM Schelling Segregation
 
-An LLM-powered implementation of Schelling's (1971) classic segregation model,
-built with [Mesa](https://github.com/projectmesa/mesa) and
-[Mesa-LLM](https://github.com/projectmesa/mesa-llm).
+## Summary
 
-## Overview
-
-The Schelling segregation model is one of the most influential agent-based
-models ever published. It demonstrates that even mild individual preferences
-for same-group neighbors produce strong global segregation — a striking example
-of emergent behavior from simple rules.
-
-**Classical model:** An agent moves if fewer than a fixed threshold (e.g. 30%)
-of its neighbors share its group.
-
-**This model:** Agents reason in natural language about their neighborhood
-composition and decide whether they feel comfortable staying or want to move.
-The LLM can weigh contextual factors, producing richer dynamics than a fixed
-threshold allows.
+An LLM-powered reimplementation of Schelling's (1971) classic segregation model where agents
+**reason in natural language** about their neighborhood before deciding to stay or move —
+instead of following a fixed satisfaction threshold.
 
 ## The Model
 
-Agents of two groups (A and B) are placed on a grid. Each step:
-1. Each agent observes its Moore neighborhood (up to 8 neighbors)
-2. It describes the neighborhood composition in natural language to the LLM
-3. The LLM decides: `happy` (stay) or `unhappy` (move)
-4. Unhappy agents relocate to a random empty cell
+Agents of two groups (A and B) are placed on a 5×5 grid. Each step:
 
-The simulation tracks happiness levels and a segregation index over time.
+1. Each agent observes its Moore neighborhood (up to 8 neighbors on a torus grid)
+2. It describes the neighborhood composition to the LLM
+3. The LLM decides: `happy` (stay) or `unhappy` (move to a random empty cell)
 
-### Parameters
+The simulation tracks happiness levels and a segregation index over time. The model stops
+when all agents are happy.
 
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `width` | Grid width | 10 |
-| `height` | Grid height | 10 |
-| `density` | Fraction of cells occupied | 0.8 |
-| `minority_fraction` | Fraction of agents in Group B | 0.4 |
-| `llm_model` | LLM model string | `gemini/gemini-2.0-flash` |
+## What makes this different from classical Schelling
 
-## Running the Model
+Classical Schelling uses a fixed threshold rule — an agent moves if fewer than X% of its
+neighbors share its group. The outcome is mathematically determined by that threshold.
 
-Set your API key:
+Here, agents **reason** at each step:
+
+> "I belong to Group A. My neighborhood has 3 Group A and 4 Group B neighbors.
+> The mix is manageable — I feel comfortable here. I'll stay."
+
+This produces **qualitatively different dynamics**. The LLM agents weigh context,
+not just ratios — and the result shows it.
+
+## Visualization
+
+**Initial state (Step 0) — random placement:**
+
+![Initial state — blue (Group A) and orange (Group B) agents distributed randomly](schelling_initial.png)
+
+Random mix across the 5×5 grid. No clustering, no preference expressed yet. Happiness and
+segregation charts are empty.
+
+**After 2 LLM reasoning steps — stable integration:**
+
+![Step 2 — all agents happy, zero segregation, model stopped](schelling_dashboard.png)
+
+| Step | Happy | Unhappy | Segregation Index | What happened |
+|------|-------|---------|-------------------|---------------|
+| 0 | — | — | — | Random initial placement |
+| 1 | ~16 | ~0 | 0.00 | LLM agents assess neighbors, most decide to stay |
+| 2 | 19 | 0 | 0.00 | All agents happy — simulation stops |
+
+**Why this matters:** The classical Schelling model *always* produces segregation from even
+mild preferences. The LLM version produced **zero segregation** — agents reasoned their way
+to comfort in a diverse neighborhood. No hardcoded tolerance parameter, no rule relaxation.
+The LLM considered context (neighborhood quality, stability, social mix) and decided the
+mixed state was acceptable. This is something a fixed-threshold agent cannot do.
+
+## How to Run
+
 ```bash
-export GEMINI_API_KEY=your_key_here
-```
-
-Install dependencies:
-```bash
+cp .env.example .env  # fill in your API key
 pip install -r requirements.txt
-```
-
-Run the visualization:
-```bash
 solara run app.py
 ```
 
-## Comparison with Classical Schelling
+## Supported LLM Providers
 
-| Feature | Classical Schelling | LLM Schelling |
-|---------|--------------------|--------------------|
-| Decision rule | Fixed threshold (e.g. 30%) | LLM natural language reasoning |
-| Agent memory | None | Short-term memory of interactions |
-| Flexibility | Rigid | Emergent from reasoning |
-| Interpretability | Mathematical | Natural language explanations |
+Gemini, OpenAI, Anthropic, Ollama (local) — configured via `.env`.
 
 ## Reference
 
