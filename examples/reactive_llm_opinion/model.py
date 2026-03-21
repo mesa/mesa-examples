@@ -13,7 +13,7 @@ class ReactiveLLMModel(mesa.Model):
     def __init__(self):
         super().__init__()
         # Creating 5 agents
-        for i in range(5):
+        for _ in range(5):
             OpinionAgent(self)
 
     def step(self):
