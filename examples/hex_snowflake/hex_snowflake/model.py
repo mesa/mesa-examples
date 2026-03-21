@@ -1,7 +1,7 @@
 import mesa
 from mesa.discrete_space import HexGrid
 
-from .cell import Cell
+from cell import Cell
 
 
 class HexSnowflake(mesa.Model):
