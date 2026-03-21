@@ -12,14 +12,13 @@ Each person on the grid goes through four states — Susceptible, Exposed, Infec
 
 The interesting part is watching the tension between how fast the disease spreads bottom-up and how quickly the government can slow it down top-down.
 
+Based on the classic SEIR compartmental model: Kermack, W. O., & McKendrick, A. G. (1927). A contribution to the mathematical theory of epidemics. *Proceedings of the Royal Society of London*, 115(772), 700–721.
+
 ---
 
 ## How to Run
-
 ```bash
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
-pip install -r requirements.txt
+pip install mesa[rec]
 python -m solara run app.py
 ```
 
@@ -39,7 +38,6 @@ python -m solara run app.py
 ## Parameters
 
 | Parameter | Default | Description |
-|---|---|---|
 | `width` / `height` | 30 | Grid size |
 | `initial_infected` | 5 | How many people start infected |
 | `transmission_rate` | 0.3 | Chance of catching it from an infected neighbor |

@@ -1,13 +1,14 @@
 from mesa.visualization import SolaraViz, make_plot_component, make_space_component
 
-from .model import SEIRModel
+from agents import State
+from model import SEIRModel
 
 # Color mapping for each state
 STATE_COLORS = {
-    "S": "#3498db",  # Blue
-    "E": "#f39c12",  # Orange
-    "I": "#e74c3c",  # Red
-    "R": "#2ecc71",  # Green
+    State.SUSCEPTIBLE: "#3498db",  # Blue
+    State.EXPOSED: "#f39c12",      # Orange
+    State.INFECTED: "#e74c3c",     # Red
+    State.RECOVERED: "#2ecc71",    # Green
 }
 
 

@@ -2,7 +2,7 @@ from mesa import Model
 from mesa.datacollection import DataCollector
 from mesa.discrete_space import OrthogonalMooreGrid
 
-from .agents import GovernmentAgent, PersonAgent
+from agents import GovernmentAgent, PersonAgent, State
 
 
 class SEIRModel(Model):
@@ -40,32 +40,46 @@ class SEIRModel(Model):
         self.vaccination_threshold = vaccination_threshold
         self.vaccination_rate = vaccination_rate
 
-        # Grid setup — Mesa 3.5 Cell API
+        # Grid setup — Mesa 3.x Cell API
         self.grid = OrthogonalMooreGrid((width, height), torus=False, capacity=1)
-
-        # Track population separately for easy access
-        self.population = []
 
         # Place one person per cell
         for cell in self.grid.all_cells:
-            person = PersonAgent(self, state="S")
+            person = PersonAgent(self, state=State.SUSCEPTIBLE)
             person.cell = cell
-            self.population.append(person)
 
         # Seed initial infections
-        initial_infected_agents = self.random.sample(self.population, initial_infected)
+        initial_infected_agents = self.random.sample(
+            list(self.agents_by_type[PersonAgent]), initial_infected
+        )
         for agent in initial_infected_agents:
-            agent.state = "I"
+            agent.state = State.INFECTED
 
         # Government meta-agent (not placed on grid)
         self.government = GovernmentAgent(self)
 
         self.datacollector = DataCollector(
             model_reporters={
-                "Susceptible": lambda m: sum(1 for a in m.population if a.state == "S"),
-                "Exposed": lambda m: sum(1 for a in m.population if a.state == "E"),
-                "Infected": lambda m: sum(1 for a in m.population if a.state == "I"),
-                "Recovered": lambda m: sum(1 for a in m.population if a.state == "R"),
+                "Susceptible": lambda m: sum(
+                    1
+                    for a in m.agents_by_type[PersonAgent]
+                    if a.state == State.SUSCEPTIBLE
+                ),
+                "Exposed": lambda m: sum(
+                    1
+                    for a in m.agents_by_type[PersonAgent]
+                    if a.state == State.EXPOSED
+                ),
+                "Infected": lambda m: sum(
+                    1
+                    for a in m.agents_by_type[PersonAgent]
+                    if a.state == State.INFECTED
+                ),
+                "Recovered": lambda m: sum(
+                    1
+                    for a in m.agents_by_type[PersonAgent]
+                    if a.state == State.RECOVERED
+                ),
                 "Vaccination Active": lambda m: int(m.government.vaccination_active),
             }
         )
@@ -74,9 +88,8 @@ class SEIRModel(Model):
         self.running = True
 
     def step(self):
-        # 1. All people act first
-        for person in self.population:
-            person.step()
+        # 1. All people act first — random activation
+        self.agents_by_type[PersonAgent].shuffle_do("step")
 
         # 2. Government monitors and responds
         self.government.step()
