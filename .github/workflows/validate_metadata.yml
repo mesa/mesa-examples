@@ -1,0 +1,24 @@
+name: Validate Example Metadata
+
+on:
+  pull_request:
+    paths:
+      - 'examples/**/metadata.toml'
+      - '.github/workflows/validate_metadata.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install tomllib (stdlib in 3.11+)
+        run: echo "tomllib is built-in"
+
+      - name: Validate all metadata.toml files
+        run: python scripts/validate_metadata.py
