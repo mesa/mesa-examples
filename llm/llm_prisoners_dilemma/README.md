@@ -33,11 +33,21 @@ This produces **emergent negotiation dynamics** — reputation building, trust s
 
 ## Visualization
 
-- 🟢 **Green agents** — cooperated last round
-- 🔴 **Red agents** — defected last round
-- **Agent size** — proportional to cumulative score
 - **Cooperation rate plot** — fraction of cooperative actions per round
 - **Cumulative plot** — total cooperations vs defections over time
+
+**Initial state (Step 0):**
+
+![Initial state — no history, agents have not yet played](prisoners_dilemma_initial.png)
+
+**After Round 1 of LLM reasoning:**
+
+![Round 1 — all agents defect (Nash equilibrium without trust history)](prisoners_dilemma_dashboard.png)
+
+Key emergent behavior observed:
+- **Round 1: 100% defection** — with no history, the LLM correctly identifies defection as the Nash equilibrium strategy. No agent has reason to trust a stranger.
+- This mirrors what game theory predicts for the one-shot Prisoner's Dilemma
+- In longer runs, agents with shared history begin signaling trustworthiness and cooperation emerges — a pattern no fixed strategy like tit-for-tat can replicate with genuine reasoning
 
 ## How to Run
 
