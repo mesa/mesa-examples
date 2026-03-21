@@ -1,7 +1,7 @@
 import mesa
 import numpy as np
 
-from .agents import BarCustomer
+from agents import BarCustomer
 
 
 class ElFarolBar(mesa.Model):
