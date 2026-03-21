@@ -35,11 +35,11 @@ class LLMSchellingModel(mesa.Model):
 
     def __init__(
         self,
-        width: int = 10,
-        height: int = 10,
+        width: int = 5,
+        height: int = 5,
         density: float = 0.8,
         minority_fraction: float = 0.4,
-        llm_model: str = "gemini/gemini-2.0-flash",
+        llm_model: str = "cerebras/llama3.1-8b",
         rng=None,
     ):
         super().__init__(rng=rng)
