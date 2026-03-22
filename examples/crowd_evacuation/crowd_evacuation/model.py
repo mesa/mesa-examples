@@ -1,5 +1,4 @@
 """Crowd Evacuation Model.
-
 Simulates people evacuating a room through exits using the
 Social Force Model (Helbing & Molnár, 1995). Built on Mesa's ContinuousSpace.
 """
@@ -13,15 +12,6 @@ from .agents import Person
 
 
 class EvacuationModel(Model):
-    """
-    A room full of people trying to get out through one or more exits.
-
-    The model creates a bounded ContinuousSpace (the room), places exits
-    on the walls, and spawns agents at random positions. Each step, agents
-    compute social forces and move accordingly. When an agent reaches
-    an exit, it's marked as escaped.
-    """
-
     def __init__(
         self,
         num_people=80,
@@ -41,10 +31,8 @@ class EvacuationModel(Model):
         self.dt = 0.1  # each step = 0.1 seconds of simulated time
         self.agents_escaped = 0
 
-        # 1. PLACE EXITS on the walls
         self.exits = self._place_exits(num_exits, exit_width)
 
-        # 2. CREATE THE ROOM (continuous, bounded — not a torus)
         self.space = ContinuousSpace(
             [[0, width], [0, height]],
             torus=False,
@@ -52,7 +40,6 @@ class EvacuationModel(Model):
             n_agents=num_people,
         )
 
-        # 3. SPAWN PEOPLE at random positions (keep away from walls a bit)
         margin = 1.0
         for _ in range(num_people):
             x = self.random.uniform(margin, width - margin)
@@ -65,7 +52,6 @@ class EvacuationModel(Model):
                 max_speed=max_speed,
             )
 
-        # 4. DATA COLLECTION
         self.datacollector = DataCollector(
             model_reporters={
                 "Agents Remaining": lambda m: m.num_people - m.agents_escaped,
@@ -106,7 +92,6 @@ class EvacuationModel(Model):
 
     def step(self):
         """One tick: move everyone, collect data, check if done."""
-        # Only bother stepping agents who haven't escaped yet
         active = [a for a in self.agents if not a.escaped]
         self.random.shuffle(active)
         for agent in active:
