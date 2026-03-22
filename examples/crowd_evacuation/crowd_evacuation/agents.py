@@ -31,8 +31,6 @@ class Person(ContinuousSpaceAgent):
         self._wall_range = 0.4  # wall repulsion falloff (m)
         self._relax_time = 0.3  # how fast agent adjusts to desired velocity (s)
 
-
-
     def _nearest_exit(self):
         """Return (direction_unit_vector, distance) toward the closest exit."""
         pos = np.asarray(self.position, dtype=float)
