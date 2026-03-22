@@ -175,7 +175,6 @@ class Person(ContinuousSpaceAgent):
                 return True
         return False
 
-
     def step(self):
         """One tick of the simulation: compute forces → move → check exit."""
         if self.escaped:
