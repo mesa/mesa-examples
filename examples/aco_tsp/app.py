@@ -1,5 +1,7 @@
 """Configure visualization elements and instantiate a server"""
+
 import os
+
 import networkx as nx
 import solara
 from aco_tsp.model import AcoTspModel, TSPGraph
