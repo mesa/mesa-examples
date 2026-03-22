@@ -1,10 +1,6 @@
 """Person agent for the Crowd Evacuation model.
 
 Implements a simplified Social Force Model (Helbing & Molnár, 1995).
-Each person is pushed by three forces:
-  1. Desired: "I want to reach that exit"
-  2. Social:  "I don't want to bump into you"
-  3. Walls:   "I don't want to walk into a wall"
 """
 
 import numpy as np
@@ -12,13 +8,6 @@ from mesa.experimental.continuous_space import ContinuousSpaceAgent
 
 
 class Person(ContinuousSpaceAgent):
-    """A pedestrian trying to evacuate a room.
-
-    The agent finds the nearest exit and walks toward it,
-    while being repelled by other agents and walls.
-    When it reaches an exit, it's marked as escaped.
-    """
-
     def __init__(
         self,
         space,
@@ -163,8 +152,6 @@ class Person(ContinuousSpaceAgent):
 
             if exit_wall != wall_id:
                 continue
-
-            # Are we lined up with the exit opening?
             # Use 2x exit width as detection zone for smoother approach
             if wall_id in ("left", "right"):
                 if abs(pos[1] - ec[1]) < exit_w * 2.0:
@@ -188,9 +175,6 @@ class Person(ContinuousSpaceAgent):
                 return True
         return False
 
-    # ------------------------------------------------------------------ #
-    #  Step
-    # ------------------------------------------------------------------ #
 
     def step(self):
         """One tick of the simulation: compute forces → move → check exit."""
