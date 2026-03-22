@@ -81,9 +81,7 @@ class SIRModel(mesa.Model):
                 "Susceptible": lambda m: sum(
                     1 for a in m.agents if a.state == "Susceptible"
                 ),
-                "Infected": lambda m: sum(
-                    1 for a in m.agents if a.state == "Infected"
-                ),
+                "Infected": lambda m: sum(1 for a in m.agents if a.state == "Infected"),
                 "Recovered": lambda m: sum(
                     1 for a in m.agents if a.state == "Recovered"
                 ),

@@ -3,9 +3,8 @@
 Run with: solara run app.py
 """
 
-from model import Person, SIRModel
-
 from mesa.visualization import SolaraViz, make_plot_component, make_space_component
+from model import Person, SIRModel
 
 # Color mapping for agent states
 STATE_COLORS = {
