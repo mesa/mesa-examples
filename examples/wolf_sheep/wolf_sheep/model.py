@@ -86,8 +86,7 @@ class WolfSheep(mesa.Model):
             for cell in self.grid:
                 fully_grown = self.random.choice([True, False])
                 countdown = (
-                    0 if fully_grown
-                    else self.random.randrange(0, grass_regrowth_time)
+                    0 if fully_grown else self.random.randrange(0, grass_regrowth_time)
                 )
                 GrassPatch(self, countdown, grass_regrowth_time, cell)
 

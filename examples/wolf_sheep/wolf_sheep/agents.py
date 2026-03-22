@@ -38,16 +38,15 @@ class Sheep(Animal):
     """A sheep that eats grass and can be eaten by wolves."""
 
     def feed(self):
-        grass = next(
-            (a for a in self.cell.agents if isinstance(a, GrassPatch)), None
-        )
+        grass = next((a for a in self.cell.agents if isinstance(a, GrassPatch)), None)
         if grass and grass.fully_grown:
             self.energy += self.energy_from_food
             grass.get_eaten()
 
     def move(self):
         safe_cells = [
-            c for c in self.cell.neighborhood
+            c
+            for c in self.cell.neighborhood
             if not any(isinstance(a, Wolf) for a in c.agents)
         ]
         target = safe_cells or list(self.cell.neighborhood)
@@ -67,7 +66,8 @@ class Wolf(Animal):
 
     def move(self):
         cells_with_sheep = [
-            c for c in self.cell.neighborhood
+            c
+            for c in self.cell.neighborhood
             if any(isinstance(a, Sheep) for a in c.agents)
         ]
         target = cells_with_sheep or list(self.cell.neighborhood)

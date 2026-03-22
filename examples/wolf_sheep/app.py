@@ -1,8 +1,7 @@
-from wolf_sheep.agents import GrassPatch, Sheep, Wolf
-from wolf_sheep.model import WolfSheep
-
 from mesa.visualization import SolaraViz, make_plot_component, make_space_component
 from mesa.visualization.user_param import Slider
+from wolf_sheep.agents import GrassPatch, Sheep, Wolf
+from wolf_sheep.model import WolfSheep
 
 
 def wolf_sheep_portrayal(agent):
