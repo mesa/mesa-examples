@@ -5,11 +5,11 @@ from mesa.visualization.components import AgentPortrayalStyle
 from mesa.visualization.utils import update_counter
 
 try:
+    from .agents import Plant, Pollinator
     from .model import PollinatorCascadeModel
-    from .agents import Pollinator, Plant
 except ImportError:
+    from agents import Plant, Pollinator
     from model import PollinatorCascadeModel
-    from agents import Pollinator, Plant
 
 model_params = {
     "n_pollinators": {
@@ -155,4 +155,3 @@ page = SolaraViz(
     model_params=model_params,
     name="Pollinator-Plant Cascade Extinction Model",
 )
-

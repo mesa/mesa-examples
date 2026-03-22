@@ -1,9 +1,10 @@
 import pytest
+
 try:
-    from .agents import Pollinator, Plant
+    from .agents import Plant, Pollinator
     from .model import PollinatorCascadeModel
 except ImportError:
-    from agents import Pollinator, Plant
+    from agents import Plant, Pollinator
     from model import PollinatorCascadeModel
 
 

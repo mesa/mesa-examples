@@ -1,10 +1,11 @@
 import mesa
 import networkx as nx
 from mesa.discrete_space import Network
+
 try:
-    from .agents import Pollinator, Plant
+    from .agents import Plant, Pollinator
 except ImportError:
-    from agents import Pollinator, Plant
+    from agents import Plant, Pollinator
 
 
 def compute_alive_pollinators(model):
