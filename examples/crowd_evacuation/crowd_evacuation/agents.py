@@ -25,16 +25,13 @@ class Person(ContinuousSpaceAgent):
         self.mass = 80.0  # kg, used for F=ma
         self.escaped = False
 
-        # --- Social Force parameters (tuned for stable 2D simulation) ---
         self._social_strength = 80.0  # agent-agent repulsion strength (N)
         self._social_range = 0.6  # repulsion falloff distance (m)
         self._wall_strength = 120.0  # wall repulsion strength (N)
         self._wall_range = 0.4  # wall repulsion falloff (m)
         self._relax_time = 0.3  # how fast agent adjusts to desired velocity (s)
 
-    # ------------------------------------------------------------------ #
-    #  Force calculations — the core of the Social Force Model
-    # ------------------------------------------------------------------ #
+
 
     def _nearest_exit(self):
         """Return (direction_unit_vector, distance) toward the closest exit."""
@@ -55,7 +52,6 @@ class Person(ContinuousSpaceAgent):
         """Pull toward the exit at the agent's preferred speed."""
         direction, _ = self._nearest_exit()
         desired_vel = direction * self.desired_speed
-        # Newton-like: force = mass * (what I want - what I have) / reaction time
         return self.mass * (desired_vel - self.velocity) / self._relax_time
 
     def _social_force(self):
@@ -71,7 +67,6 @@ class Person(ContinuousSpaceAgent):
             if other is self:
                 continue
 
-            # If two agents are literally on top of each other, nudge randomly
             if dist < 1e-6:
                 angle = self.model.random.uniform(0, 2 * np.pi)
                 force += (
@@ -82,13 +77,11 @@ class Person(ContinuousSpaceAgent):
             away = (pos - np.asarray(other.position, dtype=float)) / dist
             gap = dist - (self.radius + other.radius)
 
-            # Exponential repulsion — gets stronger as people get close
             repulsion = self._social_strength * np.exp(
                 -max(gap, 0) / self._social_range
             )
             force += repulsion * away
 
-            # Contact force if they're actually overlapping
             if gap < 0:
                 force += 500.0 * abs(gap) * away
 
@@ -104,7 +97,6 @@ class Person(ContinuousSpaceAgent):
         pos = np.asarray(self.position, dtype=float)
         w, h = self.model.width, self.model.height
 
-        # Each wall: (distance, inward normal, wall_id)
         walls = [
             (pos[0], np.array([1.0, 0.0]), "left"),
             (w - pos[0], np.array([-1.0, 0.0]), "right"),
@@ -113,7 +105,6 @@ class Person(ContinuousSpaceAgent):
         ]
 
         for dist_to_wall, normal, wall_id in walls:
-            # If there's an exit on this wall and we're near it, let them through
             if self._at_exit_opening(pos, wall_id):
                 continue
 
@@ -124,7 +115,6 @@ class Person(ContinuousSpaceAgent):
                 )
                 force += repulsion * normal
 
-                # Contact force if pressed against wall
                 if gap < 0:
                     force += 800.0 * abs(gap) * normal
 
@@ -139,7 +129,6 @@ class Person(ContinuousSpaceAgent):
         for exit_center, exit_w in self.model.exits:
             ec = np.asarray(exit_center, dtype=float)
 
-            # Which wall is this exit on?
             exit_wall = None
             if ec[0] <= 0.01:
                 exit_wall = "left"
@@ -152,7 +141,6 @@ class Person(ContinuousSpaceAgent):
 
             if exit_wall != wall_id:
                 continue
-            # Use 2x exit width as detection zone for smoother approach
             if wall_id in ("left", "right"):
                 if abs(pos[1] - ec[1]) < exit_w * 2.0:
                     return True
@@ -182,21 +170,16 @@ class Person(ContinuousSpaceAgent):
 
         dt = self.model.dt
 
-        # 1. SUM ALL FORCES
         total_force = self._desired_force() + self._social_force() + self._wall_force()
 
-        # 2. UPDATE VELOCITY (F = ma → a = F/m)
         self.velocity += (total_force / self.mass) * dt
 
-        # Clamp speed so agents can't accelerate infinitely
         speed = np.linalg.norm(self.velocity)
         if speed > self.max_speed:
             self.velocity *= self.max_speed / speed
 
-        # 3. MOVE
         new_pos = np.asarray(self.position, dtype=float) + self.velocity * dt
 
-        # Keep agents inside the room, but allow them to reach exit walls
         margin = 0.05
         new_pos[0] = np.clip(new_pos[0], margin, self.model.width - margin)
         new_pos[1] = np.clip(new_pos[1], margin, self.model.height - margin)
