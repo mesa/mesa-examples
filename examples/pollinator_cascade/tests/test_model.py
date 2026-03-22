@@ -1,6 +1,10 @@
 import pytest
-from agents import Plant, Pollinator
-from model import PollinatorCascadeModel
+try:
+    from .agents import Pollinator, Plant
+    from .model import PollinatorCascadeModel
+except ImportError:
+    from agents import Pollinator, Plant
+    from model import PollinatorCascadeModel
 
 
 @pytest.fixture
