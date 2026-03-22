@@ -1,6 +1,5 @@
 import matplotlib.cm as cm
 import matplotlib.colors as mcolors
-
 from brownian_particles.model import BrownianModel, BrownianScenario
 from mesa.visualization import Slider, SolaraViz
 from mesa.visualization.components.matplotlib_components import SpaceMatplotlib

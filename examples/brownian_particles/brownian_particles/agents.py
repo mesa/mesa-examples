@@ -32,7 +32,7 @@ class Particle(ContinuousSpaceAgent):
             # closer particles push harder
             for i, d in enumerate(distances[1:]):  # skip self (distance=0)
                 if d > 0:
-                    repulsion -= diff[i] / (d ** 2 + 0.1)
+                    repulsion -= diff[i] / (d**2 + 0.1)
             repulsion *= 0.05
 
         self.position = self.position + noise + repulsion

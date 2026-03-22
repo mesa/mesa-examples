@@ -1,9 +1,8 @@
 import mesa
 import numpy as np
+from brownian_particles.agents import Particle
 from mesa.experimental.continuous_space import ContinuousSpace
 from mesa.experimental.scenarios import Scenario
-
-from brownian_particles.agents import Particle
 
 
 class BrownianScenario(Scenario):
@@ -11,11 +10,12 @@ class BrownianScenario(Scenario):
     Parameters for the Brownian particle model.
     These show up as sliders in the UI.
     """
+
     n_particles: int = 80
     width: float = 50.0
     height: float = 50.0
-    diffusion_rate: float = 0.5   # how much each particle jumps per step
-    vision: float = 4.0           # radius in which particles sense neighbors
+    diffusion_rate: float = 0.5  # how much each particle jumps per step
+    vision: float = 4.0  # radius in which particles sense neighbors
 
 
 class BrownianModel(mesa.Model):
@@ -56,9 +56,7 @@ class BrownianModel(mesa.Model):
 
         self.datacollector = mesa.DataCollector(
             model_reporters={
-                "Avg Neighbors": lambda m: np.mean(
-                    [a.n_neighbors for a in m.agents]
-                )
+                "Avg Neighbors": lambda m: np.mean([a.n_neighbors for a in m.agents])
             }
         )
 
