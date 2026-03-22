@@ -5,3 +5,4 @@ __pycache__/
 images/*.png
 *.egg-info/
 .pytest_cache/
+.env

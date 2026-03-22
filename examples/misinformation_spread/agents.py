@@ -1,5 +1,12 @@
+import os
 import litellm
+from dotenv import load_dotenv
 from mesa_llm.llm_agent import LLMAgent
+
+load_dotenv()
+
+LLM_MODEL = os.getenv("LLM_MODEL", "ollama/llama3")
+LLM_API_BASE = os.getenv("LLM_API_BASE", "http://localhost:11434")
 
 
 class BelieverAgent(LLMAgent):
@@ -69,9 +76,9 @@ class BelieverAgent(LLMAgent):
         ]
 
         response = litellm.completion(
-            model="ollama/llama3",
+            model=LLM_MODEL,
             messages=messages,
-            api_base="http://localhost:11434",
+            api_base=LLM_API_BASE if "ollama" in LLM_MODEL else None,
         )
 
         text = response.choices[0].message.content.lower()
@@ -146,9 +153,9 @@ class SkepticAgent(LLMAgent):
         ]
 
         response = litellm.completion(
-            model="ollama/llama3",
+            model=LLM_MODEL,
             messages=messages,
-            api_base="http://localhost:11434",
+            api_base=LLM_API_BASE if "ollama" in LLM_MODEL else None,
         )
 
         text = response.choices[0].message.content.lower()
@@ -222,9 +229,9 @@ class SpreaderAgent(LLMAgent):
         ]
 
         response = litellm.completion(
-            model="ollama/llama3",
+            model=LLM_MODEL,
             messages=messages,
-            api_base="http://localhost:11434",
+            api_base=LLM_API_BASE if "ollama" in LLM_MODEL else None,
         )
 
         text = response.choices[0].message.content.lower()
