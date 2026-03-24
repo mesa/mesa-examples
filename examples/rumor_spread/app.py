@@ -1,6 +1,5 @@
 from mesa.visualization import Slider, SolaraViz, SpaceRenderer, make_plot_component
 from mesa.visualization.components.portrayal_components import AgentPortrayalStyle
-
 from model import RumorModel
 
 

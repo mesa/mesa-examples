@@ -22,7 +22,9 @@ class RumorAgent(CellAgent):
         for neighbor_cell in self.cell.neighborhood:
             for agent in neighbor_cell.agents:
                 if not agent.has_rumor:
-                    spread_probability = self.model.infection_strength * (1 - agent.resistance) * 0.3
+                    spread_probability = (
+                        self.model.infection_strength * (1 - agent.resistance) * 0.3
+                    )
                     if self.random.random() < spread_probability:
                         agent.has_rumor = True
 
