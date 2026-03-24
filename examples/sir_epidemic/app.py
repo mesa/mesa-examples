@@ -60,7 +60,7 @@ model_params = {
         "max": 20,
         "step": 1,
     },
-    "seed": 42,
+    
 }
 
 # Create visualization
