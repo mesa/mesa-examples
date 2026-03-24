@@ -26,7 +26,7 @@ if self.energy > 20:
         self.reproduce()
 
 # Needs-based — action only fires when drive is urgent
-if self.hunger > 0.6:     # only when actually hungry
+if self.hunger > 0.6:
     self._eat_nearest_prey()
 ```
 
@@ -37,8 +37,29 @@ if self.hunger > 0.6:     # only when actually hungry
 - [#2526 Tasks](https://github.com/projectmesa/mesa/discussions/2526)
   — Desire-based modelling, internal states
 
+## Emergent behavior differences
+
+Compared to standard Wolf-Sheep, the needs-based model produces
+different population dynamics:
+
+- **Fear suppresses eating:** When wolves are nearby, sheep stop
+  eating even when hungry. This can cause cascade extinction
+  events that do not appear in the standard model.
+- **Drive interaction:** A wolf that is hungry will always
+  prioritise eating over reproducing. The drive urgency system
+  handles priority without explicit if/elif chains.
+- **Reproduction gating:** Agents only reproduce when hunger is
+  low AND fear is low AND energy is sufficient — more realistic
+  than the standard probabilistic approach.
+
 ## Running the model
 ```bash
 pip install mesa
 python model.py
+```
+
+## Running the visualization
+```bash
+pip install mesa solara
+solara run app.py
 ```

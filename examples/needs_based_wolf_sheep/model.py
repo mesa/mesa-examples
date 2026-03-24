@@ -1,6 +1,6 @@
 import mesa
+from agents import NeedsBasedSheep, NeedsBasedWolf
 from mesa.discrete_space import OrthogonalMooreGrid
-from agents import NeedsBasedWolf, NeedsBasedSheep
 
 
 class GrassPatch(mesa.Agent):
@@ -9,25 +9,34 @@ class GrassPatch(mesa.Agent):
         self.grass = fully_grown
 
     def step(self):
-        if not self.grass:
-            if self.random.random() < self.model.grass_regrowth_rate:
-                self.grass = True
+        if not self.grass and self.random.random() < self.model.grass_regrowth_rate:
+            self.grass = True
 
 
 class NeedsBasedWolfSheep(mesa.Model):
     """Wolf-Sheep with needs-based behavioral drives.
-    Explores behavioral framework patterns from #2538 and #2526.
+
+    Explores behavioral framework patterns from discussions #2538
+    and #2526. Unlike standard Wolf-Sheep, agents prioritise
+    actions based on drive urgency (hunger, fear) rather than
+    checking all conditions every tick.
+
+    Note: Population dynamics differ from standard Wolf-Sheep by
+    design. Fear-suppressed eating in sheep can cause cascade
+    extinction events — an emergent property of needs-based
+    architecture that does not appear in the standard model.
+    This difference is itself a finding worth exploring.
     """
 
     def __init__(
         self,
-        width=20,
-        height=20,
-        initial_sheep=100,
-        initial_wolves=25,
-        sheep_reproduce=0.04,
-        wolf_reproduce=0.05,
-        grass_regrowth_rate=0.03,
+        width=40,
+        height=40,
+        initial_sheep=200,
+        initial_wolves=15,
+        sheep_reproduce=0.12,
+        wolf_reproduce=0.04,
+        grass_regrowth_rate=0.10,
         rng=None,
     ):
         super().__init__(rng=rng)
@@ -36,35 +45,27 @@ class NeedsBasedWolfSheep(mesa.Model):
         self.grass_regrowth_rate = grass_regrowth_rate
 
         self.grid = OrthogonalMooreGrid(
-            (width, height), torus=True, capacity=None,
-            random=self.random
+            (width, height), torus=True, capacity=None, random=self.random
         )
 
-        # Place grass patches
         for cell in self.grid.all_cells:
             patch = GrassPatch(self, self.random.random() < 0.5)
             patch.cell = cell
 
-        # Place sheep
         for _ in range(initial_sheep):
             cell = self.grid.all_cells.select_random_cell()
-            sheep = NeedsBasedSheep(self, self.random.randint(1, 6))
+            sheep = NeedsBasedSheep(self, self.random.randint(4, 8))
             sheep.cell = cell
 
-        # Place wolves
         for _ in range(initial_wolves):
             cell = self.grid.all_cells.select_random_cell()
-            wolf = NeedsBasedWolf(self, self.random.randint(5, 15))
+            wolf = NeedsBasedWolf(self, self.random.randint(3, 6))
             wolf.cell = cell
 
         self.datacollector = mesa.DataCollector(
             model_reporters={
-                "Wolves": lambda m: len(
-                    m.agents_by_type[NeedsBasedWolf]
-                ),
-                "Sheep": lambda m: len(
-                    m.agents_by_type[NeedsBasedSheep]
-                ),
+                "Wolves": lambda m: len(m.agents_by_type[NeedsBasedWolf]),
+                "Sheep": lambda m: len(m.agents_by_type[NeedsBasedSheep]),
             }
         )
 
@@ -79,7 +80,7 @@ if __name__ == "__main__":
         model.step()
         data = model.datacollector.get_model_vars_dataframe()
         print(
-            f"Step {i+1:3d}: "
+            f"Step {i + 1:3d}: "
             f"Wolves={int(data['Wolves'].iloc[-1]):3d}, "
             f"Sheep={int(data['Sheep'].iloc[-1]):3d}"
         )
