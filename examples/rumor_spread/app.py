@@ -44,5 +44,3 @@ page = SolaraViz(
     model_params=model_params,
     name="Rumor Spread Model",
 )
-
-page
