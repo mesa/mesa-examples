@@ -64,9 +64,10 @@ jobs:
   # Step 3 — Merge results, update registry + gallery, manage issue, commit
   # --------------------------------------------------------------------------
   update-and-publish:
-    needs: [test-stable, test-main, test-rc]
-    # Run even if test-rc was skipped or failed.
-    if: always() && needs.test-stable.result == 'success'
+    needs: [test-stable, test-main, test-rc, init-matrix]
+    # The matrix jobs should ALWAYS finish, and then we publish their results
+    # regardless of whether some examples passed or failed.
+    if: always() && needs.init-matrix.result == 'success'
     runs-on: ubuntu-latest
 
     permissions:
