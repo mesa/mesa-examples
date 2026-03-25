@@ -13,7 +13,7 @@ import json
 import subprocess
 import sys
 
-from files.discovery import find_example_root
+from discovery import find_example_root
 
 
 def main():
