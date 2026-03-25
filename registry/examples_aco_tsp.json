@@ -1,0 +1,18 @@
+{
+  "id": "examples/aco_tsp",
+  "name": "examples/aco_tsp",
+  "meta": {
+    "status": "incubator",
+    "complexity": "beginner"
+  },
+  "ci": {
+    "health": "untested",
+    "warning": null,
+    "last_run": "2026-03-25"
+  },
+  "compatibility": {
+    "stable": "untested",
+    "main": "untested",
+    "rc": "untested"
+  }
+}

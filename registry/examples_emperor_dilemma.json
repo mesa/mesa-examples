@@ -1,0 +1,18 @@
+{
+  "id": "examples/emperor_dilemma",
+  "name": "examples/emperor_dilemma",
+  "meta": {
+    "status": "incubator",
+    "complexity": "beginner"
+  },
+  "ci": {
+    "health": "untested",
+    "warning": null,
+    "last_run": "2026-03-25"
+  },
+  "compatibility": {
+    "stable": "untested",
+    "main": "untested",
+    "rc": "untested"
+  }
+}
