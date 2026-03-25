@@ -1,0 +1,16 @@
+# Ignore all data (raw files are large, processed are generated)
+data/
+
+# Images
+*.png
+*.jpg
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Test file
+test_model.py
+
+# Claude Code project instructions
+CLAUDE.md
