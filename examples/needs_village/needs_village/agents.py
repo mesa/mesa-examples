@@ -17,7 +17,6 @@ from dataclasses import dataclass
 
 from mesa.discrete_space import CellAgent
 
-
 # ──────────────────────────────────────────────────────────────────────── #
 #  NeedsAgent base class                                                   #
 # ──────────────────────────────────────────────────────────────────────── #
@@ -161,7 +160,7 @@ _THREAT_RADIUS: int = 3
 
 _VILLAGER_SPECS: list[NeedSpec] = [
     NeedSpec("HUNGER", decay_rate=0.045, critical_threshold=0.75, satisfy_amount=0.55),
-    NeedSpec("REST",   decay_rate=0.030, critical_threshold=0.80, satisfy_amount=0.65),
+    NeedSpec("REST", decay_rate=0.030, critical_threshold=0.80, satisfy_amount=0.65),
     NeedSpec("SOCIAL", decay_rate=0.020, critical_threshold=0.70, satisfy_amount=0.35),
     # SAFETY has zero autonomous decay; it is driven entirely by perception.
     NeedSpec("SAFETY", decay_rate=0.000, critical_threshold=0.60, satisfy_amount=1.00),
@@ -230,7 +229,8 @@ class VillagerAgent(NeedsAgent):
         # Pain Point #11: agents_by_type[T] raises KeyError if T was
         # fully removed; .get() is the safe workaround.
         pool = [
-            a for a in self.model.agents_by_type.get(agent_type, [])
+            a
+            for a in self.model.agents_by_type.get(agent_type, [])
             if a.cell is not None
         ]
         if not pool:
@@ -238,7 +238,8 @@ class VillagerAgent(NeedsAgent):
         my_x, my_y = self.cell.coordinate
         return min(
             pool,
-            key=lambda a: abs(a.cell.coordinate[0] - my_x) + abs(a.cell.coordinate[1] - my_y),
+            key=lambda a: abs(a.cell.coordinate[0] - my_x)
+            + abs(a.cell.coordinate[1] - my_y),
         )
 
     def _adjacent_to(self, other_cell) -> bool:
@@ -283,7 +284,9 @@ class VillagerAgent(NeedsAgent):
                 food.food -= 1
                 self.satisfy("HUNGER")
                 # Incidental social contact during a shared meal
-                if any(isinstance(a, VillagerAgent) for a in self.cell.neighborhood.agents):
+                if any(
+                    isinstance(a, VillagerAgent) for a in self.cell.neighborhood.agents
+                ):
                     self.needs["SOCIAL"] = max(0.0, self.needs["SOCIAL"] - 0.08)
         else:
             self._step_toward(food.cell)
@@ -301,8 +304,7 @@ class VillagerAgent(NeedsAgent):
     def _act_social(self) -> None:
         """Seek the nearest villager; mutually satisfy SOCIAL on arrival."""
         others = [
-            a for a in self.model.agents_by_type.get(VillagerAgent, [])
-            if a is not self
+            a for a in self.model.agents_by_type.get(VillagerAgent, []) if a is not self
         ]
         if not others:
             self.cell = self.cell.neighborhood.select_random_cell()
@@ -310,11 +312,12 @@ class VillagerAgent(NeedsAgent):
         my_x, my_y = self.cell.coordinate
         partner = min(
             others,
-            key=lambda a: abs(a.cell.coordinate[0] - my_x) + abs(a.cell.coordinate[1] - my_y),
+            key=lambda a: abs(a.cell.coordinate[0] - my_x)
+            + abs(a.cell.coordinate[1] - my_y),
         )
         if self._adjacent_to(partner.cell) or self.cell is partner.cell:
             self.satisfy("SOCIAL")
-            partner.satisfy("SOCIAL")   # mutual satisfaction
+            partner.satisfy("SOCIAL")  # mutual satisfaction
         else:
             self._step_toward(partner.cell)
 

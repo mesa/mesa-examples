@@ -14,7 +14,6 @@ The visualisation shows:
 """
 
 from mesa.visualization import SolaraViz, make_plot_component, make_space_component
-
 from needs_village.agents import FoodSource, HomePatch, ThreatAgent, VillagerAgent
 from needs_village.model import VillageModel
 
@@ -24,7 +23,7 @@ from needs_village.model import VillageModel
 
 _NEED_COLORS = {
     "HUNGER": "tab:orange",
-    "REST":   "tab:blue",
+    "REST": "tab:blue",
     "SOCIAL": "tab:green",
     "SAFETY": "tab:red",
 }
@@ -34,8 +33,8 @@ def agent_portrayal(agent):
     """Map each agent to its visual properties."""
     if isinstance(agent, VillagerAgent):
         return {
-            "color":  _NEED_COLORS.get(agent._active_need or "HUNGER", "tab:gray"),
-            "size":   14,
+            "color": _NEED_COLORS.get(agent._active_need or "HUNGER", "tab:gray"),
+            "size": 14,
             "marker": "o",
             "zorder": 3,
         }
@@ -43,8 +42,8 @@ def agent_portrayal(agent):
         return {"color": "black", "size": 28, "marker": "X", "zorder": 4}
     if isinstance(agent, FoodSource):
         return {
-            "color":  "tab:green" if not agent.depleted else "saddlebrown",
-            "size":   22,
+            "color": "tab:green" if not agent.depleted else "saddlebrown",
+            "size": 22,
             "marker": "s",
             "zorder": 1,
         }
@@ -60,8 +59,12 @@ def agent_portrayal(agent):
 SpaceComponent = make_space_component(agent_portrayal)
 
 NeedsChart = make_plot_component(
-    {"MeanHunger": "tab:orange", "MeanRest": "tab:blue",
-     "MeanSocial": "tab:green",  "MeanSafety": "tab:red"},
+    {
+        "MeanHunger": "tab:orange",
+        "MeanRest": "tab:blue",
+        "MeanSocial": "tab:green",
+        "MeanSafety": "tab:red",
+    },
     post_process=lambda ax: (
         ax.set_ylim(0, 1),
         ax.axhline(0.75, color="gray", linestyle="--", linewidth=0.7, alpha=0.6),
@@ -73,7 +76,7 @@ NeedsChart = make_plot_component(
 ActiveNeedChart = make_plot_component(
     {
         "DrivenByHunger": "tab:orange",
-        "DrivenByRest":   "tab:blue",
+        "DrivenByRest": "tab:blue",
         "DrivenBySocial": "tab:green",
         "DrivenBySafety": "tab:red",
     },
@@ -127,8 +130,22 @@ model_params = {
         "max": 6,
         "step": 1,
     },
-    "width":  {"type": "SliderInt", "value": 25, "label": "Grid width",  "min": 15, "max": 40, "step": 5},
-    "height": {"type": "SliderInt", "value": 25, "label": "Grid height", "min": 15, "max": 40, "step": 5},
+    "width": {
+        "type": "SliderInt",
+        "value": 25,
+        "label": "Grid width",
+        "min": 15,
+        "max": 40,
+        "step": 5,
+    },
+    "height": {
+        "type": "SliderInt",
+        "value": 25,
+        "label": "Grid height",
+        "min": 15,
+        "max": 40,
+        "step": 5,
+    },
 }
 
 # ──────────────────────────────────────────────────────────────────────── #

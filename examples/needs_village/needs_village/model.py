@@ -35,7 +35,8 @@ def _mean_need(model: VillageModel, need_name: str) -> float:
 
 def _count_driven_by(model: VillageModel, need_name: str) -> int:
     return sum(
-        1 for a in model.agents_by_type.get(VillagerAgent, [])
+        1
+        for a in model.agents_by_type.get(VillagerAgent, [])
         if a._active_need == need_name
     )
 
@@ -80,13 +81,17 @@ class VillageModel(mesa.Model):
         idx = 0
 
         for _ in range(n_food):
-            FoodSource(self).move_to(all_cells[idx]); idx += 1
+            FoodSource(self).move_to(all_cells[idx])
+            idx += 1
         for _ in range(n_homes):
-            HomePatch(self).move_to(all_cells[idx]); idx += 1
+            HomePatch(self).move_to(all_cells[idx])
+            idx += 1
         for _ in range(n_threats):
-            ThreatAgent(self).move_to(all_cells[idx]); idx += 1
+            ThreatAgent(self).move_to(all_cells[idx])
+            idx += 1
         for _ in range(n_villagers):
-            VillagerAgent(self).move_to(all_cells[idx]); idx += 1
+            VillagerAgent(self).move_to(all_cells[idx])
+            idx += 1
 
         # Manual accumulator for Pain Point #18:
         # DataCollector cannot express ∫ critical_agents dt
@@ -94,44 +99,53 @@ class VillageModel(mesa.Model):
 
         self.datacollector = mesa.DataCollector(
             model_reporters={
-                "MeanHunger":  lambda m: _mean_need(m, "HUNGER"),
-                "MeanRest":    lambda m: _mean_need(m, "REST"),
-                "MeanSocial":  lambda m: _mean_need(m, "SOCIAL"),
-                "MeanSafety":  lambda m: _mean_need(m, "SAFETY"),
-
+                "MeanHunger": lambda m: _mean_need(m, "HUNGER"),
+                "MeanRest": lambda m: _mean_need(m, "REST"),
+                "MeanSocial": lambda m: _mean_need(m, "SOCIAL"),
+                "MeanSafety": lambda m: _mean_need(m, "SAFETY"),
                 "CriticalAgents": lambda m: sum(
-                    1 for a in m.agents_by_type.get(VillagerAgent, [])
+                    1
+                    for a in m.agents_by_type.get(VillagerAgent, [])
                     if a.in_critical_state()
                 ),
-
                 # Pain Point #16: cumulative preemption events
                 "TotalPreemptions": lambda m: sum(
-                    a._preemption_count
-                    for a in m.agents_by_type.get(VillagerAgent, [])
+                    a._preemption_count for a in m.agents_by_type.get(VillagerAgent, [])
                 ),
-
                 # Pain Point #18: integral metric via manual accumulator
                 "CumulativeCriticalSteps": lambda m: m._critical_steps,
-
-                "DrivenByHunger":  lambda m: _count_driven_by(m, "HUNGER"),
-                "DrivenByRest":    lambda m: _count_driven_by(m, "REST"),
-                "DrivenBySocial":  lambda m: _count_driven_by(m, "SOCIAL"),
-                "DrivenBySafety":  lambda m: _count_driven_by(m, "SAFETY"),
+                "DrivenByHunger": lambda m: _count_driven_by(m, "HUNGER"),
+                "DrivenByRest": lambda m: _count_driven_by(m, "REST"),
+                "DrivenBySocial": lambda m: _count_driven_by(m, "SOCIAL"),
+                "DrivenBySafety": lambda m: _count_driven_by(m, "SAFETY"),
             },
             agent_reporters={
-                "Hunger":      lambda a: a.needs.get("HUNGER")  if isinstance(a, VillagerAgent) else None,
-                "Rest":        lambda a: a.needs.get("REST")    if isinstance(a, VillagerAgent) else None,
-                "Social":      lambda a: a.needs.get("SOCIAL")  if isinstance(a, VillagerAgent) else None,
-                "Safety":      lambda a: a.needs.get("SAFETY")  if isinstance(a, VillagerAgent) else None,
-                "ActiveNeed":  lambda a: a._active_need         if isinstance(a, VillagerAgent) else None,
-                "Preemptions": lambda a: a._preemption_count    if isinstance(a, VillagerAgent) else None,
+                "Hunger": lambda a: a.needs.get("HUNGER")
+                if isinstance(a, VillagerAgent)
+                else None,
+                "Rest": lambda a: a.needs.get("REST")
+                if isinstance(a, VillagerAgent)
+                else None,
+                "Social": lambda a: a.needs.get("SOCIAL")
+                if isinstance(a, VillagerAgent)
+                else None,
+                "Safety": lambda a: a.needs.get("SAFETY")
+                if isinstance(a, VillagerAgent)
+                else None,
+                "ActiveNeed": lambda a: a._active_need
+                if isinstance(a, VillagerAgent)
+                else None,
+                "Preemptions": lambda a: a._preemption_count
+                if isinstance(a, VillagerAgent)
+                else None,
             },
         )
 
     def step(self) -> None:
         # Accumulate integral metric before stepping (Pain Point #18)
         self._critical_steps += sum(
-            1 for a in self.agents_by_type.get(VillagerAgent, [])
+            1
+            for a in self.agents_by_type.get(VillagerAgent, [])
             if a.in_critical_state()
         )
         # Stepping order: threats move first so villagers perceive current positions
