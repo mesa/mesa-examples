@@ -48,6 +48,7 @@ jobs:
             --output results/${EXAMPLE_ID}_${{ inputs.mesa_version }}.json
 
       - name: Upload results
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.mesa_version }}-${{ strategy.job-index }}

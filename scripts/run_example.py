@@ -313,6 +313,9 @@ def main() -> None:
     if result.get("error"):
         print(f"     {result['error'][:120]}")
 
+    if not result.get("passed") and not result.get("skipped"):
+        sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
