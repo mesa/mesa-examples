@@ -14,7 +14,6 @@ The visualisation shows:
 """
 
 from mesa.visualization import SolaraViz, make_plot_component, make_space_component
-
 from needs_village.agents import FoodSource, HomePatch, ThreatAgent, VillagerAgent
 from needs_village.model import VillageModel
 

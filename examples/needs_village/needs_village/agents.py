@@ -17,7 +17,6 @@ from dataclasses import dataclass
 
 from mesa.discrete_space import CellAgent
 
-
 # ──────────────────────────────────────────────────────────────────────── #
 #  NeedsAgent base class                                                   #
 # ──────────────────────────────────────────────────────────────────────── #
