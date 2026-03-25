@@ -71,11 +71,11 @@ def run_via_run_py(run_py: Path, cwd: Path) -> dict:
     """
     try:
         proc = subprocess.run(
-            [sys.executable, str(run_py)],
+            [sys.executable, str(run_py.resolve())],
             capture_output=True,
             text=True,
             timeout=30,
-            cwd=str(cwd),
+            cwd=str(cwd.resolve()),
             check=False,
         )
         passed = proc.returncode == 0
@@ -102,11 +102,11 @@ def run_via_app_py(app_py: Path, cwd: Path) -> dict:
     """
     try:
         proc = subprocess.run(
-            [sys.executable, str(app_py)],
+            [sys.executable, str(app_py.resolve())],
             capture_output=True,
             text=True,
             timeout=15,
-            cwd=str(cwd),
+            cwd=str(cwd.resolve()),
             check=False,
         )
         # If we reach here, the process exited before timeout.
@@ -161,7 +161,7 @@ import json
 import sys
 import warnings as _w
 
-sys.path.insert(0, {str(example_path)!r})
+sys.path.insert(0, {str(example_path.resolve())!r})
 
 _first_warning = None
 
@@ -174,7 +174,7 @@ _w.showwarning = _capture
 
 try:
     import importlib.util
-    spec = importlib.util.spec_from_file_location("model", {str(model_py)!r})
+    spec = importlib.util.spec_from_file_location("model", {str(model_py.resolve())!r})
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
 
