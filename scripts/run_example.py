@@ -64,14 +64,11 @@ def first_warning(stderr_text: str) -> "str | None":
 # ---------------------------------------------------------------------------
 
 
-def run_via_run_py(run_py: Path, cwd: Path) -> dict:
-    """
-    Execute the example's run.py in a subprocess with a 30-second timeout.
-    Captures returncode and any warning text from stderr.
-    """
+def run_via_run_py(module_name: str, cwd: Path) -> dict:
+    """Execute run.py as a module and capture result."""
     try:
         proc = subprocess.run(
-            [sys.executable, str(run_py.resolve())],
+            [sys.executable, "-m", module_name],
             capture_output=True,
             text=True,
             timeout=30,
@@ -80,13 +77,12 @@ def run_via_run_py(run_py: Path, cwd: Path) -> dict:
         )
         passed = proc.returncode == 0
         warning = first_warning(proc.stderr)
-        # Only store the error text if the run actually failed
         error = proc.stderr.strip()[-1000:] if not passed else None
         return {"passed": passed, "warning": warning, "error": error}
     except subprocess.TimeoutExpired:
         return {"passed": False, "warning": None, "error": "Timeout after 30 seconds"}
     except Exception as exc:
-        return {"passed": False, "warning": None, "error": str(exc)}
+        return {"passed": False, "warning": None, "error": str(exc)[-1000:]}
 
 
 # ---------------------------------------------------------------------------
@@ -94,35 +90,25 @@ def run_via_run_py(run_py: Path, cwd: Path) -> dict:
 # ---------------------------------------------------------------------------
 
 
-def run_via_app_py(app_py: Path, cwd: Path) -> dict:
-    """Start app.py and verify it doesn't crash immediately.
-
-    Timeout = PASS (app is running and serving).
-    Crash   = FAIL.
-    """
+def run_via_app_py(module_name: str, cwd: Path) -> dict:
+    """Start app as a module and verify it doesn't crash immediately."""
     try:
         proc = subprocess.run(
-            [sys.executable, "-m", f"{cwd.name}.app"],
+            [sys.executable, "-m", module_name],
             capture_output=True,
             text=True,
             timeout=15,
-            cwd=str(cwd.resolve().parent),
+            cwd=str(cwd.resolve()),
             check=False,
         )
         # If we reach here, the process exited before timeout.
-        # Non-zero is definitely a crash.
         if proc.returncode != 0:
             return {
                 "passed": False,
                 "warning": first_warning(proc.stderr),
-                "error": proc.stderr.strip()[-1000:] or "app.py exited with error",
+                "error": proc.stderr.strip()[-1000:] or "app exited with error",
             }
-        # Exited cleanly before timeout — treat as pass
-        return {
-            "passed": True,
-            "warning": first_warning(proc.stderr),
-            "error": None,
-        }
+        return {"passed": True, "warning": first_warning(proc.stderr), "error": None}
     except subprocess.TimeoutExpired:
         # Timeout means the app started and stayed running → PASS
         return {"passed": True, "warning": None, "error": None}
@@ -280,14 +266,33 @@ def main() -> None:
             "error": None,
         }
     else:
-        run_py = example_path / "run.py"
-        app_py = example_path / "app.py"
-        if run_py.exists():
-            run_result = run_via_run_py(run_py, example_path)
-        elif app_py.exists():
-            run_result = run_via_app_py(app_py, example_path)
-        else:
-            run_result = run_via_fallback(example_path)
+        # Search for markers in Root or Root/Root/
+        markers = [
+            (example_path / "run.py", "run", example_path.name + ".run", example_path.parent),
+            (example_path / "app.py", "app", example_path.name + ".app", example_path.parent),
+            (example_path / "model.py", "fallback", example_path.name + ".model", example_path.parent),
+            (example_path / example_path.name / "run.py", "run", f"{example_path.name}.{example_path.name}.run", example_path.parent),
+            (example_path / example_path.name / "app.py", "app", f"{example_path.name}.{example_path.name}.app", example_path.parent),
+            (example_path / example_path.name / "model.py", "fallback", f"{example_path.name}.{example_path.name}.model", example_path.parent),
+        ]
+
+        # Execute the first one found
+        run_result = None
+        for path, mode, module_name, working_dir in markers:
+            if path.exists():
+                if mode == "run":
+                    run_result = run_via_run_py(module_name, working_dir)
+                elif mode == "app":
+                    run_result = run_via_app_py(module_name, working_dir)
+                else:
+                    run_result = run_via_fallback(module_name, working_dir)
+                break
+
+        if run_result is None:
+            run_result = {
+                "passed": False,
+                "error": "No run.py, app.py, or model.py found. Add run.py for reliable execution.",
+            }
 
         result = {
             "example_id": example_id,

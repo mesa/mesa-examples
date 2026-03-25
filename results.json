@@ -1,8 +1,8 @@
 {
-  "example_id": "examples/emperor_dilemma",
+  "example_id": "examples/el_farol/el_farol",
   "version": "stable",
   "passed": false,
   "skipped": false,
   "warning": null,
-  "error": "Traceback (most recent call last):\n  File \"/home/zoro/Downloads/OS-contro/mesa-ex/mesa-examples-os/examples/emperor_dilemma/app.py\", line 10, in <module>\n    from .model import EmperorModel\nImportErro"
+  "error": "attempted relative import with no known parent package\nAdd run.py for reliable execution."
 }

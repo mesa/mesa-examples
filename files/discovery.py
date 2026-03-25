@@ -37,6 +37,12 @@ def discover_all_examples(root="."):
     for marker in MARKER_FILES:
         for p in root_path.rglob(marker):
             parent = p.parent
+            # Mesa Pattern: Many examples put their code in a subfolder with the
+            # same name (e.g. examples/el_farol/el_farol/model.py).
+            # We want the example root to be the top-level folder (A/A -> A).
+            if parent.name == parent.parent.name:
+                parent = parent.parent
+
             # Skip directories that live inside infrastructure folders or
             # hidden directories (e.g. .git, .github).
             if any(part in SKIP_DIRS or part.startswith(".") for part in parent.parts):
