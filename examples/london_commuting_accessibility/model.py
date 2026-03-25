@@ -1,9 +1,10 @@
-import mesa
-import geopandas as gpd
-import pandas as pd
-import numpy as np
 import os
-from agents import MSOAAgent, CommuterAgent
+
+import geopandas as gpd
+import mesa
+import numpy as np
+import pandas as pd
+from agents import CommuterAgent, MSOAAgent
 
 
 class LondonCommuteModel(mesa.Model):
@@ -62,107 +63,123 @@ class LondonCommuteModel(mesa.Model):
         ]
 
         base_dir = os.path.dirname(os.path.abspath(__file__))
-        data_dir = os.path.join(base_dir, 'data', 'processed')
+        data_dir = os.path.join(base_dir, "data", "processed")
 
-        self.od_df = pd.read_csv(os.path.join(data_dir, 'london_OD_travel2work.csv'))
-        self.gdf = gpd.read_file(os.path.join(data_dir, 'london_msoa_boundaries.geojson'))
+        self.od_df = pd.read_csv(os.path.join(data_dir, "london_OD_travel2work.csv"))
+        self.gdf = gpd.read_file(
+            os.path.join(data_dir, "london_msoa_boundaries.geojson")
+        )
 
         # Employment attraction: total inflow per MSOA
-        emp = self.od_df.groupby('MSOA21CD_work')['count'].sum()
+        emp = self.od_df.groupby("MSOA21CD_work")["count"].sum()
         self.employment_attraction = emp.to_dict()
 
         # OD candidates and weights per home MSOA
         self.work_candidates = {}
         self.work_weights = {}
-        for home, group in self.od_df.groupby('MSOA21CD_home'):
-            self.work_candidates[home] = group['MSOA21CD_work'].tolist()
-            weights = group['count'].values.astype(float)
+        for home, group in self.od_df.groupby("MSOA21CD_home"):
+            self.work_candidates[home] = group["MSOA21CD_work"].tolist()
+            weights = group["count"].values.astype(float)
             self.work_weights[home] = (weights / weights.sum()).tolist()
 
         # OD capacity = observed flow (vectorised — avoid slow iterrows)
-        _cap = self.od_df[['MSOA21CD_home', 'MSOA21CD_work', 'count']].copy()
-        _cap['count'] = _cap['count'].clip(lower=1)
-        self.od_capacity = dict(zip(
-            zip(_cap['MSOA21CD_home'], _cap['MSOA21CD_work']),
-            _cap['count']
-        ))
+        _cap = self.od_df[["MSOA21CD_home", "MSOA21CD_work", "count"]].copy()
+        _cap["count"] = _cap["count"].clip(lower=1)
+        self.od_capacity = dict(
+            zip(zip(_cap["MSOA21CD_home"], _cap["MSOA21CD_work"]), _cap["count"])
+        )
 
         # Create MSOA Agents
         self.msoa_agents = {}
         msoa_agents_list = [MSOAAgent(model=self) for _ in range(len(self.gdf))]
 
         for agent, (_, row) in zip(msoa_agents_list, self.gdf.iterrows()):
-            agent.msoa_code = row['MSOA21CD']
-            agent.msoa_name = row['MSOA21NM']
-            agent.lat = row['LAT']
-            agent.lon = row['LONG']
+            agent.msoa_code = row["MSOA21CD"]
+            agent.msoa_name = row["MSOA21NM"]
+            agent.lat = row["LAT"]
+            agent.lon = row["LONG"]
             agent.employment_attraction = self.employment_attraction.get(
-                row['MSOA21CD'], 0
+                row["MSOA21CD"], 0
             )
-            self.msoa_agents[row['MSOA21CD']] = agent
+            self.msoa_agents[row["MSOA21CD"]] = agent
 
         # Pre-compute free-flow travel time for all observed OD pairs (vectorised)
-        _coords = self.gdf.set_index('MSOA21CD')[['LAT', 'LONG']]
-        _od = self.od_df[['MSOA21CD_home', 'MSOA21CD_work']].copy()
-        _od = _od.merge(_coords.rename(columns={'LAT': 'h_lat', 'LONG': 'h_lon'}),
-                        left_on='MSOA21CD_home', right_index=True, how='inner')
-        _od = _od.merge(_coords.rename(columns={'LAT': 'w_lat', 'LONG': 'w_lon'}),
-                        left_on='MSOA21CD_work', right_index=True, how='inner')
+        _coords = self.gdf.set_index("MSOA21CD")[["LAT", "LONG"]]
+        _od = self.od_df[["MSOA21CD_home", "MSOA21CD_work"]].copy()
+        _od = _od.merge(
+            _coords.rename(columns={"LAT": "h_lat", "LONG": "h_lon"}),
+            left_on="MSOA21CD_home",
+            right_index=True,
+            how="inner",
+        )
+        _od = _od.merge(
+            _coords.rename(columns={"LAT": "w_lat", "LONG": "w_lon"}),
+            left_on="MSOA21CD_work",
+            right_index=True,
+            how="inner",
+        )
         _od = _od.reset_index(drop=True)
-        _dist_deg = np.sqrt((_od['h_lat'] - _od['w_lat'])**2 +
-                            (_od['h_lon'] - _od['w_lon'])**2)
-        _t0 = np.maximum(0.5 / 60,
-                         _dist_deg * 111 * self.circuity_factor / self.avg_speed_kmh)
+        _dist_deg = np.sqrt(
+            (_od["h_lat"] - _od["w_lat"]) ** 2 + (_od["h_lon"] - _od["w_lon"]) ** 2
+        )
+        _t0 = np.maximum(
+            0.5 / 60, _dist_deg * 111 * self.circuity_factor / self.avg_speed_kmh
+        )
         _mask = _t0 <= 2.0
-        self.free_flow_time = dict(zip(
-            zip(_od.loc[_mask, 'MSOA21CD_home'], _od.loc[_mask, 'MSOA21CD_work']),
-            _t0[_mask]
-        ))
+        self.free_flow_time = dict(
+            zip(
+                zip(_od.loc[_mask, "MSOA21CD_home"], _od.loc[_mask, "MSOA21CD_work"]),
+                _t0[_mask],
+            )
+        )
 
         # Load TomTom hourly congestion ratios per MSOA (vectorised)
-        congestion_path = os.path.join(data_dir, 'msoa_hourly_congestion.csv')
+        congestion_path = os.path.join(data_dir, "msoa_hourly_congestion.csv")
         congestion_df = pd.read_csv(congestion_path)
-        hour_cols = [f'hour_{h}' for h in range(24)]
+        hour_cols = [f"hour_{h}" for h in range(24)]
         self.msoa_congestion = {
-            row['MSOA21CD']: {h: row[f'hour_{h}'] for h in range(24)}
-            for row in congestion_df[['MSOA21CD'] + hour_cols].to_dict('records')
+            row["MSOA21CD"]: {h: row[f"hour_{h}"] for h in range(24)}
+            for row in congestion_df[["MSOA21CD"] + hour_cols].to_dict("records")
         }
 
         # Load commute mode proportions
-        mode_path = os.path.join(data_dir, 'london_commute_mode_msoa.csv')
+        mode_path = os.path.join(data_dir, "london_commute_mode_msoa.csv")
         mode_df = pd.read_csv(mode_path)
-        self.commute_mode_props = mode_df.set_index('MSOA11CD')[
-            ['prop_car', 'prop_pt', 'prop_active']
-        ].to_dict('index')
+        self.commute_mode_props = mode_df.set_index("MSOA11CD")[
+            ["prop_car", "prop_pt", "prop_active"]
+        ].to_dict("index")
 
         # Load occupation proportions per home MSOA
-        occ_path = os.path.join(data_dir, 'london_occupation_msoa.csv')
+        occ_path = os.path.join(data_dir, "london_occupation_msoa.csv")
         occ_df = pd.read_csv(occ_path)
-        self.occupation_props = occ_df.set_index('MSOA21CD')[
-            [f'prop_soc{i}' for i in range(1, 10)]
-        ].to_dict('index')
+        self.occupation_props = occ_df.set_index("MSOA21CD")[
+            [f"prop_soc{i}" for i in range(1, 10)]
+        ].to_dict("index")
 
         # Load SOC work attraction weights
         import json
-        with open(os.path.join(data_dir, 'soc_work_attraction.json'), 'r') as f:
+
+        with open(os.path.join(data_dir, "soc_work_attraction.json")) as f:
             self.soc_work_attraction = json.load(f)
 
         # Load BRES industry employment per work MSOA
-        bres_path = os.path.join(data_dir, 'london_bres_msoa.csv')
+        bres_path = os.path.join(data_dir, "london_bres_msoa.csv")
         bres_df = pd.read_csv(bres_path)
-        self.work_msoa_employment = bres_df.set_index('MSOA21CD')['total_employment'].to_dict()
-        
+        self.work_msoa_employment = bres_df.set_index("MSOA21CD")[
+            "total_employment"
+        ].to_dict()
+
         # Real accessibility: gravity model with exponential decay (vectorised)
         _ff_df = pd.DataFrame(
             [(h, w, t) for (h, w), t in self.free_flow_time.items()],
-            columns=['home', 'work', 't0']
+            columns=["home", "work", "t0"],
         )
-        _ff_df['emp_attr'] = _ff_df['work'].map(self.employment_attraction).fillna(0)
-        _ff_df['acc'] = _ff_df['emp_attr'] * np.exp(-self.beta_acc * _ff_df['t0'])
-        self.real_accessibility = _ff_df.groupby('home')['acc'].sum().to_dict()
+        _ff_df["emp_attr"] = _ff_df["work"].map(self.employment_attraction).fillna(0)
+        _ff_df["acc"] = _ff_df["emp_attr"] * np.exp(-self.beta_acc * _ff_df["t0"])
+        self.real_accessibility = _ff_df.groupby("home")["acc"].sum().to_dict()
 
         # Create Commuter Agents
-        home_counts = self.od_df.groupby('MSOA21CD_home')['count'].sum()
+        home_counts = self.od_df.groupby("MSOA21CD_home")["count"].sum()
         home_msoas = home_counts.index.tolist()
         weights = home_counts.values / home_counts.values.sum()
         sampled_homes = self.rng.choice(home_msoas, size=n_commuters, p=weights)
@@ -175,27 +192,32 @@ class LondonCommuteModel(mesa.Model):
             # Assign occupation based on home MSOA proportions
             if home_code in self.occupation_props:
                 props = self.occupation_props[home_code]
-                soc_keys = [f'prop_soc{i}' for i in range(1, 10)]
-                soc_names = [f'soc{i}' for i in range(1, 10)]
+                soc_keys = [f"prop_soc{i}" for i in range(1, 10)]
+                soc_names = [f"soc{i}" for i in range(1, 10)]
                 soc_weights = [props.get(k, 0) for k in soc_keys]
                 commuter.occupation = self.random.choices(
                     soc_names, weights=soc_weights, k=1
                 )[0]
             else:
                 commuter.occupation = self.random.choices(
-                    [f'soc{i}' for i in range(1, 10)],
-                    weights=[0.11]*9, k=1
+                    [f"soc{i}" for i in range(1, 10)], weights=[0.11] * 9, k=1
                 )[0]
 
             # Assign commute mode
             if home_code in self.commute_mode_props:
                 props = self.commute_mode_props[home_code]
-                modes = ['car', 'pt', 'active']
-                mode_weights = [props['prop_car'], props['prop_pt'], props['prop_active']]
+                modes = ["car", "pt", "active"]
+                mode_weights = [
+                    props["prop_car"],
+                    props["prop_pt"],
+                    props["prop_active"],
+                ]
             else:
-                modes = ['car', 'pt', 'active']
+                modes = ["car", "pt", "active"]
                 mode_weights = [0.341, 0.519, 0.132]
-            commuter.commute_mode = self.random.choices(modes, weights=mode_weights, k=1)[0]
+            commuter.commute_mode = self.random.choices(
+                modes, weights=mode_weights, k=1
+            )[0]
 
             # Assign workplace based on occupation-specific industry attraction
             # Blend OD-based weights with SOC-based attraction
@@ -205,9 +227,9 @@ class LondonCommuteModel(mesa.Model):
 
                 # SOC-based attraction weights for these candidates
                 soc_attraction = self.soc_work_attraction.get(commuter.occupation, {})
-                soc_weights_arr = np.array([
-                    soc_attraction.get(w, 1e-6) for w in candidates
-                ])
+                soc_weights_arr = np.array(
+                    [soc_attraction.get(w, 1e-6) for w in candidates]
+                )
                 soc_weights_arr = soc_weights_arr / soc_weights_arr.sum()
 
                 # Blend: 60% OD-based, 40% SOC-based
@@ -234,34 +256,39 @@ class LondonCommuteModel(mesa.Model):
                 "Hour": lambda m: m.current_hour,
                 "Mean_Commute_Time": self._mean_commute_time,
                 "Accessibility_Palma": self._accessibility_palma,
-                "SOC1_Accessibility": lambda m: m._person_based_accessibility_by_occupation().get('soc1', 0),
-                "SOC5_Accessibility": lambda m: m._person_based_accessibility_by_occupation().get('soc5', 0),
-                "SOC9_Accessibility": lambda m: m._person_based_accessibility_by_occupation().get('soc9', 0),
+                "SOC1_Accessibility": lambda m: m._person_based_accessibility_by_occupation().get(
+                    "soc1", 0
+                ),
+                "SOC5_Accessibility": lambda m: m._person_based_accessibility_by_occupation().get(
+                    "soc5", 0
+                ),
+                "SOC9_Accessibility": lambda m: m._person_based_accessibility_by_occupation().get(
+                    "soc9", 0
+                ),
                 "SOC_Gap": lambda m: (
-                    max(m._person_based_accessibility_by_occupation().values()) /
-                    max(min(m._person_based_accessibility_by_occupation().values()), 1)
+                    max(m._person_based_accessibility_by_occupation().values())
+                    / max(
+                        min(m._person_based_accessibility_by_occupation().values()), 1
+                    )
                 ),
             },
             agent_reporters={
                 "Accessibility": lambda a: (
                     a.accessibility if isinstance(a, MSOAAgent) else None
                 ),
-            }
+            },
         )
         self.datacollector.collect(self)
 
     def _person_based_accessibility_by_occupation(self):
         """Mean accessibility per SOC group."""
-        soc_acc = {f'soc{i}': [] for i in range(1, 10)}
+        soc_acc = {f"soc{i}": [] for i in range(1, 10)}
         msoa_acc = {a.msoa_code: a.accessibility for a in self._msoa_agent_list}
         for agent in self._commuter_agent_list:
             if agent.occupation and agent.home_msoa:
                 acc = msoa_acc.get(agent.home_msoa, 0)
                 soc_acc[agent.occupation].append(acc)
-        return {
-            soc: np.mean(vals) if vals else 0.0
-            for soc, vals in soc_acc.items()
-        }
+        return {soc: np.mean(vals) if vals else 0.0 for soc, vals in soc_acc.items()}
 
     def _get_free_flow_time(self, home, work):
         return self.free_flow_time.get((home, work), 0.5)
@@ -271,7 +298,9 @@ class LondonCommuteModel(mesa.Model):
         capacity = self.od_capacity.get((home, work), 1)
         congestion_ratio = self.msoa_congestion.get(work, {}).get(hour, 1.2)
         effective_capacity = capacity / congestion_ratio
-        bpr_time = t0 * (1 + self.bpr_alpha * (flow / max(effective_capacity, 0.1)) ** self.bpr_beta)
+        bpr_time = t0 * (
+            1 + self.bpr_alpha * (flow / max(effective_capacity, 0.1)) ** self.bpr_beta
+        )
         # Cap at 3x free-flow time to prevent extreme values
         return min(bpr_time, t0 * 3.0)
 
@@ -280,21 +309,26 @@ class LondonCommuteModel(mesa.Model):
         return np.mean(values) if values else 0.0
 
     def _accessibility_gini(self):
-        values = sorted([a.accessibility for a in self._msoa_agent_list if a.accessibility > 0])
+        values = sorted(
+            [a.accessibility for a in self._msoa_agent_list if a.accessibility > 0]
+        )
         if not values:
             return 0
         n = len(values)
         cumsum = np.cumsum(values)
-        return (2 * sum((i + 1) * v for i, v in enumerate(values))
-                / (n * cumsum[-1])) - (n + 1) / n
+        return (
+            2 * sum((i + 1) * v for i, v in enumerate(values)) / (n * cumsum[-1])
+        ) - (n + 1) / n
 
     def _accessibility_palma(self):
-        values = sorted([a.accessibility for a in self._msoa_agent_list if a.accessibility > 0])
+        values = sorted(
+            [a.accessibility for a in self._msoa_agent_list if a.accessibility > 0]
+        )
         if not values:
             return 0.0
         n = len(values)
-        bottom_40 = values[:int(n * 0.4)]
-        top_10 = values[int(n * 0.9):]
+        bottom_40 = values[: int(n * 0.4)]
+        top_10 = values[int(n * 0.9) :]
         if not bottom_40 or not top_10:
             return 0.0
         return np.mean(top_10) / np.mean(bottom_40)
@@ -311,8 +345,11 @@ class LondonCommuteModel(mesa.Model):
         return float(np.corrcoef(sim_arr, real_arr)[0, 1])
 
     def _mean_commute_time(self):
-        times = [a.commute_time_minutes for a in self._commuter_agent_list
-                 if a.commute_time_minutes > 0]
+        times = [
+            a.commute_time_minutes
+            for a in self._commuter_agent_list
+            if a.commute_time_minutes > 0
+        ]
         return np.mean(times) if times else 0.0
 
     def _initialise_accessibility(self):
@@ -361,9 +398,9 @@ class LondonCommuteModel(mesa.Model):
         for agent in self._commuter_agent_list:
             if agent.chosen_work_msoa:
                 key = (agent.home_msoa, agent.chosen_work_msoa)
-                if agent.commute_mode == 'car':
+                if agent.commute_mode == "car":
                     od_flow_car[key] = od_flow_car.get(key, 0) + 1
-                elif agent.commute_mode == 'pt':
+                elif agent.commute_mode == "pt":
                     od_flow_pt[key] = od_flow_pt.get(key, 0) + 1
                 else:
                     od_flow_active[key] = od_flow_active.get(key, 0) + 1
@@ -376,10 +413,16 @@ class LondonCommuteModel(mesa.Model):
         }
 
         # PT: crowding penalty during peak based on TomTom congestion level
-        london_avg_congestion = np.mean([
-            self.msoa_congestion.get(key[1], {}).get(self.current_hour, 1.2)
-            for key in od_flow_pt
-        ]) if od_flow_pt else 1.2
+        london_avg_congestion = (
+            np.mean(
+                [
+                    self.msoa_congestion.get(key[1], {}).get(self.current_hour, 1.2)
+                    for key in od_flow_pt
+                ]
+            )
+            if od_flow_pt
+            else 1.2
+        )
         pt_multiplier = 1.1 if london_avg_congestion > 1.5 else 1.0
         travel_time_pt = {
             key: self._get_free_flow_time(key[0], key[1]) * pt_multiplier
@@ -388,8 +431,7 @@ class LondonCommuteModel(mesa.Model):
 
         # Active: always free flow
         travel_time_active = {
-            key: self._get_free_flow_time(key[0], key[1])
-            for key in od_flow_active
+            key: self._get_free_flow_time(key[0], key[1]) for key in od_flow_active
         }
 
         # Merge: active → pt → car
