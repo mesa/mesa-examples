@@ -1,0 +1,134 @@
+# Scheduled Full CI
+#
+# Runs every Monday at 06:00 UTC, and can be triggered manually.
+#
+# Steps:
+#   1. Discover all examples dynamically (structure-agnostic).
+#   2. Run them against stable, main, and (if available) rc Mesa
+#      via the reusable example_validation.yml workflow.
+#   3. Collect all results, update per-example registry files.
+#   4. Regenerate GALLERY.md.
+#   5. Create / update / close the GitHub health issue.
+#   6. Commit and push registry + GALLERY changes.
+
+name: Scheduled Full CI
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"   # Every Monday at 06:00 UTC
+  workflow_dispatch:        # Also allow manual runs from the Actions tab
+
+jobs:
+  # --------------------------------------------------------------------------
+  # Step 1 — Discover all examples
+  # --------------------------------------------------------------------------
+  init-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      examples: ${{ steps.set-matrix.outputs.examples }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate Example List
+        id: set-matrix
+        run: |
+          EXAMPLES=$(python -c 'from scripts.discovery import discover_all_examples; import json; print(json.dumps(discover_all_examples()))')
+          echo "examples=$EXAMPLES" >> $GITHUB_OUTPUT
+
+  # --------------------------------------------------------------------------
+  # Step 2 — Test via reusable workflow
+  # --------------------------------------------------------------------------
+  test-stable:
+    needs: init-matrix
+    uses: ./.github/workflows/example_validation.yml
+    with:
+      examples: ${{ needs.init-matrix.outputs.examples }}
+      mesa_version: stable
+
+  test-main:
+    needs: init-matrix
+    uses: ./.github/workflows/example_validation.yml
+    with:
+      examples: ${{ needs.init-matrix.outputs.examples }}
+      mesa_version: main
+
+  test-rc:
+    needs: init-matrix
+    uses: ./.github/workflows/example_validation.yml
+    with:
+      examples: ${{ needs.init-matrix.outputs.examples }}
+      mesa_version: rc
+
+  # --------------------------------------------------------------------------
+  # Step 3 — Merge results, update registry + gallery, manage issue, commit
+  # --------------------------------------------------------------------------
+  update-and-publish:
+    needs: [test-stable, test-main, test-rc]
+    # Run even if test-rc was skipped or failed.
+    if: always() && needs.test-stable.result == 'success'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write   # needed to push registry/GALLERY changes
+      issues: write     # needed for issue_manager.py
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install pyyaml requests
+
+      # Download all result artifacts into the same results/ directory.
+      # Use continue-on-error so a missing RC artifact doesn't abort the job.
+      - uses: actions/download-artifact@v4
+        with:
+          name: results-stable
+          path: results/
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: results-main
+          path: results/
+
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: results-rc
+          path: results/
+
+      - name: Update registry files
+        run: |
+          python scripts/generate_registry.py \
+            --results-dir results/ \
+            --registry-dir registry/ \
+            --examples-dir examples/
+
+      - name: Generate GALLERY.md
+        run: |
+          python scripts/generate_gallery.py \
+            --registry-dir registry/ \
+            --output GALLERY.md
+
+      - name: Manage GitHub health issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python scripts/issue_manager.py \
+            --registry-dir registry/ \
+            --repo "${{ github.repository }}"
+
+      - name: Commit and push changes
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add registry/ GALLERY.md
+          # Only commit if there is actually something to commit.
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "ci: update registry and gallery [skip ci]"
+            git push
+          fi

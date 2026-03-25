@@ -1,0 +1,59 @@
+# PR Validation CI
+#
+# Triggered on every pull request targeting main.
+# Steps:
+#   1. Detect which examples changed (or if shared scripts changed → test all).
+#   2. Call the reusable validation workflow for stable and main Mesa.
+#   3. Report results — stable failures block merge, main failures warn only.
+
+name: PR Validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '**/*.py'
+      - 'scripts/**'
+      - '.github/workflows/pr_ci.yml'
+      - '.github/workflows/example_validation.yml'
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Step 1 — Detect which examples to test
+  # ---------------------------------------------------------------------------
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      examples: ${{ steps.set-matrix.outputs.examples }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed examples
+        id: set-matrix
+        run: |
+          EXAMPLES=$(python scripts/detect_changes.py origin/${{ github.base_ref }} ${{ github.sha }})
+          if [ "$EXAMPLES" = '["ALL"]' ]; then
+            EXAMPLES=$(python -c 'from scripts.discovery import discover_all_examples; import json; print(json.dumps(discover_all_examples()))')
+          fi
+          echo "examples=$EXAMPLES" >> $GITHUB_OUTPUT
+
+  # ---------------------------------------------------------------------------
+  # Step 2 — Test via reusable workflow
+  # ---------------------------------------------------------------------------
+  test-stable:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.examples != '[]'
+    uses: ./.github/workflows/example_validation.yml
+    with:
+      examples: ${{ needs.detect-changes.outputs.examples }}
+      mesa_version: stable
+
+  test-main:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.examples != '[]'
+    uses: ./.github/workflows/example_validation.yml
+    with:
+      examples: ${{ needs.detect-changes.outputs.examples }}
+      mesa_version: main

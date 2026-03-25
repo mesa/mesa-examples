@@ -1,0 +1,54 @@
+name: Example Validation
+
+on:
+  workflow_call:
+    inputs:
+      examples:
+        description: 'JSON array of example paths'
+        required: true
+        type: string
+      mesa_version:
+        description: 'stable | main | rc'
+        required: true
+        type: string
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        example: ${{ fromJson(inputs.examples) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip pyyaml
+          if [ "${{ inputs.mesa_version }}" = "stable" ]; then
+            pip install mesa
+          elif [ "${{ inputs.mesa_version }}" = "main" ]; then
+            pip install git+https://github.com/projectmesa/mesa.git@main
+          elif [ "${{ inputs.mesa_version }}" = "rc" ]; then
+            pip install --pre mesa
+          fi
+          if [ -f "requirements.txt" ]; then pip install -r requirements.txt; fi
+          if [ -f "${{ matrix.example }}/requirements.txt" ]; then
+            pip install -r "${{ matrix.example }}/requirements.txt"
+          fi
+
+      - name: Run example
+        run: |
+          EXAMPLE_ID=$(echo "${{ matrix.example }}" | tr '/' '_')
+          python scripts/run_example.py ${{ matrix.example }} \
+            --version ${{ inputs.mesa_version }} \
+            --output results/${EXAMPLE_ID}_${{ inputs.mesa_version }}.json
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.mesa_version }}-${{ strategy.job-index }}
+          path: results/*.json
