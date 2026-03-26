@@ -39,7 +39,8 @@ def main():
 
     for f in changed_files:
         # Pure documentation changes never trigger tests.
-        if f.endswith(".md"):
+        # Only skip root-level docs
+        if f.endswith(".md") and "/" not in f:
             continue
         root = find_example_root(f)
         if root:

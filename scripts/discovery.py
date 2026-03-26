@@ -4,7 +4,15 @@
 from pathlib import Path
 
 MARKER_FILES = ("model.py", "run.py", "app.py")
-SKIP_DIRS = {".git", "__pycache__", ".github", "scripts", "files", "pulls", "node_modules"}
+SKIP_DIRS = {
+    ".git",
+    "__pycache__",
+    ".github",
+    "scripts",
+    "files",
+    "pulls",
+    "node_modules",
+}
 
 
 def discover_all_examples(root="."):
@@ -42,6 +50,6 @@ def find_example_root(filepath, repo_root="."):
             break
         if any(part in SKIP_DIRS or part.startswith(".") for part in parent.parts):
             break
-        if any((repo / parent / m).exists() for m in MARKER_FILES):
+        if any((parent / m).exists() for m in MARKER_FILES):
             return str(parent)
     return None

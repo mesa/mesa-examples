@@ -50,10 +50,12 @@ def first_warning(stderr_text: str) -> "str | None":
 def _make_env(example_path: Path) -> dict:
     """Build env dict with PYTHONPATH covering example root and its parent."""
     env = os.environ.copy()
-    env["PYTHONPATH"] = os.pathsep.join([
-        str(example_path.resolve()),
-        str(example_path.resolve().parent),
-    ])
+    env["PYTHONPATH"] = os.pathsep.join(
+        [
+            str(example_path.resolve()),
+            str(example_path.resolve().parent),
+        ]
+    )
     return env
 
 
@@ -62,9 +64,12 @@ def run_script(script_path: Path, example_path: Path, timeout: int = 30) -> dict
     try:
         proc = subprocess.run(
             [sys.executable, str(script_path.resolve())],
-            capture_output=True, text=True, timeout=timeout,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
             cwd=str(example_path.resolve()),
-            env=_make_env(example_path), check=False,
+            env=_make_env(example_path),
+            check=False,
         )
         passed = proc.returncode == 0
         error = proc.stderr.strip()[-1000:] if not passed else None
@@ -81,15 +86,21 @@ def run_module(module_name: str, example_path: Path, timeout: int = 30) -> dict:
     parent = example_path.resolve().parent
     env = _make_env(example_path)
     # also add the parent to PYTHONPATH for nested package resolution
-    env["PYTHONPATH"] = os.pathsep.join([
-        str(example_path.resolve()),
-        str(parent),
-    ])
+    env["PYTHONPATH"] = os.pathsep.join(
+        [
+            str(example_path.resolve()),
+            str(parent),
+        ]
+    )
     try:
         proc = subprocess.run(
             [sys.executable, "-m", module_name],
-            capture_output=True, text=True, timeout=timeout,
-            cwd=str(parent), env=env, check=False,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            cwd=str(parent),
+            env=env,
+            check=False,
         )
         passed = proc.returncode == 0
         error = proc.stderr.strip()[-1000:] if not passed else None
@@ -109,8 +120,11 @@ def run_fallback(example_path: Path) -> dict:
         model_py = subfolder / "model.py"
 
     if not model_py.exists():
-        return {"passed": False, "warning": None,
-                "error": "No run.py, app.py, or model.py found."}
+        return {
+            "passed": False,
+            "warning": None,
+            "error": "No run.py, app.py, or model.py found.",
+        }
 
     # use importlib.import_module so relative imports work inside packages
     root_str = str(example_path.resolve())
@@ -176,16 +190,22 @@ except Exception:
     try:
         proc = subprocess.run(
             [sys.executable, "-c", runner],
-            capture_output=True, text=True, timeout=30, check=False,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
         )
-        lines = [l for l in proc.stdout.splitlines() if l.strip()]
+        lines = [line for line in proc.stdout.splitlines() if line.strip()]
         if lines:
             result = json.loads(lines[-1])
             if result["warning"] is None:
                 result["warning"] = first_warning(proc.stderr)
             return result
-        return {"passed": False, "warning": None,
-                "error": proc.stderr.strip()[-1000:] or "No output from fallback"}
+        return {
+            "passed": False,
+            "warning": None,
+            "error": proc.stderr.strip()[-1000:] or "No output from fallback",
+        }
     except subprocess.TimeoutExpired:
         return {"passed": False, "warning": None, "error": "Timeout after 30s"}
     except Exception as exc:
@@ -199,7 +219,7 @@ def _has_relative_imports(filepath: Path) -> bool:
             if line.strip().startswith("from ."):
                 return True
     except Exception:
-        pass
+        return False
     return False
 
 
@@ -208,16 +228,15 @@ def _imports_own_package(filepath: Path, pkg_name: str) -> bool:
     try:
         for line in filepath.read_text(encoding="utf-8").splitlines():
             stripped = line.strip()
-            if stripped.startswith(f"from {pkg_name}.") or stripped.startswith(f"import {pkg_name}."):
+            if stripped.startswith((f"from {pkg_name}.", f"import {pkg_name}.")):
                 return True
     except Exception:
-        pass
+        return False
     return False
 
 
 def find_and_run(example_path: Path) -> dict:
     """Find the best entry point and run it with the right strategy."""
-    has_init = (example_path / "__init__.py").exists()
     subfolder = example_path / example_path.name
 
     # collect entry points: (path, is_app)
@@ -232,20 +251,25 @@ def find_and_run(example_path: Path) -> dict:
         return run_fallback(example_path)
 
     script_path, is_app = candidates[0]
-    timeout = 15 if is_app else 30
-    uses_relative = _has_relative_imports(script_path)
-    in_subfolder = script_path.parent != example_path
-    imports_self = _imports_own_package(script_path, example_path.name)
+    timeout = 45 if is_app else 30
 
-    # use module mode only for subfolder scripts or pure relative imports
-    # but NOT when the script imports its own package name (needs script mode)
-    if in_subfolder or (uses_relative and not imports_self):
-        rel = script_path.relative_to(example_path.parent)
-        module_name = str(rel.with_suffix("")).replace(os.sep, ".")
-        return run_module(module_name, example_path, timeout)
-    else:
-        # script mode: run directly from root with PYTHONPATH
-        return run_script(script_path, example_path, timeout)
+    # Always prefer script execution first (more reliable)
+    result = run_script(script_path, example_path, timeout)
+
+    # If it fails and looks like import issue → fallback to module
+    if not result["passed"] and (
+        "ImportError" in (result.get("error") or "")
+        or "ModuleNotFoundError" in (result.get("error") or "")
+    ):
+        return run_module(
+            str(script_path.relative_to(example_path.parent).with_suffix("")).replace(
+                os.sep, "."
+            ),
+            example_path,
+            timeout,
+        )
+
+    return result
 
 
 def main() -> None:
@@ -268,14 +292,20 @@ def main() -> None:
 
     if ci_config.get("skip", False):
         result = {
-            "example_id": example_id, "version": args.version,
-            "passed": None, "skipped": True, "warning": None, "error": None,
+            "example_id": example_id,
+            "version": args.version,
+            "passed": None,
+            "skipped": True,
+            "warning": None,
+            "error": None,
         }
     else:
         run_result = find_and_run(example_path)
         result = {
-            "example_id": example_id, "version": args.version,
-            "passed": run_result["passed"], "skipped": False,
+            "example_id": example_id,
+            "version": args.version,
+            "passed": run_result["passed"],
+            "skipped": False,
             "warning": run_result.get("warning"),
             "error": run_result.get("error"),
         }
