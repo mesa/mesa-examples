@@ -14,11 +14,14 @@
 
 import argparse
 import json
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 import yaml  # pip install pyyaml
-from discovery import discover_all_examples
+
+sys.path.append(str(Path(__file__).parent.parent))
+from discovery.discover_examples import discover_all_examples
 
 # ---------------------------------------------------------------------------
 # Frontmatter parser (identical to the one in run_example.py)

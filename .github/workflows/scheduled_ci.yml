@@ -34,7 +34,7 @@ jobs:
       - name: Generate Example List
         id: set-matrix
         run: |
-          EXAMPLES=$(python -c 'from scripts.discovery import discover_all_examples; import json; print(json.dumps(discover_all_examples()))')
+          EXAMPLES=$(python -c 'from scripts.discovery.discover_examples import discover_all_examples; import json; print(json.dumps(discover_all_examples()))')
           echo "examples=$EXAMPLES" >> $GITHUB_OUTPUT
 
   # --------------------------------------------------------------------------
@@ -98,21 +98,22 @@ jobs:
 
       - name: Update registry files
         run: |
-          python scripts/generate_registry.py \
+          python scripts/state/build_registry.py \
             --results-dir results/ \
-            --registry-dir registry/
+            --registry-dir registry/ \
+            --search-root examples/
 
       - name: Generate GALLERY.md
         run: |
-          python scripts/generate_gallery.py \
+          python scripts/presentation/render_gallery.py \
             --registry-dir registry/ \
             --output GALLERY.md
 
-      - name: Manage GitHub health issue
+      - name: Update GitHub Issues
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python scripts/issue_manager.py \
+          python scripts/presentation/manage_issues.py \
             --registry-dir registry/ \
             --repo "${{ github.repository }}"
 

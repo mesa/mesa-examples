@@ -49,9 +49,7 @@ def should_flag(r: dict) -> bool:
     health = r.get("ci", {}).get("health", "untested")
     if status == "showcase" and health in ("warning", "broken"):
         return True
-    if status == "standard" and health == "broken":
-        return True
-    return False
+    return bool(status == "standard" and health == "broken")
 
 
 def all_clear(records: list) -> bool:

@@ -43,7 +43,7 @@ jobs:
       - name: Run example
         run: |
           EXAMPLE_ID=$(echo "${{ matrix.example }}" | tr '/' '_')
-          python scripts/run_example.py ${{ matrix.example }} \
+          python scripts/validation/validate_example.py ${{ matrix.example }} \
             --version ${{ inputs.mesa_version }} \
             --output results/${EXAMPLE_ID}_${{ inputs.mesa_version }}.json
 

@@ -2,7 +2,7 @@
 
 import argparse
 import json
-from datetime import date
+from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -34,8 +34,9 @@ def load_registry(registry_dir):
     for f in sorted(Path(registry_dir).glob("*.json")):
         try:
             records.append(json.loads(f.read_text(encoding="utf-8")))
-        except Exception:
-            continue  # skip any malformed file instead of breaking CI
+        except Exception as e:
+            print(f"Skipping malformed registry file {f}: {e}")
+            continue
     return records
 
 
@@ -88,12 +89,14 @@ def main():
     records = load_registry(args.registry_dir)
 
     # Sort for stable output (avoids noisy diffs in CI)
-    records.sort(key=lambda r: r.get("name", r.get("location", r.get("id", ""))).lower())
+    records.sort(
+        key=lambda r: r.get("name", r.get("location", r.get("id", ""))).lower()
+    )
 
     stats = counts(records)
     groups = group_by_status(records)
 
-    today = date.today().isoformat()
+    today = datetime.now(timezone.utc).date().isoformat()
 
     content = []
 

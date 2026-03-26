@@ -12,8 +12,10 @@ Usage (from repo root):
 import json
 import subprocess
 import sys
+from pathlib import Path
 
-from discovery import find_example_root
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+from discovery.discover_examples import find_example_root
 
 
 def main():

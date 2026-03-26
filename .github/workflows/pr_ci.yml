@@ -33,9 +33,9 @@ jobs:
       - name: Detect changed examples
         id: set-matrix
         run: |
-          EXAMPLES=$(python scripts/detect_changes.py origin/${{ github.base_ref }} ${{ github.sha }})
+          EXAMPLES=$(python scripts/discovery/discover_changed.py origin/${{ github.base_ref }} ${{ github.sha }})
           if [ "$EXAMPLES" = '["ALL"]' ]; then
-            EXAMPLES=$(python -c 'from scripts.discovery import discover_all_examples; import json; print(json.dumps(discover_all_examples()))')
+            EXAMPLES=$(python -c 'from scripts.discovery.discover_examples import discover_all_examples; import json; print(json.dumps(discover_all_examples()))')
           fi
           echo "examples=$EXAMPLES" >> $GITHUB_OUTPUT
 
