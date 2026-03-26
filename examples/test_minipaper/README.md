@@ -1,20 +1,31 @@
 ---
-title: "Test Mini-Paper Example"
-status: "standard"
-complexity: "intermediate"
-ci:
-  skip: false
+title: LLM Schelling Segregation
+authors:
+  - abhinavk0220
+domain:
+  - social-dynamics
+  - segregation
+complexity: intermediate
+mesa_version_min: "3.0"
+status: incubator
+owner: null
+keywords: [LLM, segregation, behavioral heterogeneity]
 ---
 
-# Test Mini-Paper Example
+# LLM Schelling Segregation
 
-This is a sample example designed to verify the Mesa CI pipeline's ability to:
-1. Discover examples with YAML frontmatter.
-2. Execute models with custom `run.py` entry points.
-3. Correctly report health status and compatibility.
+## Abstract
+One-paragraph summary of what this model does and why it's interesting.
 
-## Usage
+## Model Description
+Agents, rules, space, parameters...
+
+## How to Run
+Exact commands to get it working.
 
 ```bash
 python run.py
 ```
+
+## Results & Discussion
+...
