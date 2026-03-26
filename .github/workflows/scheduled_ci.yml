@@ -101,7 +101,7 @@ jobs:
           python scripts/state/build_registry.py \
             --results-dir results/ \
             --registry-dir registry/ \
-            --search-root examples/
+            --search-root .
 
       - name: Generate GALLERY.md
         run: |

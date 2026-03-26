@@ -63,10 +63,14 @@ def render_table(rows):
     ]
     for r in rows:
         name = r.get("name", r.get("location", "Unknown"))
+        location = r.get("location", "")
+        # Link the name to its directory if we have a location
+        md_name = f"[{name}]({location})" if location else name
+
         health = health_label(r.get("ci", {}).get("health"))
         complexity = r.get("meta", {}).get("complexity", "-")
         compat = works_on(r.get("compatibility", {}))
-        out.append(f"| {name} | {health} | {complexity} | {compat} |")
+        out.append(f"| {md_name} | {health} | {complexity} | {compat} |")
     return "\n".join(out) + "\n"
 
 
