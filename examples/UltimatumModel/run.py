@@ -11,10 +11,10 @@ data = model.datacollector.get_model_vars_dataframe()
 
 # Visualization
 fig, axes = plt.subplots(2, 2, figsize=(12, 10))
-data['Accept Rate'].plot(ax=axes[0,0], title='Accept Rate %')
-data['Avg Offer'].plot(ax=axes[0,1], title='Average Offer')
-data['Proposer Avg'].plot(ax=axes[1,0], title='Proposer Earnings')
-data['Responder Avg'].plot(ax=axes[1,1], title='Responder Earnings')
+data["Accept Rate"].plot(ax=axes[0, 0], title="Accept Rate %")
+data["Avg Offer"].plot(ax=axes[0, 1], title="Average Offer")
+data["Proposer Avg"].plot(ax=axes[1, 0], title="Proposer Earnings")
+data["Responder Avg"].plot(ax=axes[1, 1], title="Responder Earnings")
 
 plt.tight_layout()
 plt.show()
