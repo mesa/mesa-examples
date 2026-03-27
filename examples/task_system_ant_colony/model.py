@@ -21,31 +21,57 @@ Scenario:
 
 import mesa
 import numpy as np
-
-from tasks import Task, TaskQueue, TaskStatus, linear_reward, threshold_reward
-
+from tasks import Task, TaskQueue, linear_reward, threshold_reward
 
 # ── Task factories ──────────────────────────────────────────────────────────
 
+
 def make_dig_task() -> Task:
-    return Task(name="Dig Soil", duration=5, priority=10,
-                reward_fn=linear_reward, interruptible=True, resumable=True)
+    return Task(
+        name="Dig Soil",
+        duration=5,
+        priority=10,
+        reward_fn=linear_reward,
+        interruptible=True,
+        resumable=True,
+    )
+
 
 def make_transport_task() -> Task:
-    return Task(name="Transport Material", duration=3, priority=8,
-                reward_fn=lambda p: threshold_reward(p, threshold=1.0),
-                interruptible=True, resumable=False)
+    return Task(
+        name="Transport Material",
+        duration=3,
+        priority=8,
+        reward_fn=lambda p: threshold_reward(p, threshold=1.0),
+        interruptible=True,
+        resumable=False,
+    )
+
 
 def make_rest_task() -> Task:
-    return Task(name="Rest", duration=2, priority=1,
-                reward_fn=linear_reward, interruptible=True, resumable=True)
+    return Task(
+        name="Rest",
+        duration=2,
+        priority=1,
+        reward_fn=linear_reward,
+        interruptible=True,
+        resumable=True,
+    )
+
 
 def make_urgent_task() -> Task:
-    return Task(name="Respond to Signal", duration=2, priority=100,
-                reward_fn=linear_reward, interruptible=False, resumable=False)
+    return Task(
+        name="Respond to Signal",
+        duration=2,
+        priority=100,
+        reward_fn=linear_reward,
+        interruptible=False,
+        resumable=False,
+    )
 
 
 # ── Agent ─────────────────────────────────────────────────────────────────────
+
 
 class AntAgent(mesa.Agent):
     def __init__(self, model):
@@ -101,9 +127,17 @@ class AntAgent(mesa.Agent):
 
 # ── Model ─────────────────────────────────────────────────────────────────────
 
+
 class AntColonyModel(mesa.Model):
-    def __init__(self, n_ants=20, width=20, height=20,
-                 signal_radius=3, signal_prob=0.05, seed=None):
+    def __init__(
+        self,
+        n_ants=20,
+        width=20,
+        height=20,
+        signal_radius=3,
+        signal_prob=0.05,
+        seed=None,
+    ):
         super().__init__(seed=seed)
         self.n_ants = n_ants
         self.signal_radius = signal_radius
@@ -120,17 +154,29 @@ class AntColonyModel(mesa.Model):
 
         self.datacollector = mesa.DataCollector(
             model_reporters={
-                "Total Reward":        lambda m: sum(a.task_queue.total_reward for a in m.agents),
-                "Ants Digging":        lambda m: sum(1 for a in m.agents if a.current_task_name == "Dig Soil"),
-                "Ants Transporting":   lambda m: sum(1 for a in m.agents if a.current_task_name == "Transport Material"),
-                "Ants Responding":     lambda m: sum(1 for a in m.agents if a.current_task_name == "Respond to Signal"),
-                "Ants Resting":        lambda m: sum(1 for a in m.agents if a.current_task_name == "Rest"),
-                "Total Interruptions": lambda m: sum(a.interrupted_count for a in m.agents),
+                "Total Reward": lambda m: sum(
+                    a.task_queue.total_reward for a in m.agents
+                ),
+                "Ants Digging": lambda m: sum(
+                    1 for a in m.agents if a.current_task_name == "Dig Soil"
+                ),
+                "Ants Transporting": lambda m: sum(
+                    1 for a in m.agents if a.current_task_name == "Transport Material"
+                ),
+                "Ants Responding": lambda m: sum(
+                    1 for a in m.agents if a.current_task_name == "Respond to Signal"
+                ),
+                "Ants Resting": lambda m: sum(
+                    1 for a in m.agents if a.current_task_name == "Rest"
+                ),
+                "Total Interruptions": lambda m: sum(
+                    a.interrupted_count for a in m.agents
+                ),
             },
             agent_reporters={
-                "Task":          "current_task_name",
-                "Progress":      "current_task_progress",
-                "Total Reward":  lambda a: a.task_queue.total_reward,
+                "Task": "current_task_name",
+                "Progress": "current_task_progress",
+                "Total Reward": lambda a: a.task_queue.total_reward,
                 "Interruptions": "interrupted_count",
             },
         )
