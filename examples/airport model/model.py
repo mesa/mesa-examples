@@ -298,13 +298,13 @@ class AirportModel(Model):
         if holding_snapshot:
             self.max_holding_wait_seen = max(
                 self.max_holding_wait_seen,
-                max(a.wait_time for a in holding_snapshot)
+                *(a.wait_time for a in holding_snapshot),
             )
 
         if takeoff_snapshot:
             self.max_takeoff_wait_seen = max(
                 self.max_takeoff_wait_seen,
-                max(a.wait_time for a in takeoff_snapshot)
+                *(a.wait_time for a in takeoff_snapshot),
             )
 
     def avg_holding_queue_size(self) -> float:
