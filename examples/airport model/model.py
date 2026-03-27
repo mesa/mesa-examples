@@ -1,24 +1,23 @@
 # model.py
+import numpy as np
+from agents import AircraftAgent, RunwayAgent
 from mesa import Model
 from mesa.datacollection import DataCollector
-
-from agents import AircraftAgent, RunwayAgent
 from queues import HoldingQueue, TakeOffQueue
-import numpy as np
 
 
 class AirportModel(Model):
     def __init__(
         self,
         num_runways: int = 2,
-        inbound_rate: int = 12,              # aircraft per hour
-        outbound_rate: int = 10,             # aircraft per hour
-        tick_size: int = 1,                  # minutes per step
+        inbound_rate: int = 12,  # aircraft per hour
+        outbound_rate: int = 10,  # aircraft per hour
+        tick_size: int = 1,  # minutes per step
         emergency_fuel_threshold: int = 30,  # minutes of fuel remaining
-        minimum_fuel_threshold: int = 20,    # diversion threshold
-        max_takeoff_wait: int = 45,          # cancellation threshold
-        landing_duration: int = 3,           # minutes runway occupied
-        takeoff_duration: int = 2,           # minutes runway occupied
+        minimum_fuel_threshold: int = 20,  # diversion threshold
+        max_takeoff_wait: int = 45,  # cancellation threshold
+        landing_duration: int = 3,  # minutes runway occupied
+        takeoff_duration: int = 2,  # minutes runway occupied
         emergency_probability: float = 0.01,
         seed=None,
     ):
@@ -206,9 +205,9 @@ class AirportModel(Model):
             # Emergency landing always wins
             next_holding = self.holding_queue.peek() if holding_has_aircraft else None
             if (
-                    next_holding is not None
-                    and next_holding.emergency
-                    and runway.is_available_for("landing")
+                next_holding is not None
+                and next_holding.emergency
+                and runway.is_available_for("landing")
             ):
                 aircraft = self.holding_queue.dequeue()
                 runway.assign(
@@ -221,9 +220,9 @@ class AirportModel(Model):
 
             # Fairness policy: after too many consecutive landings, allow a takeoff
             if (
-                    takeoff_has_aircraft
-                    and self.consecutive_landings >= self.max_consecutive_landings
-                    and runway.is_available_for("takeoff")
+                takeoff_has_aircraft
+                and self.consecutive_landings >= self.max_consecutive_landings
+                and runway.is_available_for("takeoff")
             ):
                 aircraft = self.takeoff_queue.dequeue()
                 runway.assign(

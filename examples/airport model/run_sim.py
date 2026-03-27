@@ -11,7 +11,7 @@ model = AirportModel(
     takeoff_duration=3,
     emergency_fuel_threshold=25,
     minimum_fuel_threshold=10,
-    max_takeoff_wait=40
+    max_takeoff_wait=40,
 )
 
 for _ in range(300):

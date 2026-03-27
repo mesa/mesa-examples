@@ -66,8 +66,12 @@ def print_queue_dashboard(model) -> None:
     print(f"Holding queue size: {len(model.holding_queue)}")
     print(f"Takeoff queue size: {len(model.takeoff_queue)}")
 
-    holding_snapshot = model.holding_queue.to_list() if hasattr(model.holding_queue, "to_list") else []
-    takeoff_snapshot = model.takeoff_queue.to_list() if hasattr(model.takeoff_queue, "to_list") else []
+    holding_snapshot = (
+        model.holding_queue.to_list() if hasattr(model.holding_queue, "to_list") else []
+    )
+    takeoff_snapshot = (
+        model.takeoff_queue.to_list() if hasattr(model.takeoff_queue, "to_list") else []
+    )
 
     print("Holding queue aircraft:")
     for a in holding_snapshot[:10]:

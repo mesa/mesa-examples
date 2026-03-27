@@ -7,7 +7,7 @@ class AircraftAgent(Agent):
         self,
         model,
         flight_id: str,
-        flight_type: str,   # "inbound" or "outbound"
+        flight_type: str,  # "inbound" or "outbound"
         fuel_remaining: int | None = None,
         emergency: bool = False,
     ):
@@ -50,7 +50,7 @@ class RunwayAgent(Agent):
     def __init__(self, model, runway_id: str, mode: str = "mixed"):
         super().__init__(model)
         self.runway_id = runway_id
-        self.mode = mode   # "landing", "takeoff", "mixed"
+        self.mode = mode  # "landing", "takeoff", "mixed"
         self.blocked = False
         self.current_aircraft = None
         self.remaining_service_time = 0

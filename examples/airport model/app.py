@@ -1,6 +1,5 @@
 import solara
 from mesa.visualization import SolaraViz, make_plot_component
-
 from model import AirportModel
 
 
@@ -11,7 +10,7 @@ def runway_status_component(model):
             aircraft = runway.current_aircraft
             solara.Markdown(
                 f"""
-**{runway.runway_id}**  
+**{runway.runway_id}**
 - Mode: {runway.mode}
 - Operation: {runway.operation or "idle"}
 - Occupied: {"yes" if aircraft else "no"}
@@ -28,8 +27,8 @@ def live_metrics_component(model):
         with solara.Card("Queues"):
             solara.Markdown(
                 f"""
-**Holding:** {len(model.holding_queue)}  
-**Takeoff:** {len(model.takeoff_queue)}  
+**Holding:** {len(model.holding_queue)}
+**Takeoff:** {len(model.takeoff_queue)}
 **Total waiting:** {total_waiting}
 """
             )
@@ -37,9 +36,9 @@ def live_metrics_component(model):
         with solara.Card("Outcomes"):
             solara.Markdown(
                 f"""
-**Landed:** {model.landed_count}  
-**Departed:** {model.departed_count}  
-**Diverted:** {model.diverted_count}  
+**Landed:** {model.landed_count}
+**Departed:** {model.departed_count}
+**Diverted:** {model.diverted_count}
 **Cancelled:** {model.cancelled_count}
 """
             )
@@ -47,7 +46,7 @@ def live_metrics_component(model):
         with solara.Card("Time"):
             solara.Markdown(
                 f"""
-**Tick:** {model.tick_count}  
+**Tick:** {model.tick_count}
 **Sim time:** {model.sim_time} min
 """
             )

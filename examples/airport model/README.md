@@ -87,13 +87,13 @@ In particular:
 * visualization is primarily oriented toward spatial models rather than operational dashboards
 * modeling of service systems requires combining agent logic with external scheduling and queue management
 
-These observations align with the Mesa GSoC direction of evaluating what works well in practice and identifying missing components through implementation experience. 
+These observations align with the Mesa GSoC direction of evaluating what works well in practice and identifying missing components through implementation experience.
 
 ---
 
 ## Proposed Improvements
 
-This project suggests a natural extension of Mesa in line with the 2026 project ideas, particularly the **behavioral framework initiative**, which emphasizes implementing models, identifying limitations, and proposing reusable improvements based on practical experience. 
+This project suggests a natural extension of Mesa in line with the 2026 project ideas, particularly the **behavioral framework initiative**, which emphasizes implementing models, identifying limitations, and proposing reusable improvements based on practical experience.
 
 Based on this work, the following improvements are proposed:
 
