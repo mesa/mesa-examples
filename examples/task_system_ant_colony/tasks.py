@@ -12,9 +12,9 @@ and "agent actually does it over multiple steps."
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from collections.abc import Callable
 
 
 class TaskStatus(Enum):
