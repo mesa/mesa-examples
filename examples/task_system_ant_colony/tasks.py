@@ -12,9 +12,9 @@ and "agent actually does it over multiple steps."
 
 from __future__ import annotations
 
-from enum import Enum, auto
 from dataclasses import dataclass, field
-from typing import Callable, Optional
+from enum import Enum, auto
+from typing import Callable
 
 
 class TaskStatus(Enum):
@@ -135,7 +135,7 @@ class TaskQueue:
 
     def __init__(self):
         self._queue: list[Task] = []
-        self.current: Optional[Task] = None
+        self.current: Task | None = None
         self.total_reward: float = 0.0
 
     def push(self, task: Task):
@@ -162,7 +162,7 @@ class TaskQueue:
         self.total_reward += reward
         return reward
 
-    def interrupt_current(self, force: bool = False) -> Optional[float]:
+    def interrupt_current(self, force: bool = False) -> float | None:
         """
         Interrupt the active task.
         If force=True, interrupts even non-interruptible tasks (sets FAILED).
