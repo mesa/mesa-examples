@@ -12,17 +12,18 @@ and "agent actually does it over multiple steps."
 
 from __future__ import annotations
 
-from enum import Enum, auto
 from dataclasses import dataclass, field
-from typing import Callable, Optional
+from enum import Enum, auto
+from typing import Optional
+from collections.abc import Callable
 
 
 class TaskStatus(Enum):
-    PENDING = auto()      # Queued, not yet started
-    ACTIVE = auto()       # Currently being executed
+    PENDING = auto()  # Queued, not yet started
+    ACTIVE = auto()  # Currently being executed
     INTERRUPTED = auto()  # Paused mid-execution
-    DONE = auto()         # Completed, reward already applied
-    FAILED = auto()       # Could not complete (requirements unmet)
+    DONE = auto()  # Completed, reward already applied
+    FAILED = auto()  # Could not complete (requirements unmet)
 
 
 def linear_reward(progress: float) -> float:
@@ -37,7 +38,7 @@ def threshold_reward(progress: float, threshold: float = 1.0) -> float:
 
 def exponential_reward(progress: float) -> float:
     """Reward accelerates near completion. y = x^2."""
-    return progress ** 2
+    return progress**2
 
 
 @dataclass
@@ -58,8 +59,8 @@ class Task:
     """
 
     name: str
-    duration: int                          # Steps needed to complete
-    priority: int = 0                      # Higher = more urgent
+    duration: int  # Steps needed to complete
+    priority: int = 0  # Higher = more urgent
     reward_fn: Callable[[float], float] = field(default=linear_reward)
     interruptible: bool = True
     resumable: bool = True
@@ -135,7 +136,7 @@ class TaskQueue:
 
     def __init__(self):
         self._queue: list[Task] = []
-        self.current: Optional[Task] = None
+        self.current: Task | None = None
         self.total_reward: float = 0.0
 
     def push(self, task: Task):
@@ -152,7 +153,10 @@ class TaskQueue:
         Returns reward earned this step (0 if none).
         """
         # Promote from queue if idle
-        if self.current is None or self.current.status in (TaskStatus.DONE, TaskStatus.FAILED):
+        if self.current is None or self.current.status in (
+            TaskStatus.DONE,
+            TaskStatus.FAILED,
+        ):
             self._activate_next()
 
         if self.current is None:
@@ -162,7 +166,7 @@ class TaskQueue:
         self.total_reward += reward
         return reward
 
-    def interrupt_current(self, force: bool = False) -> Optional[float]:
+    def interrupt_current(self, force: bool = False) -> float | None:
         """
         Interrupt the active task.
         If force=True, interrupts even non-interruptible tasks (sets FAILED).
