@@ -25,7 +25,7 @@ model_params = {
     "seed":          {"type": "SliderInt",   "label": "Random seed",              "value": 42,   "min": 0,   "max": 999, "step": 1},
 }
 
-# Pass an instance, not the class — fixes the NoneType/_time bug in Mesa 3.5.1
+# Pass an instance, not the class -- fixes the NoneType/_time bug in Mesa 3.5.1
 model = AntColonyModel()
 
 page = mv.SolaraViz(
@@ -42,7 +42,5 @@ page = mv.SolaraViz(
         mv.make_plot_component({"Total Interruptions": "#E24B4A"}),
     ],
     model_params=model_params,
-    name="Ant Colony — Task System",
+    name="Ant Colony -- Task System",
 )
-
-page

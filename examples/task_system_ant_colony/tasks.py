@@ -2,7 +2,7 @@
 Task system for Mesa agents.
 
 Implements the Task concept proposed in Mesa discussion #2526 (EwoutH).
-A Task represents an activity an agent performs over time — with explicit
+A Task represents an activity an agent performs over time -- with explicit
 duration, priority, progress tracking, interruptibility, and a pluggable
 reward function.
 
@@ -48,7 +48,7 @@ class Task:
     Core properties (from discussion #2526):
       - duration:      How many steps to complete (int = step-based)
       - priority:      Higher number = higher priority. Used by TaskQueue.
-      - reward_fn:     Called with progress [0.0–1.0] → float reward value
+      - reward_fn:     Called with progress [0.0-1.0] → float reward value
       - interruptible: Can another agent or event pause this?
       - resumable:     If interrupted, can it continue from where it left off?
 
@@ -70,7 +70,7 @@ class Task:
 
     @property
     def completion(self) -> float:
-        """Progress as a fraction [0.0 – 1.0]."""
+        """Progress as a fraction [0.0 - 1.0]."""
         if self.duration == 0:
             return 1.0
         return min(self.progress / self.duration, 1.0)
