@@ -97,41 +97,41 @@ print(data)
 ```
 ## Extensions
 
-This model has been extended with three additions that make rumor dynamics 
+This model has been extended with three additions that make rumor dynamics
 more realistic and interesting to explore.
 
 ### Skepticism
-Each agent has a `skepticism` attribute sampled from a normal distribution 
-around `skepticism_mean`. A skeptical agent is harder to convince — the 
-effective spread chance is reduced by `rumor_spread_chance * (1 - skepticism)`. 
-At skepticism 0.5 the rumor struggles to spread at all. At 0.9 it dies out 
+Each agent has a `skepticism` attribute sampled from a normal distribution
+around `skepticism_mean`. A skeptical agent is harder to convince — the
+effective spread chance is reduced by `rumor_spread_chance * (1 - skepticism)`.
+At skepticism 0.5 the rumor struggles to spread at all. At 0.9 it dies out
 almost immediately regardless of spread chance.
 
 ### Forgetting Mechanic
-Agents who know the rumor can forget it each step with probability 
-`forget_chance`. This prevents the rumor from monotonically saturating 
-the population. At forget_chance 0.1 with high spread, the rumor reaches 
-a dynamic equilibrium — new people learn it every step while others forget 
+Agents who know the rumor can forget it each step with probability
+`forget_chance`. This prevents the rumor from monotonically saturating
+the population. At forget_chance 0.1 with high spread, the rumor reaches
+a dynamic equilibrium — new people learn it every step while others forget
 it, producing persistent fluctuation rather than a flat ceiling.
 
 ### Debunker Agent
-A new `Debunker` subclass that actively tells neighbors the rumor is false. 
-Each step a debunker picks a random neighbor — if that neighbor knows the 
-rumor, there is a chance they forget it. At 10% debunkers with 10% forget 
-chance, the rumor never fully saturates and debunker effectiveness fluctuates 
+A new `Debunker` subclass that actively tells neighbors the rumor is false.
+Each step a debunker picks a random neighbor — if that neighbor knows the
+rumor, there is a chance they forget it. At 10% debunkers with 10% forget
+chance, the rumor never fully saturates and debunker effectiveness fluctuates
 between 30-80%, showing an ongoing battle between spreaders and debunkers.
 
 ### Key Findings
-Setting forget_chance=0.0, skepticism_mean=0.0, fraction_debunkers=0.0 
+Setting forget_chance=0.0, skepticism_mean=0.0, fraction_debunkers=0.0
 reproduces the original model exactly.
 
-The most interesting dynamics appear when forget_chance and fraction_debunkers 
-are both set above 0.05 — the rumor reaches a fluctuating equilibrium instead 
-of saturating, with Percentage_Forgotten and Debunker_Effectiveness both 
+The most interesting dynamics appear when forget_chance and fraction_debunkers
+are both set above 0.05 — the rumor reaches a fluctuating equilibrium instead
+of saturating, with Percentage_Forgotten and Debunker_Effectiveness both
 showing active values throughout the run.
 
-High skepticism (above 0.5) suppresses rumor spread almost entirely even 
-with high spread chance, suggesting that population-level skepticism is a 
+High skepticism (above 0.5) suppresses rumor spread almost entirely even
+with high spread chance, suggesting that population-level skepticism is a
 stronger brake on rumor dynamics than individual debunking.
 
 ## New Parameters

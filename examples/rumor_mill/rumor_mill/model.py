@@ -1,7 +1,9 @@
 import mesa
 from mesa import Model
 from mesa.discrete_space import OrthogonalMooreGrid, OrthogonalVonNeumannGrid
-from rumor_mill.agent import Person, Debunker
+
+from rumor_mill.agent import Debunker, Person
+
 
 class RumorMillModel(Model):
     """
@@ -46,19 +48,29 @@ class RumorMillModel(Model):
         self.random.shuffle(all_cells)
 
         rumor_cells = set(all_cells[:num_initial_rumor_knowers])
-        debunker_cells = set(all_cells[num_initial_rumor_knowers:num_initial_rumor_knowers + num_debunkers])
+        debunker_cells = set(
+            all_cells[
+                num_initial_rumor_knowers : num_initial_rumor_knowers + num_debunkers
+            ]
+        )
 
         for cell in all_cells:
             skepticism = max(0.0, min(1.0, self.random.gauss(skepticism_mean, 0.1)))
             if cell in rumor_cells:
-                agent = Person(self, cell, rumor_spread_chance, skepticism, forget_chance, "red")
+                agent = Person(
+                    self, cell, rumor_spread_chance, skepticism, forget_chance, "red"
+                )
                 agent.knows_rumor = True
                 agent.times_heard = 1
                 agent.newly_learned = True
             elif cell in debunker_cells:
-                agent = Debunker(self, cell, rumor_spread_chance, skepticism, forget_chance, "green")
+                agent = Debunker(
+                    self, cell, rumor_spread_chance, skepticism, forget_chance, "green"
+                )
             else:
-                agent = Person(self, cell, rumor_spread_chance, skepticism, forget_chance, "blue")
+                agent = Person(
+                    self, cell, rumor_spread_chance, skepticism, forget_chance, "blue"
+                )
             self.agents.add(agent)
 
         self.datacollector = mesa.DataCollector(
@@ -82,22 +94,40 @@ class RumorMillModel(Model):
 
     def compute_percentage_knowing_rumor(self):
         agents_knowing = sum(1 for a in self.agents if a.knows_rumor)
-        return (agents_knowing / self.number_of_agents) * 100 if self.number_of_agents > 0 else 0
+        return (
+            (agents_knowing / self.number_of_agents) * 100
+            if self.number_of_agents > 0
+            else 0
+        )
 
     def compute_new_rumor_times_heard(self):
         return sum(a.times_heard_this_step for a in self.agents)
 
     def compute_new_people_ratio_knowing_rumor(self):
         new_knowers = sum(1 for a in self.agents if a.newly_learned)
-        return (new_knowers / self.number_of_agents) * 100 if self.number_of_agents > 0 else 0
+        return (
+            (new_knowers / self.number_of_agents) * 100
+            if self.number_of_agents > 0
+            else 0
+        )
 
     def compute_percentage_forgotten(self):
         forgotten = sum(1 for a in self.agents if a.newly_forgotten)
-        return (forgotten / self.number_of_agents) * 100 if self.number_of_agents > 0 else 0
+        return (
+            (forgotten / self.number_of_agents) * 100
+            if self.number_of_agents > 0
+            else 0
+        )
 
     def compute_debunker_effectiveness(self):
-        debunkers = [a for a in self.agents if hasattr(a, "agent_type") and a.agent_type == "debunker"]
+        debunkers = [
+            a
+            for a in self.agents
+            if hasattr(a, "agent_type") and a.agent_type == "debunker"
+        ]
         if not debunkers:
             return 0
-        successes = sum(1 for a in self.agents if a.newly_forgotten and not hasattr(a, "agent_type"))
+        successes = sum(
+            1 for a in self.agents if a.newly_forgotten and not hasattr(a, "agent_type")
+        )
         return (successes / len(debunkers)) * 100

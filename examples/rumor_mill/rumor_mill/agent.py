@@ -4,8 +4,15 @@ from mesa.discrete_space import CellAgent
 class Person(CellAgent):
     """A person who can know, spread, or forget a rumor."""
 
-    def __init__(self, model, cell, rumor_spread_chance=0.5,
-                 skepticism=0.0, forget_chance=0.0, color=None):
+    def __init__(
+        self,
+        model,
+        cell,
+        rumor_spread_chance=0.5,
+        skepticism=0.0,
+        forget_chance=0.0,
+        color=None,
+    ):
         super().__init__(model)
         self.cell = cell
         self.knows_rumor = False
@@ -44,16 +51,22 @@ class Person(CellAgent):
 class Debunker(Person):
     """An agent that spreads a counter-rumor, actively telling neighbors the rumor is false."""
 
-    def __init__(self, model, cell, rumor_spread_chance=0.5,
-                 skepticism=0.0, forget_chance=0.0, color=None):
-        super().__init__(model, cell, rumor_spread_chance,
-                        skepticism, forget_chance, color)
+    def __init__(
+        self,
+        model,
+        cell,
+        rumor_spread_chance=0.5,
+        skepticism=0.0,
+        forget_chance=0.0,
+        color=None,
+    ):
+        super().__init__(
+            model, cell, rumor_spread_chance, skepticism, forget_chance, color
+        )
         self.agent_type = "debunker"
 
     def step(self):
-        neighbors = [
-            agent for agent in self.cell.neighborhood.agents if agent != self
-        ]
+        neighbors = [agent for agent in self.cell.neighborhood.agents if agent != self]
         if neighbors:
             neighbor = self.random.choice(neighbors)
             if neighbor.knows_rumor and self.random.random() < self.rumor_spread_chance:

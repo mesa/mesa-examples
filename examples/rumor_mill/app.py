@@ -2,6 +2,7 @@ from mesa.visualization import SolaraViz, SpaceRenderer, make_plot_component
 from mesa.visualization.components import AgentPortrayalStyle
 from rumor_mill.model import RumorMillModel
 
+
 def agent_portrayal(agent):
     if hasattr(agent, "agent_type") and agent.agent_type == "debunker":
         return AgentPortrayalStyle(color="green", size=80)
@@ -73,8 +74,13 @@ debunker_plot = make_plot_component("Debunker_Effectiveness", page=1)
 page = SolaraViz(
     rumor_model,
     renderer,
-    components=[rumor_spread_plot, times_heard_plot, new_learners_plot,
-                forgotten_plot, debunker_plot],
+    components=[
+        rumor_spread_plot,
+        times_heard_plot,
+        new_learners_plot,
+        forgotten_plot,
+        debunker_plot,
+    ],
     model_params=model_params,
     name="Rumor Mill Model",
 )
