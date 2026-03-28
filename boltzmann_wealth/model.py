@@ -1,6 +1,7 @@
+import matplotlib.pyplot as plt
 import mesa
 import seaborn as sns
-import matplotlib.pyplot as plt
+
 
 class MoneyAgent(mesa.Agent):
     """An agent with fixed initial wealth."""
@@ -36,7 +37,5 @@ if __name__ == "__main__":
 
     agent_wealth = [a.wealth for a in model.agents]
     g = sns.histplot(agent_wealth, discrete=True)
-    g.set(
-        title="Wealth distribution", xlabel="Wealth", ylabel="number of agents"
-    )
+    g.set(title="Wealth distribution", xlabel="Wealth", ylabel="number of agents")
     plt.show()
