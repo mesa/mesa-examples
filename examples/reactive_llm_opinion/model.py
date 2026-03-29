@@ -1,8 +1,10 @@
-import mesa
 import random
+
+import mesa
 
 # -----------------------------
 # Agent with Reactive LLM Logic
+
 
 class ReactiveAgent(mesa.Agent):
     def __init__(self, model, threshold=0.2):
@@ -37,6 +39,7 @@ class ReactiveAgent(mesa.Agent):
 
 # -----------------------------
 # Model
+
 
 class ReactiveLLMModel(mesa.Model):
     def __init__(self, num_agents=10):
@@ -77,7 +80,7 @@ if __name__ == "__main__":
         model.step()
 
     # -----------------------------
-    # FINAL METRICS 
+    # FINAL METRICS
     total_possible_calls = STEPS * model.num_agents
 
     print("\n========== RESULTS ==========")
