@@ -1,19 +1,31 @@
+import logging
+import os
 from mesa.datacollection import DataCollector
 from mesa.model import Model
 from rich import print as rprint
 
 from .agents import CountryAgent
+from mesa_llm.reasoning.react import ReActReasoning
 from mesa_llm.reasoning.reasoning import Reasoning
+
+_log_path = os.environ.get("CLIMATE_LOG_FILE", "climate_negotiation.log")
+_file_handler = logging.FileHandler(_log_path, mode="w", encoding="utf-8")
+_file_handler.setFormatter(logging.Formatter("%(asctime)s | %(levelname)s | %(message)s"))
+
+sim_logger = logging.getLogger("climate_negotiation")
+sim_logger.setLevel(logging.DEBUG)
+sim_logger.addHandler(_file_handler)
+sim_logger.propagate = False
 
 COUNTRIES: list[dict] = [
     {
         "country_name": "USA",
-        "emissions_per_capita": 14.5,
-        "gdp_per_capita": 65_000,
+        "emissions_per_capita": 14.0,
+        "gdp_per_capita": 76_000,
         "development_status": "developed",
         "system_prompt": (
             "You are the USA's chief climate negotiator. "
-            "The USA is the largest historical emitter with a $65k GDP per capita. "
+            "The USA is the largest historical emitter with a $76k GDP per capita. "
             "You support climate action but insist all major economies — especially "
             "China and India — commit to comparable reductions. You prefer "
             "market-based mechanisms and oppose unilateral economic disadvantages."
@@ -21,12 +33,12 @@ COUNTRIES: list[dict] = [
     },
     {
         "country_name": "EU",
-        "emissions_per_capita": 6.4,
-        "gdp_per_capita": 35_000,
+        "emissions_per_capita": 6.0,
+        "gdp_per_capita": 37_000,
         "development_status": "developed",
         "system_prompt": (
             "You are the EU's chief climate negotiator. "
-            "The EU targets a 55% reduction by 2030 and leads global climate ambition. "
+            "The EU targets a 55% reduction by 2030 (Fit for 55) and leads global climate ambition. "
             "You push for legally binding targets for all developed nations and "
             "substantial financial support for developing nations. "
             "Actively build coalitions with high-ambition partners."
@@ -34,13 +46,13 @@ COUNTRIES: list[dict] = [
     },
     {
         "country_name": "China",
-        "emissions_per_capita": 7.1,
-        "gdp_per_capita": 12_000,
+        "emissions_per_capita": 8.0,
+        "gdp_per_capita": 12_700,
         "development_status": "developing",
         "system_prompt": (
             "You are China's chief climate negotiator. "
             "China is the world's largest current emitter but still a developing "
-            "economy at $12k GDP per capita. You argue that developed nations caused "
+            "economy at $12.7k GDP per capita. You argue that developed nations caused "
             "most historical emissions and must bear greater financial burdens. "
             "You support long-term goals but resist targets that constrain development "
             "without adequate technology transfer and green finance from rich countries."
@@ -48,12 +60,12 @@ COUNTRIES: list[dict] = [
     },
     {
         "country_name": "India",
-        "emissions_per_capita": 1.9,
-        "gdp_per_capita": 2_200,
+        "emissions_per_capita": 2.0,
+        "gdp_per_capita": 2_500,
         "development_status": "developing",
         "system_prompt": (
             "You are India's chief climate negotiator. "
-            "India has very low per-capita emissions (1.9 tCO2) and a $2.2k GDP. "
+            "India has very low per-capita emissions (2.0 tCO2) and a $2.5k GDP. "
             "You firmly defend common but differentiated responsibilities. "
             "India needs fossil fuel access to develop. You support renewables "
             "but reject targets that deny energy access to 1.4 billion people. "
@@ -62,8 +74,8 @@ COUNTRIES: list[dict] = [
     },
     {
         "country_name": "Brazil",
-        "emissions_per_capita": 2.2,
-        "gdp_per_capita": 8_600,
+        "emissions_per_capita": 2.8,
+        "gdp_per_capita": 10_400,
         "development_status": "developing",
         "system_prompt": (
             "You are Brazil's chief climate negotiator. "
@@ -76,12 +88,12 @@ COUNTRIES: list[dict] = [
     },
     {
         "country_name": "Russia",
-        "emissions_per_capita": 11.4,
-        "gdp_per_capita": 12_000,
+        "emissions_per_capita": 12.5,
+        "gdp_per_capita": 15_000,
         "development_status": "developed",
         "system_prompt": (
             "You are Russia's chief climate negotiator. "
-            "Russia is a major fossil fuel exporter with 11.4 tCO2 per capita. "
+            "Russia is a major fossil fuel exporter with 12.5 tCO2 per capita. "
             "You accept climate science but argue for gradual, technology-led "
             "transitions. You resist aggressive near-term targets that threaten "
             "your fossil fuel revenues. You may agree to modest pledges if given "
@@ -117,17 +129,15 @@ class ClimateNegotiationModel(Model):
 
     def __init__(
         self,
-        reasoning: type[Reasoning],
+        reasoning: type[Reasoning] = ReActReasoning,
         llm_model: str = "gemini/gemini-2.0-flash",
         rng: int = 42,
     ):
         super().__init__(rng=rng)
 
-        # Global negotiation counters - updated by the tool functions
         self.total_proposals: int = 0
         self.total_acceptances: int = 0
 
-        # Create one CountryAgent per country profile
         for config in COUNTRIES:
             CountryAgent(
                 model=self,
@@ -179,20 +189,50 @@ class ClimateNegotiationModel(Model):
 
     def step(self):
         self.datacollector.collect(self)
+        round_num = self.steps
         rprint(
-            f"\n[bold cyan]- Climate Summit  Round {self.steps} "
+            f"\n[bold cyan]- Climate Summit  Round {round_num} "
             f"[/bold cyan]"
         )
+        sim_logger.info("=" * 60)
+        sim_logger.info(f"ROUND {round_num} START")
+        sim_logger.info("=" * 60)
+
+        # Log each agent's state at the start of the round
+        for a in self.agents:
+            sim_logger.debug(
+                f"  Agent {a.unique_id} ({getattr(a, 'country_name', '?')}): "
+                f"pledge={getattr(a, 'current_pledge', 0):.1f}%  "
+                f"accepted={getattr(a, 'accepted_treaty', False)}  "
+                f"coalition={getattr(a, 'coalition_members', [])}"
+            )
+
         self.agents.shuffle_do("step")
 
         avg = self._average_pledge()
         treaty = self._treaty_reached()
         rprint(
-            f"[bold green]  End of round {self.steps}: "
+            f"[bold green]  End of round {round_num}: "
             f"avg_pledge={avg:.1f}%  "
             f"total_proposals={self.total_proposals}  "
             f"treaty_reached={treaty}[/bold green]"
         )
+        sim_logger.info(
+            f"ROUND {round_num} END | "
+            f"avg_pledge={avg:.1f}%  "
+            f"total_proposals={self.total_proposals}  "
+            f"total_acceptances={self.total_acceptances}  "
+            f"treaty_reached={treaty}"
+        )
+        # Log final state of each agent after the round
+        for a in self.agents:
+            sim_logger.info(
+                f"  [{getattr(a, 'country_name', a.unique_id)}] "
+                f"pledge={getattr(a, 'current_pledge', 0):.1f}%  "
+                f"accepted={getattr(a, 'accepted_treaty', False)}  "
+                f"proposals_made={getattr(a, 'proposals_made', 0)}  "
+                f"coalition={getattr(a, 'coalition_members', [])}"
+            )
 
 
 if __name__ == "__main__":

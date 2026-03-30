@@ -30,7 +30,7 @@ model_params = {
             "gemini/gemini-2.0-flash",
             "openai/gpt-4o-mini",
             "openai/gpt-4o",
-            "anthropic/claude-3-5-haiku-20241022",
+            "anthropic/claude-haiku-4-5-20251001",
             "ollama/llama3.2",
         ],
         "label": "LLM Model",
@@ -174,5 +174,5 @@ page = SolaraViz(
         LargestCoalitionPlot,
     ],
     model_params=model_params,
-    name="Climate Negotiation — Mesa-LLM",
+    name="Climate Negotiation - Mesa-LLM",
 )

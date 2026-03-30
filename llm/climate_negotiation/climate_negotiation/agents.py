@@ -128,10 +128,18 @@ class CountryAgent(LLMAgent):
                 )
         other_status = "\n".join(other_status_lines) or "  No data yet."
 
+        # Build a concise ID→name reference to help smaller LLMs avoid hallucinating IDs.
+        id_reference = ", ".join(
+            f"{a.unique_id}={getattr(a, 'country_name', str(a.unique_id))}"
+            for a in self.model.agents
+        )
+
         prompt = (
             f"NEGOTIATION ROUND {self.model.steps}\n\n"
+            f"VALID COUNTRY IDs — use ONLY these integers for partner_ids and proposer_id:\n"
+            f"  {id_reference}\n\n"
             f"YOUR STATUS:\n"
-            f"  Country: {self.country_name}\n"
+            f"  Country: {self.country_name} (your ID: {self.unique_id})\n"
             f"  Emissions per capita: {self.emissions_per_capita} tCO2/year\n"
             f"  GDP per capita: ${self.gdp_per_capita:,.0f}\n"
             f"  Development status: {self.development_status}\n"
@@ -144,7 +152,7 @@ class CountryAgent(LLMAgent):
             f"You are {self.country_name}'s chief climate negotiator at the Global "
             f"Climate Summit. Choose ONE action this round:\n"
             f"  speak_to send a targeted diplomatic message to one or more "
-            f"countries (use their integer IDs)\n"
+            f"countries (use their integer IDs from the VALID COUNTRY IDs list above)\n"
             f"  make_proposal formally propose a reduction target to all parties\n"
             f"  accept_proposal accept another country's proposal if it is acceptable\n"
             f"  form_coalition build an alliance with countries that share your stance\n"
