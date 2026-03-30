@@ -11,8 +11,9 @@ CountryAgent because ToolManager copies global tools at construction time.
 import logging
 from typing import TYPE_CHECKING
 
-from .agents import country_tool_manager
 from mesa_llm.tools.tool_decorator import tool
+
+from .agents import country_tool_manager
 
 if TYPE_CHECKING:
     from mesa_llm.llm_agent import LLMAgent
@@ -138,10 +139,13 @@ def form_coalition(
     """
     if isinstance(partner_ids, str):
         import json
+
         try:
             partner_ids = json.loads(partner_ids)
         except (json.JSONDecodeError, ValueError):
-            partner_ids = [int(x.strip()) for x in partner_ids.strip("[]").split(",") if x.strip()]
+            partner_ids = [
+                int(x.strip()) for x in partner_ids.strip("[]").split(",") if x.strip()
+            ]
     partner_ids = [int(pid) for pid in (partner_ids or [])]
 
     # Filter out hallucinated IDs - only keep IDs that map to real agents.
@@ -168,10 +172,9 @@ def form_coalition(
         ):
             partner.coalition_members.append(agent.unique_id)
 
-    member_names = (
-        [getattr(a, "country_name", str(a.unique_id)) for a in partner_agents]
-        + [agent.country_name]
-    )
+    member_names = [
+        getattr(a, "country_name", str(a.unique_id)) for a in partner_agents
+    ] + [agent.country_name]
 
     agent.send_message(
         f"[COALITION] {agent.country_name} proposes the '{coalition_name}'. "
@@ -207,11 +210,11 @@ def reject_and_counter(
     """
     counter_reduction_percent = float(counter_reduction_percent or 20.0)
     proposer_id = int(proposer_id or 0)
-    proposer = next(
-        (a for a in agent.model.agents if a.unique_id == proposer_id), None
-    )
+    proposer = next((a for a in agent.model.agents if a.unique_id == proposer_id), None)
     proposer_name = (
-        getattr(proposer, "country_name", str(proposer_id)) if proposer else str(proposer_id)
+        getattr(proposer, "country_name", str(proposer_id))
+        if proposer
+        else str(proposer_id)
     )
 
     counter_msg = (

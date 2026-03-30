@@ -1,16 +1,19 @@
 import logging
 import os
+
 from mesa.datacollection import DataCollector
 from mesa.model import Model
+from mesa_llm.reasoning.react import ReActReasoning
+from mesa_llm.reasoning.reasoning import Reasoning
 from rich import print as rprint
 
 from .agents import CountryAgent
-from mesa_llm.reasoning.react import ReActReasoning
-from mesa_llm.reasoning.reasoning import Reasoning
 
 _log_path = os.environ.get("CLIMATE_LOG_FILE", "climate_negotiation.log")
 _file_handler = logging.FileHandler(_log_path, mode="w", encoding="utf-8")
-_file_handler.setFormatter(logging.Formatter("%(asctime)s | %(levelname)s | %(message)s"))
+_file_handler.setFormatter(
+    logging.Formatter("%(asctime)s | %(levelname)s | %(message)s")
+)
 
 sim_logger = logging.getLogger("climate_negotiation")
 sim_logger.setLevel(logging.DEBUG)
@@ -162,7 +165,6 @@ class ClimateNegotiationModel(Model):
             },
         )
 
-
     def _treaty_reached(self) -> bool:
         """Return True when at least 2/3 of countries have accepted."""
         agents = list(self.agents)
@@ -182,18 +184,12 @@ class ClimateNegotiationModel(Model):
         """Size (including self) of the largest active coalition."""
         if not self.agents:
             return 0
-        return max(
-            len(getattr(a, "coalition_members", [])) + 1 for a in self.agents
-        )
-
+        return max(len(getattr(a, "coalition_members", [])) + 1 for a in self.agents)
 
     def step(self):
         self.datacollector.collect(self)
         round_num = self.steps
-        rprint(
-            f"\n[bold cyan]- Climate Summit  Round {round_num} "
-            f"[/bold cyan]"
-        )
+        rprint(f"\n[bold cyan]- Climate Summit  Round {round_num} [/bold cyan]")
         sim_logger.info("=" * 60)
         sim_logger.info(f"ROUND {round_num} START")
         sim_logger.info("=" * 60)

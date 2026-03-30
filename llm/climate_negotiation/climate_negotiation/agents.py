@@ -39,7 +39,9 @@ def get_negotiation_history(agent, max_messages: int = 6) -> str:
                     sender_agent = next(
                         a for a in agent.model.agents if a.unique_id == sender_id
                     )
-                    sender_name = getattr(sender_agent, "country_name", f"Agent {sender_id}")
+                    sender_name = getattr(
+                        sender_agent, "country_name", f"Agent {sender_id}"
+                    )
                 except StopIteration:
                     sender_name = f"Agent {sender_id}"
                 messages.append(f"  {sender_name}: {msg}")

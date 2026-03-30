@@ -4,12 +4,11 @@ import warnings
 import matplotlib.pyplot as plt
 import pandas as pd
 import solara
+from climate_negotiation.agents import CountryAgent
+from climate_negotiation.model import ClimateNegotiationModel
 from dotenv import load_dotenv
 from mesa.visualization import SolaraViz, make_plot_component
 from mesa.visualization.utils import update_counter
-
-from climate_negotiation.agents import CountryAgent
-from climate_negotiation.model import ClimateNegotiationModel
 from mesa_llm.reasoning.react import ReActReasoning
 
 warnings.filterwarnings("ignore", category=UserWarning, module="pydantic.main")
@@ -78,7 +77,10 @@ def PledgeBarChart(model):
                 bar.get_x() + bar.get_width() / 2,
                 bar.get_height() + 1.2,
                 f"{pledge:.0f}%",
-                ha="center", va="bottom", fontsize=9, fontweight="bold",
+                ha="center",
+                va="bottom",
+                fontsize=9,
+                fontweight="bold",
             )
 
     plt.tight_layout()
@@ -105,13 +107,15 @@ def CoalitionStatusPanel(model):
     rows = []
     for a in sorted(countries, key=lambda x: x.country_name):
         coalition = [id_to_name.get(i, str(i)) for i in a.coalition_members]
-        rows.append({
-            "Country": a.country_name,
-            "Pledge": f"{a.current_pledge:.1f}%",
-            "Accepted": "✓" if a.accepted_treaty else "—",
-            "Coalition": ", ".join(coalition) or "—",
-            "Proposals": a.proposals_made,
-        })
+        rows.append(
+            {
+                "Country": a.country_name,
+                "Pledge": f"{a.current_pledge:.1f}%",
+                "Accepted": "✓" if a.accepted_treaty else "—",
+                "Coalition": ", ".join(coalition) or "—",
+                "Proposals": a.proposals_made,
+            }
+        )
 
     solara.DataFrame(pd.DataFrame(rows))
 
@@ -133,9 +137,7 @@ def PledgeTrajectoriesChart(model):
         return solara.FigureMatplotlib(fig)
 
     id_to_name = {
-        a.unique_id: a.country_name
-        for a in model.agents
-        if isinstance(a, CountryAgent)
+        a.unique_id: a.country_name for a in model.agents if isinstance(a, CountryAgent)
     }
 
     if isinstance(df.index, pd.MultiIndex):
@@ -146,7 +148,9 @@ def PledgeTrajectoriesChart(model):
         return solara.FigureMatplotlib(fig)
 
     for country in pledge_df.columns:
-        ax.plot(pledge_df.index, pledge_df[country], marker="o", label=country, linewidth=2)
+        ax.plot(
+            pledge_df.index, pledge_df[country], marker="o", label=country, linewidth=2
+        )
 
     ax.set_xlabel("Round", fontsize=11)
     ax.set_ylabel("Reduction Pledge (%)", fontsize=11)
