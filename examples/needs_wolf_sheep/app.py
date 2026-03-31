@@ -4,10 +4,9 @@ Solara visualization for the Needs-Based Wolf-Sheep model.
 Run with: solara run app.py
 """
 
+from agents import NeedsGrass, NeedsSheep, NeedsWolf
 from mesa.experimental.devs import ABMSimulator
 from mesa.visualization import SolaraViz, make_plot_component, make_space_component
-
-from agents import NeedsGrass, NeedsSheep, NeedsWolf
 from model import NeedsWolfSheep
 
 

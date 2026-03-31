@@ -21,12 +21,11 @@ References:
 
 import math
 
+from agents import NeedsGrass, NeedsSheep, NeedsWolf
 from mesa import Model
 from mesa.datacollection import DataCollector
 from mesa.discrete_space import OrthogonalVonNeumannGrid
 from mesa.experimental.devs import ABMSimulator
-
-from agents import NeedsGrass, NeedsSheep, NeedsWolf
 
 
 class NeedsWolfSheep(Model):
