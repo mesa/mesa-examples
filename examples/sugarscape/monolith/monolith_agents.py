@@ -125,8 +125,7 @@ class Trader(CellAgent):
         helper function for self.trade()
         """
 
-        sugar_exchanged, spice_exchanged = self.calculate_sell_spice_amount(
-            price)
+        sugar_exchanged, spice_exchanged = self.calculate_sell_spice_amount(price)
 
         # Assess new sugar and spice amount - what if change did occur
         self_sugar = self.sugar + sugar_exchanged
@@ -191,15 +190,13 @@ class Trader(CellAgent):
 
         if mrs_self > mrs_other:
             # self is a sugar buyer, spice seller
-            sold = self.maybe_sell_spice(
-                other, price, welfare_self, welfare_other)
+            sold = self.maybe_sell_spice(other, price, welfare_self, welfare_other)
             # no trade - criteria not met
             if not sold:
                 return
         else:
             # self is a spice buyer, sugar seller
-            sold = other.maybe_sell_spice(
-                self, price, welfare_other, welfare_self)
+            sold = other.maybe_sell_spice(self, price, welfare_other, welfare_self)
             # no trade - criteria not met
             if not sold:
                 return
@@ -250,8 +247,7 @@ class Trader(CellAgent):
             # then rank those by welfare as the tiebreaker.
             max_sugar = max(cell.sugar for cell in neighboring_cells)
             neighboring_cells = [
-                cell for cell in neighboring_cells
-                if cell.sugar == max_sugar
+                cell for cell in neighboring_cells if cell.sugar == max_sugar
             ]
             scores = [
                 self.calculate_welfare(
@@ -265,8 +261,7 @@ class Trader(CellAgent):
             # Same two-pass logic used in gather sugar.
             max_spice = max(cell.spice for cell in neighboring_cells)
             neighboring_cells = [
-                cell for cell in neighboring_cells
-                if cell.spice == max_spice
+                cell for cell in neighboring_cells if cell.spice == max_spice
             ]
             scores = [
                 self.calculate_welfare(
@@ -280,7 +275,7 @@ class Trader(CellAgent):
             """
             - Agent is comfortable but imbalanced
             - it wants to find traders who have the opposite imbalance
-            - Score each cell by: base welfare + count of complementary 
+            - Score each cell by: base welfare + count of complementary
               traders reachable from that cell within vision.
             """
             sugar_ticks = self.sugar / self.metabolism_sugar
@@ -302,7 +297,9 @@ class Trader(CellAgent):
                     other_sugar_t = agent.sugar / agent.metabolism_sugar
                     other_spice_t = agent.spice / agent.metabolism_spice
                     # I need sugar and and they have more sugar than spice
-                    if (need_sugar and other_sugar_t > other_spice_t) or (need_spice and other_spice_t > other_sugar_t):
+                    if (need_sugar and other_sugar_t > other_spice_t) or (
+                        need_spice and other_spice_t > other_sugar_t
+                    ):
                         complementary_count += 1
 
                 # Each complementary trader adds the base welfare as bonus
@@ -361,7 +358,7 @@ class Trader(CellAgent):
         """
         MONOLITH STEP: All drive logic crammed into one method.
 
-        Working, but look at what happens: 
+        Working, but look at what happens:
         - Adding a new drive means adding another elif branch here AND in move()
         - Changing how one drive affects trading means editing deep in this method
         - The interaction between urgency calculation and movement is implicit
@@ -391,8 +388,10 @@ class Trader(CellAgent):
         if (
             sugar_ticks > COMFORTABLE_THRESHOLD
             and spice_ticks > COMFORTABLE_THRESHOLD
-            and (sugar_ticks / spice_ticks > IMBALANCE_RATIO
-                 or spice_ticks / sugar_ticks > IMBALANCE_RATIO)
+            and (
+                sugar_ticks / spice_ticks > IMBALANCE_RATIO
+                or spice_ticks / sugar_ticks > IMBALANCE_RATIO
+            )
         ):
             self.active_drive = "seek_trade"
             self.move(mode="seek_trade")

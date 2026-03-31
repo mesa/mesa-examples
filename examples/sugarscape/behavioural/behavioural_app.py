@@ -84,7 +84,6 @@ page = SolaraViz(
     components=[
         make_plot_component("#Traders", page=1),
         make_plot_component("Price", page=1),
-
         make_plot_component("Survive", page=2),
         make_plot_component("Gather Sugar", page=2),
         make_plot_component("Gather Spice", page=2),

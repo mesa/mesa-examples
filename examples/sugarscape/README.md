@@ -1,16 +1,16 @@
 # Sugarscape: Drive-Based Agent Architecture
 
-## What This Model Does 
+## What This Model Does
 
 This project implements three versions of Epstein & Axtell's Sugarscape with Traders model, each with the same intended agent behaviour but a different internal architecture:
 
 1. **Original** - Mesa's built-in Sugarscape G1MT. Agents follow a fixed action sequence (move -> eat -> trade) every tick with no internal decision-making about what they should prioritise.
 
-2. **Monolith** - Adds four internal drives (survive, gather sugar, gather spice, seek trade) that change how agents move and whether they trade or not. It is named "Monolith" as all the drive logic is crammed into `step()` and `move()` using if/elif chains. 
+2. **Monolith** - Adds four internal drives (survive, gather sugar, gather spice, seek trade) that change how agents move and whether they trade or not. It is named "Monolith" as all the drive logic is crammed into `step()` and `move()` using if/elif chains.
 
-3. **Behavioural** - The same four drives, refactored into separate 'Behaviour' classes. Each behaviour defines its own urgency scoring and action sequence. The agent's `step()` selected the highest-scoring behaviour and delegates to it. 
+3. **Behavioural** - The same four drives, refactored into separate 'Behaviour' classes. Each behaviour defines its own urgency scoring and action sequence. The agent's `step()` selected the highest-scoring behaviour and delegates to it.
 
-The point of this model is not to just build a better Sugarscape. It is to show, with data, that how you structure agent decision-making can change the results emerging from the model. It is also to show that currently Mesa has no clean way to express drive-based architectures, and that adding proper abstraction (like the Behaviour class pattern) makes models easier to extend; adding a new drive just involves adding a new class, not involving edits across multiple methods(). 
+The point of this model is not to just build a better Sugarscape. It is to show, with data, that how you structure agent decision-making can change the results emerging from the model. It is also to show that currently Mesa has no clean way to express drive-based architectures, and that adding proper abstraction (like the Behaviour class pattern) makes models easier to extend; adding a new drive just involves adding a new class, not involving edits across multiple methods().
 
 ## Why Sugarscape
 
@@ -18,11 +18,11 @@ EwoutH explicitly cited Sugarscape as a pain point for the Behavioural Framework
 
 > "All needs get stuffed into one big step method, illustrating how badly Mesa lacks goals, tasks, or behaviour trees."
 
-Sugarscape is also a harder test case than most examples. The bilateral MRS-based trading system (Epstein & Axtell, 1996) creates complex agent interactions: agents compute marginal rates of substitution, negotiate prices as the geometric mean of their MRS values, and trade only when both parties benefit. 
+Sugarscape is also a harder test case than most examples. The bilateral MRS-based trading system (Epstein & Axtell, 1996) creates complex agent interactions: agents compute marginal rates of substitution, negotiate prices as the geometric mean of their MRS values, and trade only when both parties benefit.
 
-In a Complexity Explorer session on the Sugarscape model (that I stumbled across trying to research the model on Youtube), co-creator Rob Axtell explained that decentralised bilateral trade introduces structural friction; because agents can only trade with immediate neighbours rather than seeking optimal partners globally, trade volume is suppressed below what classical supply-and-demand theory predicts. The price converges roughly correctly, but the quantity traded is lower than equilibrium. Axtell framed this bottom-up approach though as a more realistic model than the top-down "auctioneer computes market-clearing price" approach. Real markets work through local adaptive agents, not based off of central planners. However, the friction is a direct consequence of agents having no strategic trade-seeking behaviour. 
+In a Complexity Explorer session on the Sugarscape model (that I stumbled across trying to research the model on Youtube), co-creator Rob Axtell explained that decentralised bilateral trade introduces structural friction; because agents can only trade with immediate neighbours rather than seeking optimal partners globally, trade volume is suppressed below what classical supply-and-demand theory predicts. The price converges roughly correctly, but the quantity traded is lower than equilibrium. Axtell framed this bottom-up approach though as a more realistic model than the top-down "auctioneer computes market-clearing price" approach. Real markets work through local adaptive agents, not based off of central planners. However, the friction is a direct consequence of agents having no strategic trade-seeking behaviour.
 
-This makes Sugarscape ideal for testing whether drive-based agents can reduce that friction by actively seeking for complementary trade partners, rather than passively stumbling into them. 
+This makes Sugarscape ideal for testing whether drive-based agents can reduce that friction by actively seeking for complementary trade partners, rather than passively stumbling into them.
 
 Sugarscape's two independent resources create drive conflicts that simpler models cannot. In Wolf-sheep, there was one prey type, making the only decision possible to eat or not to eat. In Sugarscape, an agent can be desperate for sugar and comfortable on spice simultaneously, and it has two ways to address this deficit: gather the resource directly, or trade surplus spice for it. This is what makes a four-drive system meaningful.
 
@@ -35,9 +35,9 @@ This complexity is also what makes the architectural problem visible. With four 
 - **CellAgent** - Agents bound to grid cells. Movement is handled by reassigning `self.cell`.
 - **shuffle_do()** - Randomised agent activation order each tick. The original and monolith use two passes (`"step"` then `"trade_with_neighbours"`). The behavioural version uses a signle pass with trading handled inside each behaviour's `act()` method.
 - **DataCollector** - Tracks trader count, trade volume, geometric mean price, and drive distribution each tick
-- **SolaraViz** - Interactive browser-based visualisation with agents colour-coded by active drive 
+- **SolaraViz** - Interactive browser-based visualisation with agents colour-coded by active drive
 - **create_agents()** - batch agent creation in model.py
-- **AgentSet / model.agents** - Agent collection used in DataCollector lambdas and `shuffle_do()`for randomised activation 
+- **AgentSet / model.agents** - Agent collection used in DataCollector lambdas and `shuffle_do()`for randomised activation
 - **get_neighborhood()** - Vision-based cell and agent scanning. Used in every drive's cell selection and in trade partner dcisions
 - **self.random / self.rng** - Mesa's built in reproducible random number generation that enables the 100-seed batch comparison with identical initial conditions across all three model versions
 
@@ -88,22 +88,22 @@ Adding a new drive means you only have to write one new class and append it to `
 
 ## The Drives
 
-Each drive computes a score based on the agent's current state. The highest-scoring 
+Each drive computes a score based on the agent's current state. The highest-scoring
 drive wins and controls the agent's behaviour for that tick.
 
-**Survive** — Fires when either resource is critically low. The agent moves greedily 
+**Survive** — Fires when either resource is critically low. The agent moves greedily
 toward whichever resource is most urgent and skips trading entirely.
 
-**Gather Sugar / Gather Spice** — Activates when one resource has fewer ticks of 
-reserves than the other. The agent targets cells rich in the needed resource, using 
-welfare as a tiebreaker between equal options. Trades opportunistically if neighbours 
+**Gather Sugar / Gather Spice** — Activates when one resource has fewer ticks of
+reserves than the other. The agent targets cells rich in the needed resource, using
+welfare as a tiebreaker between equal options. Trades opportunistically if neighbours
 are nearby.
 
-**Seek Trade** — Activates when both resources are comfortable but imbalanced. The 
-agent moves toward cells near complementary traders — agents who have surplus of 
+**Seek Trade** — Activates when both resources are comfortable but imbalanced. The
+agent moves toward cells near complementary traders — agents who have surplus of
 what it needs. This is the drive that directly addresses Axtell's friction.
 
-**Default** — Fallback when resources are roughly balanced. Uses the original 
+**Default** — Fallback when resources are roughly balanced. Uses the original
 welfare-maximising movement from Epstein & Axtell.
 
 ### Drive Distribution over time
@@ -111,14 +111,14 @@ welfare-maximising movement from Epstein & Axtell.
 - **Steps 0–60:** Gather Sugar and Gather Spice dominate as agents start with random endowments and immediately prioritise whichever resource they lack. Survive spikes briefly as some agents hit critical levels. There is a rapid die-off during this phase.
 - **Steps 60–120:** Gather drives drop as agents die or stabilise, with Survive falling to near zero.
 - **Steps 120+:** Seek Trade becomes the most common drive. Surviving agents are comfortable enough that their primary activity is rebalancing through trade. Gather drives persist at low levels as agents occasionally top up a resource.
- 
+
 This emergent shift — from resource desperation to trade-seeking — falls naturally out of the scoring functions without any explicit phase logic.
 
 ![Drive distribution over time](images/drive_distribution.png)
 
 ## Results
 
-The batch_run.py class is used to compare the final results of each model with reliability through repetition, taking the results and the standard deviations of each. 
+The batch_run.py class is used to compare the final results of each model with reliability through repetition, taking the results and the standard deviations of each.
 
 100-seed batch comparison, 500 steps per run, 200 initial agents.
 
@@ -131,13 +131,13 @@ The batch_run.py class is used to compare the final results of each model with r
 
 ### Key findings
 
-**Survival is comparable across all three versions.** The standard deviations heavily overlap, showing the drive-based agents survive at the same rate as the reactive agents. Adding these drives neither hurts nor helps survival in a statistically significant way. 
+**Survival is comparable across all three versions.** The standard deviations heavily overlap, showing the drive-based agents survive at the same rate as the reactive agents. Adding these drives neither hurts nor helps survival in a statistically significant way.
 
-**The behavioural version generates 53% more trades.** 13,036 vs 8,541, with non-overlapping standard deviations. This is the most important finding; the seek trade drive actively moves agents toward complementary partners rather than relying on random encounters. This directly reduces the bilateral trade friction described by Axtell; agents no longer just trade with whoever they happen to be near, they instead move toward agents who have what they need. 
+**The behavioural version generates 53% more trades.** 13,036 vs 8,541, with non-overlapping standard deviations. This is the most important finding; the seek trade drive actively moves agents toward complementary partners rather than relying on random encounters. This directly reduces the bilateral trade friction described by Axtell; agents no longer just trade with whoever they happen to be near, they instead move toward agents who have what they need.
 
-**Price convergence is tighter.** The behavioural version reaches a final price of 0.996 (closer to the theoretical equilibrium of 1.0) with lower variance than the original 1.039 ± 0.239. More trade volume means more price discovery, connecting to Axtell's point that the decentralised bottom-up view can approximate market-clearing prices. Drive-based agents get there faster because they trade more. 
+**Price convergence is tighter.** The behavioural version reaches a final price of 0.996 (closer to the theoretical equilibrium of 1.0) with lower variance than the original 1.039 ± 0.239. More trade volume means more price discovery, connecting to Axtell's point that the decentralised bottom-up view can approximate market-clearing prices. Drive-based agents get there faster because they trade more.
 
-**The monolith and behavioural versions implement the same drives but produce different trade volumes.** The monolith generates 9,046 trades, whereas the behavioural version generates 13,036. The difference is because of execution timing. 
+**The monolith and behavioural versions implement the same drives but produce different trade volumes.** The monolith generates 9,046 trades, whereas the behavioural version generates 13,036. The difference is because of execution timing.
 
 ### Execution timing matters
 
@@ -145,19 +145,19 @@ The monolith and behavioural versions have the same drives, the same scoring fun
 
 In the monolith, the model runs two separate passes: all agents move (`shuffle_do("step")`), then all agents trade (`shuffle_do("trade_with_neighbors")`). Everyone is in their final position before any trading begins.
 
-In the behavioural version, each agent moves and trades within their own `step()` before the next agent acts. Each trade changes both agents' resource levels, which can create new trade opportunities for agents who act later in the same tick. This cascading effect is impossible in the separated-pass approahc, where all movement is finished before any trading begins. 
+In the behavioural version, each agent moves and trades within their own `step()` before the next agent acts. Each trade changes both agents' resource levels, which can create new trade opportunities for agents who act later in the same tick. This cascading effect is impossible in the separated-pass approahc, where all movement is finished before any trading begins.
 
-This was unintended. The 53% trade increase is a consequence that fell out of the architectural decision about when trading happens relative to movement. This is the kind of effect that the Behavioural Framework needs to make explicit and controllable. 
+This was unintended. The 53% trade increase is a consequence that fell out of the architectural decision about when trading happens relative to movement. This is the kind of effect that the Behavioural Framework needs to make explicit and controllable.
 
 ## What I learned
 
 **The original agents are smarter than they look.** My initial instinct was to frame the original as a simple reflex agent, and position my extension to adding goals. I quickly realised that would be wrong though, as the original uses a Cobb-Douglas welfare function to evaluate outcomes and select the best available cell - it is a utility based optimiser, not a reflex agent. What it lacks is not goals but temporal depth and action selection: the ability to choose between moving and trading, to prioritise one resource over another, or to pursue a strategy across multiple ticks.
 
-**Execution timing is an architectural decision with emergent consequences.** I did not set out to increase trade volume. The 53% increase was a side effect of moving trading from a separate model pass into the agent's behaviour. This finding reinforces the case for the Behavioural Framework: when Mesa forces you to structure agent actions in a particular way (separate activation passes), it implicitly constrains what can emerge from the model. A framework that gives modellers explicit control over action sequencing would prevent these accidental effects, or let modellers create them intentionally. 
+**Execution timing is an architectural decision with emergent consequences.** I did not set out to increase trade volume. The 53% increase was a side effect of moving trading from a separate model pass into the agent's behaviour. This finding reinforces the case for the Behavioural Framework: when Mesa forces you to structure agent actions in a particular way (separate activation passes), it implicitly constrains what can emerge from the model. A framework that gives modellers explicit control over action sequencing would prevent these accidental effects, or let modellers create them intentionally.
 
 **Building the monolith first made the refactor's value obvious.** If i had gone straight to the behavioural version, the clean architecture would look like over-engineering. Building the monolith first and experiencing the pain of adding any drives to an already-branching `step()` method made the case for separation strong.
 
-**Decoupling movement from the Trader completed the separation.** The earlier behavioural version still had a shared `move()` method with string-flag branching, which was the same pattern used in the monolith model, just being called from a nicer place. Moving cell selection into each behaviour's `choose_cell()` completed the decoupling. The Trader class no longer knows how any drive makes movement decisions. 
+**Decoupling movement from the Trader completed the separation.** The earlier behavioural version still had a shared `move()` method with string-flag branching, which was the same pattern used in the monolith model, just being called from a nicer place. Moving cell selection into each behaviour's `choose_cell()` completed the decoupling. The Trader class no longer knows how any drive makes movement decisions.
 
 **Learning Solara changed how i debug models.** Being able to watch agents switch drives in real time (colour coded on the grid) caught issues that batch runs couldn't do. I saw that agents would get stuck in survive mode in areas with plenty of resources, with almost no agents getting being put in seek_trade mode, pointing towards a threshold problem that i was able to test and change. I learnt that solara visualisation was not just for presenting and understanding, but it's also a very useful development tool.
 
@@ -171,70 +171,70 @@ This was unintended. The 53% trade increase is a consequence that fell out of th
 
 ## What Was Hard
 
-**Mesa's API is changing rapidly.** The installed version's PropertyLayer, DataCollector, and Model constructor signatures all differ from what the documentation and built-in examples show. The built-in Sugarscape G1MT example itself has bugs (the `max()` crashes on empty welfare lists, the KeyError in the datacollector). This was the most frustrating part in the building process, spending time debugging the API mismatches rather than building the model. 
+**Mesa's API is changing rapidly.** The installed version's PropertyLayer, DataCollector, and Model constructor signatures all differ from what the documentation and built-in examples show. The built-in Sugarscape G1MT example itself has bugs (the `max()` crashes on empty welfare lists, the KeyError in the datacollector). This was the most frustrating part in the building process, spending time debugging the API mismatches rather than building the model.
 
 **The seek trade cell scoring is expensive.** For each candidate cell, the agent scans all traders within vision of that cell to count complementary partners. With 200 agents and vision up to 5, this is a lot of nested iteration. It works for 50x50 grids but would not scale well. A Behavioural Framework implementation might use spatial indexing or cached neighbour lookups.
 
 **Getting the three versions to produce a fair comparison was tricky** The original uses Mesa's Scenario class; the monolith and behavioural use plain constructor parameters. The original and monolith separate movement and trading into two activation passes, whereas the behavioural model interleaves them. These structural differences affect outcomes in ways that are hard to control for. In the batch comparison, I used the same seeds, same grid size, same initial parameters, and same step count, but the execution order difference remains a confounding factor, and is in itself a finding.
 
-**Drive thresholds and principled justification** 
+**Drive thresholds and principled justification**
 The values for `CRITICAL_THRESHOLD`, `COMFORTABLE_THRESHOLD`, and `IMBALANCE_RATIO` are currently hand-tuned. A sensitivity analysis varying these thresholds and measuring their effect on survival and trade volume would strengthen the results. This is something I would add given more time
 
-## Future Directions 
+## Future Directions
 
-The drive system built here is the simplest useful architecture; each tick you score all drives, pick the highest, and then execute. This is enough to demonstrate the problem and produce measureable emergent differences, but it is not the end of the road. 
+The drive system built here is the simplest useful architecture; each tick you score all drives, pick the highest, and then execute. This is enough to demonstrate the problem and produce measureable emergent differences, but it is not the end of the road.
 
 **Goal-based agents with multi-step plans.** The current drives are reactive, re-evaluating every tick. A goal-based agent would commit to a plan ("move to the spice hills over the next 5 ticks") and would only re-evaluate when the goal is achieved or an interrupt fires. This adds temporal depth, making the agent's current action, with the agent's current action depending on decisions made several ticks ago. Sugarscape is well-suited for this because the landscape has resource-hills, so an agent could form a plan to reach one rather than taking a cell-by-cell greedy approach.
 
 **Behaviour trees.** Currently, the `max(score)` selection in the behavioural model is flat, with every drive competing equally. A behaviour tree would add hierarchical structure: a top-level selector could choose between "survival subtree" and "economic subtree" where the economic subtree has its own selector between gathering and trading. This would make complex decision logic composable and inspectable, rather than relying on numeric score comparisons.
 
 
-**Adaptive trade behaviour** Trade behaviour could also become drive dependent, meaning a desperate agent could accept worse trading terms, or a comfortable agent could hold out for better terms. A drive's `act()` could pass modified parameters to the trade logic, but this has not yet been implemented. 
+**Adaptive trade behaviour** Trade behaviour could also become drive dependent, meaning a desperate agent could accept worse trading terms, or a comfortable agent could hold out for better terms. A drive's `act()` could pass modified parameters to the trade logic, but this has not yet been implemented.
 
-These directions map onto a progression of agent architectures from Russell & Norvig: reactive -> drive-based (this model) -> goal-based -> utility-based -> learning. Each state adds a capability that Mesa currently cannot express natively. The Behavioural Framework's job is to make all of them possible without forcing modellers to reinvent the abstractions each time. 
+These directions map onto a progression of agent architectures from Russell & Norvig: reactive -> drive-based (this model) -> goal-based -> utility-based -> learning. Each state adds a capability that Mesa currently cannot express natively. The Behavioural Framework's job is to make all of them possible without forcing modellers to reinvent the abstractions each time.
 
 ## How to Run
- 
+
 ### Requirements
- 
+
 ```
 pip install mesa[rec] numpy pandas
 ```
- 
+
 ### Visualisation (Solara)
- 
+
 ```bash
 # Original
 cd models/sugarscape/original
 solara run original_app.py
- 
+
 # Monolith
 cd models/sugarscape/monolith
 solara run monolith_app.py
- 
+
 # Behavioural
 cd models/sugarscape/behavioural
 solara run behavioural_app.py
 ```
- 
+
 ### Batch comparison
- 
+
 ```bash
 cd models/sugarscape
 python batch_run.py
 ```
- 
+
 Runs all three models across 100 seeds (500 steps each). Outputs a side-by-side comparison table and saves raw data to `batch_comparison.csv`.
- 
+
 ### Individual runs
- 
+
 ```bash
 cd models/sugarscape/monolith
 python monolith_run.py
 ```
- 
+
 ## File Structure
- 
+
 ```
 sugarscape/
 ├── batch_run.py              # 100-seed comparison across all three models
@@ -251,7 +251,7 @@ sugarscape/
     ├── behavioural_model.py  # Model with single-pass execution
     └── behavioural_app.py    # Solara viz with drive-coloured agents
 ```
- 
+
 
 
 

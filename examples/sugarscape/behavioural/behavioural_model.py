@@ -27,7 +27,6 @@ def drive_count(model, drive_name):
 
 
 class SugarscapeBehavioural(mesa.Model):
-
     def __init__(
         self,
         width=50,
@@ -54,9 +53,7 @@ class SugarscapeBehavioural(mesa.Model):
         )
 
         # Read in landscape file
-        self.sugar_distribution = np.genfromtxt(
-            Path(__file__).parent / "sugar-map.txt"
-        )
+        self.sugar_distribution = np.genfromtxt(Path(__file__).parent / "sugar-map.txt")
         self.spice_distribution = np.flip(self.sugar_distribution, 1)
 
         sugar_layer = PropertyLayer("sugar", (self.width, self.height))
@@ -71,9 +68,7 @@ class SugarscapeBehavioural(mesa.Model):
         self.datacollector = mesa.DataCollector(
             model_reporters={
                 "#Traders": lambda m: len(m.agents),
-                "Trade Volume": lambda m: sum(
-                    len(a.trade_partners) for a in m.agents
-                ),
+                "Trade Volume": lambda m: sum(len(a.trade_partners) for a in m.agents),
                 "Price": lambda m: geometric_mean(
                     flatten([a.prices for a in m.agents])
                 ),
@@ -92,18 +87,15 @@ class SugarscapeBehavioural(mesa.Model):
             self,
             n,
             self.random.choices(self.grid.all_cells.cells, k=n),
-            sugar=self.rng.integers(
-                endowment_min, endowment_max, (n,), endpoint=True),
-            spice=self.rng.integers(
-                endowment_min, endowment_max, (n,), endpoint=True),
+            sugar=self.rng.integers(endowment_min, endowment_max, (n,), endpoint=True),
+            spice=self.rng.integers(endowment_min, endowment_max, (n,), endpoint=True),
             metabolism_sugar=self.rng.integers(
                 metabolism_min, metabolism_max, (n,), endpoint=True
             ),
             metabolism_spice=self.rng.integers(
                 metabolism_min, metabolism_max, (n,), endpoint=True
             ),
-            vision=self.rng.integers(
-                vision_min, vision_max, (n,), endpoint=True),
+            vision=self.rng.integers(vision_min, vision_max, (n,), endpoint=True),
         )
 
     def step(self):

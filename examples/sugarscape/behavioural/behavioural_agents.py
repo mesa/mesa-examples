@@ -43,6 +43,7 @@ class Behaviour:
     it to the agent's self.behaviours list. No changes needed
     to the Trader class itself.
     """
+
     name = "default"
 
     def score(self, agent):
@@ -62,6 +63,7 @@ class SurviveBehaviour(Behaviour):
     Overrides normal behaviour — agent moves greedily toward the
     most urgent resource and skips trading entirely.
     """
+
     name = "survive"
 
     def score(self, agent):
@@ -84,8 +86,7 @@ class SurviveBehaviour(Behaviour):
 
         neighboring_cells = [
             cell
-            for cell in agent.cell.get_neighborhood(
-                agent.vision, include_center=True)
+            for cell in agent.cell.get_neighborhood(agent.vision, include_center=True)
             if cell.is_empty
         ]
 
@@ -95,23 +96,17 @@ class SurviveBehaviour(Behaviour):
         # Score by the urgent resource only
         if urgent == "sugar":
             max_val = max(cell.sugar for cell in neighboring_cells)
-            candidates = [
-                cell for cell in neighboring_cells
-                if cell.sugar == max_val
-            ]
+            candidates = [cell for cell in neighboring_cells if cell.sugar == max_val]
         else:
             max_val = max(cell.spice for cell in neighboring_cells)
-            candidates = [
-                cell for cell in neighboring_cells
-                if cell.spice == max_val
-            ]
+            candidates = [cell for cell in neighboring_cells if cell.spice == max_val]
 
         # Tiebreak: closest cell
         min_dist = min(get_distance(agent.cell, cell) for cell in candidates)
         final_candidates = [
-            cell for cell in candidates
-            if math.isclose(
-                get_distance(agent.cell, cell), min_dist, rel_tol=1e-02)
+            cell
+            for cell in candidates
+            if math.isclose(get_distance(agent.cell, cell), min_dist, rel_tol=1e-02)
         ]
 
         return agent.random.choice(final_candidates)
@@ -131,6 +126,7 @@ class GatherSugarBehaviour(Behaviour):
     maximum sugar, then rank those by welfare as tiebreaker.
     Trades opportunistically if neighbours are available.
     """
+
     name = "gather_sugar"
 
     def score(self, agent):
@@ -148,8 +144,7 @@ class GatherSugarBehaviour(Behaviour):
         """
         neighboring_cells = [
             cell
-            for cell in agent.cell.get_neighborhood(
-                agent.vision, include_center=True)
+            for cell in agent.cell.get_neighborhood(agent.vision, include_center=True)
             if cell.is_empty
         ]
 
@@ -158,10 +153,7 @@ class GatherSugarBehaviour(Behaviour):
 
         # First pass: filter to cells with the most sugar
         max_sugar = max(cell.sugar for cell in neighboring_cells)
-        sugar_cells = [
-            cell for cell in neighboring_cells
-            if cell.sugar == max_sugar
-        ]
+        sugar_cells = [cell for cell in neighboring_cells if cell.sugar == max_sugar]
 
         # Second pass: rank by welfare as tiebreaker
         welfares = [
@@ -182,9 +174,9 @@ class GatherSugarBehaviour(Behaviour):
         # Tiebreak: closest cell
         min_dist = min(get_distance(agent.cell, cell) for cell in candidates)
         final_candidates = [
-            cell for cell in candidates
-            if math.isclose(
-                get_distance(agent.cell, cell), min_dist, rel_tol=1e-02)
+            cell
+            for cell in candidates
+            if math.isclose(get_distance(agent.cell, cell), min_dist, rel_tol=1e-02)
         ]
 
         return agent.random.choice(final_candidates)
@@ -205,6 +197,7 @@ class GatherSpiceBehaviour(Behaviour):
     maximum spice, then rank those by welfare as tiebreaker.
     Trades opportunistically if neighbours are available.
     """
+
     name = "gather_spice"
 
     def score(self, agent):
@@ -222,8 +215,7 @@ class GatherSpiceBehaviour(Behaviour):
         """
         neighboring_cells = [
             cell
-            for cell in agent.cell.get_neighborhood(
-                agent.vision, include_center=True)
+            for cell in agent.cell.get_neighborhood(agent.vision, include_center=True)
             if cell.is_empty
         ]
 
@@ -232,10 +224,7 @@ class GatherSpiceBehaviour(Behaviour):
 
         # First pass: filter to cells with the most spice
         max_spice = max(cell.spice for cell in neighboring_cells)
-        spice_cells = [
-            cell for cell in neighboring_cells
-            if cell.spice == max_spice
-        ]
+        spice_cells = [cell for cell in neighboring_cells if cell.spice == max_spice]
 
         # Second pass: rank by welfare as tiebreaker
         welfares = [
@@ -256,9 +245,9 @@ class GatherSpiceBehaviour(Behaviour):
         # Tiebreak: closest cell
         min_dist = min(get_distance(agent.cell, cell) for cell in candidates)
         final_candidates = [
-            cell for cell in candidates
-            if math.isclose(
-                get_distance(agent.cell, cell), min_dist, rel_tol=1e-02)
+            cell
+            for cell in candidates
+            if math.isclose(get_distance(agent.cell, cell), min_dist, rel_tol=1e-02)
         ]
 
         return agent.random.choice(final_candidates)
@@ -283,14 +272,14 @@ class SeekTradeBehaviour(Behaviour):
     agents actively move toward beneficial trade partners rather
     than passively stumbling into them.
     """
+
     name = "seek_trade"
 
     def score(self, agent):
         sugar_ticks = agent.sugar / agent.metabolism_sugar
         spice_ticks = agent.spice / agent.metabolism_spice
         # Only scores positive when both resources are comfortable
-        if (sugar_ticks > COMFORTABLE_THRESHOLD
-                and spice_ticks > COMFORTABLE_THRESHOLD):
+        if sugar_ticks > COMFORTABLE_THRESHOLD and spice_ticks > COMFORTABLE_THRESHOLD:
             return max(sugar_ticks / spice_ticks, spice_ticks / sugar_ticks)
         return 0
 
@@ -304,8 +293,7 @@ class SeekTradeBehaviour(Behaviour):
         """
         neighboring_cells = [
             cell
-            for cell in agent.cell.get_neighborhood(
-                agent.vision, include_center=True)
+            for cell in agent.cell.get_neighborhood(agent.vision, include_center=True)
             if cell.is_empty
         ]
 
@@ -333,7 +321,9 @@ class SeekTradeBehaviour(Behaviour):
                 other_sugar_t = other.sugar / other.metabolism_sugar
                 other_spice_t = other.spice / other.metabolism_spice
                 # I need sugar and they have more sugar than spice
-                if (need_sugar and other_sugar_t > other_spice_t) or (need_spice and other_spice_t > other_sugar_t):
+                if (need_sugar and other_sugar_t > other_spice_t) or (
+                    need_spice and other_spice_t > other_sugar_t
+                ):
                     complementary_count += 1
 
             # Proportional bonus: each complementary trader
@@ -351,9 +341,9 @@ class SeekTradeBehaviour(Behaviour):
         # Tiebreak: closest cell
         min_dist = min(get_distance(agent.cell, cell) for cell in candidates)
         final_candidates = [
-            cell for cell in candidates
-            if math.isclose(
-                get_distance(agent.cell, cell), min_dist, rel_tol=1e-02)
+            cell
+            for cell in candidates
+            if math.isclose(get_distance(agent.cell, cell), min_dist, rel_tol=1e-02)
         ]
 
         return agent.random.choice(final_candidates)
@@ -374,6 +364,7 @@ class DefaultBehaviour(Behaviour):
     Epstein & Axtell. Always scores just above zero so
     it loses to any real drive.
     """
+
     name = "default"
 
     def score(self, agent):
@@ -389,8 +380,7 @@ class DefaultBehaviour(Behaviour):
         """
         neighboring_cells = [
             cell
-            for cell in agent.cell.get_neighborhood(
-                agent.vision, include_center=True)
+            for cell in agent.cell.get_neighborhood(agent.vision, include_center=True)
             if cell.is_empty
         ]
 
@@ -415,9 +405,9 @@ class DefaultBehaviour(Behaviour):
         # Tiebreak: closest cell
         min_dist = min(get_distance(agent.cell, cell) for cell in candidates)
         final_candidates = [
-            cell for cell in candidates
-            if math.isclose(
-                get_distance(agent.cell, cell), min_dist, rel_tol=1e-02)
+            cell
+            for cell in candidates
+            if math.isclose(get_distance(agent.cell, cell), min_dist, rel_tol=1e-02)
         ]
 
         return agent.random.choice(final_candidates)
@@ -554,8 +544,7 @@ class Trader(CellAgent):
         1. Both agents must be better off after the trade
         2. MRS crossing condition must not be violated
         """
-        sugar_exchanged, spice_exchanged = self.calculate_sell_spice_amount(
-            price)
+        sugar_exchanged, spice_exchanged = self.calculate_sell_spice_amount(price)
 
         # Assess hypothetical post-trade amounts
         self_sugar = self.sugar + sugar_exchanged
@@ -618,12 +607,10 @@ class Trader(CellAgent):
 
         if mrs_self > mrs_other:
             # Self is a sugar buyer, spice seller
-            sold = self.maybe_sell_spice(
-                other, price, welfare_self, welfare_other)
+            sold = self.maybe_sell_spice(other, price, welfare_self, welfare_other)
         else:
             # Self is a spice buyer, sugar seller
-            sold = other.maybe_sell_spice(
-                self, price, welfare_other, welfare_self)
+            sold = other.maybe_sell_spice(self, price, welfare_other, welfare_self)
 
         if not sold:
             return
