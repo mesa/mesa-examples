@@ -13,17 +13,14 @@ Outputs summary statistics and saves raw data to CSV.
 import sys
 from pathlib import Path
 
-sys.path.insert(0, "/Users/tomrodger/GSoC-learning-space/models/sugarscape/monolith")
-sys.path.insert(0, "/Users/tomrodger/GSoC-learning-space/models/sugarscape/behavioural")
-
-import pandas as pd
-from behavioural_model import SugarscapeBehavioural
-from mesa.examples.advanced.sugarscape_g1mt.model import SugarscapeG1mt
-from monolith_model import SugarscapeMonolith
-
-# Add subfolders to path so we can import from each
+# Add subfolders to path 
 sys.path.insert(0, str(Path(__file__).parent / "monolith"))
 sys.path.insert(0, str(Path(__file__).parent / "behavioural"))
+
+import pandas as pd  # noqa: E402
+from behavioural_model import SugarscapeBehavioural  # noqa: E402
+from mesa.examples.advanced.sugarscape_g1mt.model import SugarscapeG1mt  # noqa: E402
+from monolith_model import SugarscapeMonolith  # noqa: E402
 
 
 # ---- Configuration ----
@@ -78,21 +75,19 @@ def run_batch(model_class, name):
 
 def print_summary(df, name):
     """Print summary statistics for a model's batch results."""
-    print(f"\n{'=' * 50}")
+    print(f"\n{'='*50}")
     print(f"  {name} ({NUM_SEEDS} runs, {STEPS} steps)")
-    print(f"{'=' * 50}")
-    print(
-        f"  Survival rate:  {df['survival_rate'].mean():.3f} "
-        f"± {df['survival_rate'].std():.3f}"
-    )
-    print(f"  Final alive:    {df['alive'].mean():.1f} ± {df['alive'].std():.1f}")
-    print(
-        f"  Total trades:   {df['total_trade'].mean():.1f} "
-        f"± {df['total_trade'].std():.1f}"
-    )
+    print(f"{'='*50}")
+    print(f"  Survival rate:  {df['survival_rate'].mean():.3f} "
+          f"± {df['survival_rate'].std():.3f}")
+    print(f"  Final alive:    {df['alive'].mean():.1f} "
+          f"± {df['alive'].std():.1f}")
+    print(f"  Total trades:   {df['total_trade'].mean():.1f} "
+          f"± {df['total_trade'].std():.1f}")
     valid = df[df["final_price"] > 0]["final_price"]
     if len(valid) > 0:
-        print(f"  Final price:    {valid.mean():.3f} ± {valid.std():.3f}")
+        print(f"  Final price:    {valid.mean():.3f} "
+              f"± {valid.std():.3f}")
     else:
         print("  Final price:    N/A")
 
@@ -112,29 +107,23 @@ def main():
     print_summary(behavioural_df, "Behavioural")
 
     # Side-by-side comparison
-    print(f"\n{'=' * 60}")
+    print(f"\n{'='*60}")
     print("  Side-by-Side Comparison")
-    print(f"{'=' * 60}")
+    print(f"{'='*60}")
     print(f"{'Metric':<20} {'Original':>12} {'Monolith':>12} {'Behavioural':>12}")
-    print(f"{'-' * 56}")
-    print(
-        f"{'Survival rate':<20} "
-        f"{original_df['survival_rate'].mean():>11.3f} "
-        f"{monolith_df['survival_rate'].mean():>12.3f} "
-        f"{behavioural_df['survival_rate'].mean():>12.3f}"
-    )
-    print(
-        f"{'Final alive':<20} "
-        f"{original_df['alive'].mean():>11.1f} "
-        f"{monolith_df['alive'].mean():>12.1f} "
-        f"{behavioural_df['alive'].mean():>12.1f}"
-    )
-    print(
-        f"{'Total trades':<20} "
-        f"{original_df['total_trade'].mean():>11.1f} "
-        f"{monolith_df['total_trade'].mean():>12.1f} "
-        f"{behavioural_df['total_trade'].mean():>12.1f}"
-    )
+    print(f"{'-'*56}")
+    print(f"{'Survival rate':<20} "
+          f"{original_df['survival_rate'].mean():>11.3f} "
+          f"{monolith_df['survival_rate'].mean():>12.3f} "
+          f"{behavioural_df['survival_rate'].mean():>12.3f}")
+    print(f"{'Final alive':<20} "
+          f"{original_df['alive'].mean():>11.1f} "
+          f"{monolith_df['alive'].mean():>12.1f} "
+          f"{behavioural_df['alive'].mean():>12.1f}")
+    print(f"{'Total trades':<20} "
+          f"{original_df['total_trade'].mean():>11.1f} "
+          f"{monolith_df['total_trade'].mean():>12.1f} "
+          f"{behavioural_df['total_trade'].mean():>12.1f}")
 
     # Save raw data
     all_data = pd.concat([original_df, monolith_df, behavioural_df])
