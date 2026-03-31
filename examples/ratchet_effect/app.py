@@ -59,7 +59,7 @@ def RatchetChart(model):
         color="#e74c3c",
         linewidth=1.5,
         linestyle="--",
-        label="Return Resistance (×100)",
+        label="Return Resistance (x100)",
     )
 
     # Shade shock period
@@ -103,7 +103,7 @@ def LockInChart(model):
     )
     ax.fill_between(df.index, df["Avg Lock-in"], alpha=0.2, color="#8e44ad")
     ax.set_xlabel("Step")
-    ax.set_ylabel("Lock-in (0–1)")
+    ax.set_ylabel("Lock-in (0-1)")
     ax.set_title("Average Lock-in Accumulation")
     ax.set_ylim(0, 1.05)
     ax.legend()
