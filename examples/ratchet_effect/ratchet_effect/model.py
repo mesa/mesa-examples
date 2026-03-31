@@ -118,11 +118,16 @@ class RatchetEffectModel(Model):
 
 # --- Model-level reporter functions ---
 
+
 def _pct_remote(model: RatchetEffectModel) -> float:
     """Percentage of workers currently working remotely."""
     if not model.agents:
         return 0.0
-    return sum(1 for a in model.agents if a.work_mode == "remote") / len(model.agents) * 100
+    return (
+        sum(1 for a in model.agents if a.work_mode == "remote")
+        / len(model.agents)
+        * 100
+    )
 
 
 def _avg_lock_in(model: RatchetEffectModel) -> float:

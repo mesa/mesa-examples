@@ -1,9 +1,7 @@
 import solara
 from matplotlib.figure import Figure
-from mesa.visualization import Slider, SolaraViz, make_plot_component
-from mesa.visualization import SpaceRenderer
+from mesa.visualization import Slider, SolaraViz, SpaceRenderer
 from mesa.visualization.components.portrayal_components import AgentPortrayalStyle
-
 from ratchet_effect.model import RatchetEffectModel
 
 
@@ -21,7 +19,7 @@ def worker_portrayal(agent):
         g = int(120 + 135 * agent.lock_in)
         r = int(60 - 60 * agent.lock_in)
         b = int(60 - 60 * agent.lock_in)
-        color = f"#{max(0,r):02x}{min(255,g):02x}{max(0,b):02x}"
+        color = f"#{max(0, r):02x}{min(255, g):02x}{max(0, b):02x}"
         size = 90 + int(110 * agent.lock_in)
     else:
         # Steel blue for office workers

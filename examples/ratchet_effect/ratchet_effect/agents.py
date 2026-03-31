@@ -32,9 +32,7 @@ class WorkerAgent(FixedAgent):
         neighbors = list(self.cell.neighborhood.agents)
         n = len(neighbors)
         remote_fraction = (
-            sum(1 for nb in neighbors if nb.work_mode == "remote") / n
-            if n > 0
-            else 0.0
+            sum(1 for nb in neighbors if nb.work_mode == "remote") / n if n > 0 else 0.0
         )
 
         if self.work_mode == "office":
@@ -59,7 +57,11 @@ class WorkerAgent(FixedAgent):
 
         net = social_pull + pref_pull + shock_boost
         # Only cross the threshold probabilistically
-        p_go_remote = min(1.0, max(0.0, net - 0.12)) if not self.model.shock_active else min(1.0, net)
+        p_go_remote = (
+            min(1.0, max(0.0, net - 0.12))
+            if not self.model.shock_active
+            else min(1.0, net)
+        )
 
         if self.model.random.random() < p_go_remote:
             self.work_mode = "remote"
