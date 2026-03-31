@@ -125,7 +125,8 @@ class Trader(CellAgent):
         helper function for self.trade()
         """
 
-        sugar_exchanged, spice_exchanged = self.calculate_sell_spice_amount(price)
+        sugar_exchanged, spice_exchanged = self.calculate_sell_spice_amount(
+            price)
 
         # Assess new sugar and spice amount - what if change did occur
         self_sugar = self.sugar + sugar_exchanged
@@ -190,13 +191,15 @@ class Trader(CellAgent):
 
         if mrs_self > mrs_other:
             # self is a sugar buyer, spice seller
-            sold = self.maybe_sell_spice(other, price, welfare_self, welfare_other)
+            sold = self.maybe_sell_spice(
+                other, price, welfare_self, welfare_other)
             # no trade - criteria not met
             if not sold:
                 return
         else:
             # self is a spice buyer, sugar seller
-            sold = other.maybe_sell_spice(self, price, welfare_other, welfare_self)
+            sold = other.maybe_sell_spice(
+                self, price, welfare_other, welfare_self)
             # no trade - criteria not met
             if not sold:
                 return
@@ -368,7 +371,7 @@ class Trader(CellAgent):
         self.prices = []
         self.trade_partners = []
 
-        # Compute urgency (ticks of reserves remaning)
+        # Compute urgency (ticks of reserves remaining)
         sugar_ticks = self.sugar / self.metabolism_sugar
         spice_ticks = self.spice / self.metabolism_spice
 

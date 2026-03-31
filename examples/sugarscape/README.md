@@ -33,7 +33,7 @@ This complexity is also what makes the architectural problem visible. With four 
 - **OrthogonalVonNeumannGrid** - 50x50 grid with Von Neumann neighbourhood (four cardinal directions)
 - **PropertyLayer** - Sugar and spice distributions loaded from 'sugar-map.txt', with per-tick regrowth capped at initial max values.
 - **CellAgent** - Agents bound to grid cells. Movement is handled by reassigning `self.cell`.
-- **shuffle_do()** - Randomised agent activation order each tick. The original and monolith use two passes (`"step"` then `"trade_with_neighbours"`). The behavioural version uses a signle pass with trading handled inside each behaviour's `act()` method.
+- **shuffle_do()** - Randomised agent activation order each tick. The original and monolith use two passes (`"step"` then `"trade_with_neighbours"`). The behavioural version uses a single pass with trading handled inside each behaviour's `act()` method.
 - **DataCollector** - Tracks trader count, trade volume, geometric mean price, and drive distribution each tick
 - **SolaraViz** - Interactive browser-based visualisation with agents colour-coded by active drive
 - **create_agents()** - batch agent creation in model.py
@@ -69,7 +69,7 @@ The monolith adds four drives by computing urgency values at the top of 'step()'
 
 This is the pattern that EwoutH described, with all needs being stuffed into one big step method. The monolith acts as a problem model, showing the issues caused by the current structure when looking to extend the original model. This is used to compare against the next refactored model.
 
-### Behavioural (drives as seperate classes)
+### Behavioural (drives as separate classes)
 
 Each drive becomes a 'Behaviour' subclass with three responsibilities: `score(agent)` returns urgency, `choose_cell(agent)` selects the target cell, and `act(agent)`executes the full action sequence including movement, eating, and trading.
 
@@ -141,7 +141,7 @@ The batch_run.py class is used to compare the final results of each model with r
 
 ### Execution timing matters
 
-The monolith and behavioural versions have the same drives, the same scoring functions, and the same cell selction logic, however they produce these very different trade volumes. The difference is entirely structural.
+The monolith and behavioural versions have the same drives, the same scoring functions, and the same cell selection logic, however they produce these very different trade volumes. The difference is entirely structural.
 
 In the monolith, the model runs two separate passes: all agents move (`shuffle_do("step")`), then all agents trade (`shuffle_do("trade_with_neighbors")`). Everyone is in their final position before any trading begins.
 
@@ -182,7 +182,7 @@ The values for `CRITICAL_THRESHOLD`, `COMFORTABLE_THRESHOLD`, and `IMBALANCE_RAT
 
 ## Future Directions
 
-The drive system built here is the simplest useful architecture; each tick you score all drives, pick the highest, and then execute. This is enough to demonstrate the problem and produce measureable emergent differences, but it is not the end of the road.
+The drive system built here is the simplest useful architecture; each tick you score all drives, pick the highest, and then execute. This is enough to demonstrate the problem and produce measurable emergent differences, but it is not the end of the road.
 
 **Goal-based agents with multi-step plans.** The current drives are reactive, re-evaluating every tick. A goal-based agent would commit to a plan ("move to the spice hills over the next 5 ticks") and would only re-evaluate when the goal is achieved or an interrupt fires. This adds temporal depth, making the agent's current action, with the agent's current action depending on decisions made several ticks ago. Sugarscape is well-suited for this because the landscape has resource-hills, so an agent could form a plan to reach one rather than taking a cell-by-cell greedy approach.
 
