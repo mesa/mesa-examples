@@ -21,7 +21,7 @@ from mesa.discrete_space import CellAgent, FixedAgent
 class NeedsBasedAnimal(CellAgent):
     """Base animal with continuous internal states driving behavior.
 
-    Internal states (all floats 0.0–1.0):
+    Internal states (all floats 0.0-1.0):
         hunger: Increases each step. Reduced by eating.
         fear: Spikes when predators are nearby. Decays when safe.
         fatigue: Increases with movement, decreases with rest.
