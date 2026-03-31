@@ -10,19 +10,18 @@ Runs all three models across the same seeds and compares:
 Outputs summary statistics and saves raw data to CSV.
 """
 
-from pathlib import Path
 import sys
+from pathlib import Path
+
 sys.path.insert(
     0, "/Users/tomrodger/GSoC-learning-space/models/sugarscape/monolith")
 sys.path.insert(
     0, "/Users/tomrodger/GSoC-learning-space/models/sugarscape/behavioural")
 
-import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
-from mesa.examples.advanced.sugarscape_g1mt.model import SugarscapeG1mt  # noqa: E402
-from monolith_model import SugarscapeMonolith  # noqa: E402
-from behavioural_model import SugarscapeBehavioural  # noqa: E402
-
+import pandas as pd
+from behavioural_model import SugarscapeBehavioural
+from mesa.examples.advanced.sugarscape_g1mt.model import SugarscapeG1mt
+from monolith_model import SugarscapeMonolith
 
 # Add subfolders to path so we can import from each
 sys.path.insert(0, str(Path(__file__).parent / "monolith"))
@@ -95,12 +94,12 @@ def print_summary(df, name):
         print(f"  Final price:    {valid.mean():.3f} "
               f"± {valid.std():.3f}")
     else:
-        print(f"  Final price:    N/A")
+        print("  Final price:    N/A")
 
 
 def main():
     print(f"Batch comparison: {NUM_SEEDS} seeds, {STEPS} steps each")
-    print(f"Models: Original, Monolith, Behavioural")
+    print("Models: Original, Monolith, Behavioural")
 
     # Run all three
     original_df = run_batch(SugarscapeG1mt, "Original")
@@ -114,7 +113,7 @@ def main():
 
     # Side-by-side comparison
     print(f"\n{'='*60}")
-    print(f"  Side-by-Side Comparison")
+    print("  Side-by-Side Comparison")
     print(f"{'='*60}")
     print(f"{'Metric':<20} {'Original':>12} {'Monolith':>12} {'Behavioural':>12}")
     print(f"{'-'*56}")
@@ -134,7 +133,7 @@ def main():
     # Save raw data
     all_data = pd.concat([original_df, monolith_df, behavioural_df])
     all_data.to_csv("batch_comparison.csv", index=False)
-    print(f"\nRaw data saved to batch_comparison.csv")
+    print("\nRaw data saved to batch_comparison.csv")
 
 
 if __name__ == "__main__":

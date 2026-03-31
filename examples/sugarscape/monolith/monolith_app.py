@@ -1,6 +1,6 @@
-from monolith_model import SugarscapeMonolith
 from mesa.visualization import Slider, SolaraViz, SpaceRenderer, make_plot_component
 from mesa.visualization.components import AgentPortrayalStyle, PropertyLayerStyle
+from monolith_model import SugarscapeMonolith
 
 
 def agent_portrayal(agent):

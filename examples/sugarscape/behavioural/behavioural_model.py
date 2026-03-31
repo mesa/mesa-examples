@@ -1,13 +1,13 @@
 from pathlib import Path
 
-import numpy as np
-
 import mesa
-from mesa.discrete_space import OrthogonalVonNeumannGrid
-from mesa.discrete_space.property_layer import PropertyLayer
+import numpy as np
 
 # Import from LOCAL agents file, not Mesa's built-in
 from behavioural_agents import Trader
+from mesa.discrete_space import OrthogonalVonNeumannGrid
+from mesa.discrete_space.property_layer import PropertyLayer
+
 # Helper Functions
 
 

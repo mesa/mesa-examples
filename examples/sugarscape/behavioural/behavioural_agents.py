@@ -333,10 +333,7 @@ class SeekTradeBehaviour(Behaviour):
                 other_sugar_t = other.sugar / other.metabolism_sugar
                 other_spice_t = other.spice / other.metabolism_spice
                 # I need sugar and they have more sugar than spice
-                if need_sugar and other_sugar_t > other_spice_t:
-                    complementary_count += 1
-                # I need spice and they have more spice than sugar
-                elif need_spice and other_spice_t > other_sugar_t:
+                if (need_sugar and other_sugar_t > other_spice_t) or (need_spice and other_spice_t > other_sugar_t):
                     complementary_count += 1
 
             # Proportional bonus: each complementary trader
