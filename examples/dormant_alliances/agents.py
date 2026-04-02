@@ -15,10 +15,10 @@ from __future__ import annotations
 import mesa
 from mesa.experimental.meta_agents import MetaAgent
 
-
 # ---------------------------------------------------------------------------
 # Country agent
 # ---------------------------------------------------------------------------
+
 
 class CountryAgent(mesa.Agent):
     """A country that can join alliances, gain/lose power, and be defeated.
@@ -38,7 +38,7 @@ class CountryAgent(mesa.Agent):
     # ------------------------------------------------------------------
 
     @property
-    def alliance(self) -> "Alliance | None":
+    def alliance(self) -> Alliance | None:
         """Convenience accessor: the first Alliance this country belongs to."""
         if hasattr(self, "meta_agents"):
             alliances = [ma for ma in self.meta_agents if isinstance(ma, Alliance)]
@@ -77,6 +77,7 @@ class CountryAgent(mesa.Agent):
 # Alliance meta-agent
 # ---------------------------------------------------------------------------
 
+
 class Alliance(MetaAgent):
     """A group of countries that act as a collective entity.
 
@@ -102,7 +103,7 @@ class Alliance(MetaAgent):
         _weakened_emitted: Guard so the signal fires only once.
     """
 
-    cascade_step: bool = True   # automatically step all members
+    cascade_step: bool = True  # automatically step all members
 
     def __init__(
         self,
@@ -172,13 +173,10 @@ class Alliance(MetaAgent):
         returns (handled in MetaAgent.step()).
         """
         if not self.is_active:
-            return   # DORMANT — skip entirely; base class will also guard
+            return  # DORMANT — skip entirely; base class will also guard
 
         # Check collective power
-        if (
-            not self._weakened_emitted
-            and self.total_power < self.power_threshold
-        ):
+        if not self._weakened_emitted and self.total_power < self.power_threshold:
             self._weakened_emitted = True
             self.emit("alliance_weakened", self)
 
@@ -194,4 +192,3 @@ class Alliance(MetaAgent):
             f"state={self._state.name} members={self.size} "
             f"power={self.total_power:.1f}>"
         )
-

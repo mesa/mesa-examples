@@ -6,17 +6,14 @@ Run:
 
 from __future__ import annotations
 
-import matplotlib.pyplot as plt
 import networkx as nx
 import solara
 from matplotlib.figure import Figure
-
 from mesa.visualization import SolaraViz
 from mesa.visualization.utils import update_counter
 
-from .model import DormantAlliancesModel
 from .agents import Alliance, CountryAgent
-
+from .model import DormantAlliancesModel
 
 # ---------------------------------------------------------------------------
 # Solara components
@@ -24,9 +21,9 @@ from .agents import Alliance, CountryAgent
 
 # Colour coding: active alliance = blue, dormant = orange, unaffiliated = grey
 _STATE_COLOUR = {
-    "ACTIVE":  "#3B82F6",   # blue-500
-    "DORMANT": "#F97316",   # orange-500
-    None:      "#9CA3AF",   # grey-400  (unaffiliated)
+    "ACTIVE": "#3B82F6",  # blue-500
+    "DORMANT": "#F97316",  # orange-500
+    None: "#9CA3AF",  # grey-400  (unaffiliated)
 }
 
 
@@ -42,7 +39,7 @@ def plot_alliance_network(model):
     g = nx.Graph()
 
     countries = list(model.agents_by_type.get(CountryAgent, []))
-    alliances  = list(model.agents_by_type.get(Alliance, []))
+    alliances = list(model.agents_by_type.get(Alliance, []))
 
     # Add country nodes
     for c in countries:
@@ -57,13 +54,12 @@ def plot_alliance_network(model):
 
     pos = nx.spring_layout(g, seed=0)
 
-    country_nodes  = [n for n, d in g.nodes(data=True) if d.get("kind") == "country"]
+    country_nodes = [n for n, d in g.nodes(data=True) if d.get("kind") == "country"]
     alliance_nodes = [n for n, d in g.nodes(data=True) if d.get("kind") == "alliance"]
 
-    country_sizes  = [g.nodes[n]["power"] * 3 for n in country_nodes]
+    country_sizes = [g.nodes[n]["power"] * 3 for n in country_nodes]
     alliance_colours = [
-        _STATE_COLOUR.get(g.nodes[n].get("state"), "#9CA3AF")
-        for n in alliance_nodes
+        _STATE_COLOUR.get(g.nodes[n].get("state"), "#9CA3AF") for n in alliance_nodes
     ]
 
     fig = Figure(figsize=(7, 5))
@@ -76,11 +72,23 @@ def plot_alliance_network(model):
         fontsize=9,
     )
 
-    nx.draw_networkx_nodes(g, pos, nodelist=country_nodes,
-                           node_size=country_sizes, node_color="#6EE7B7", ax=ax)
-    nx.draw_networkx_nodes(g, pos, nodelist=alliance_nodes,
-                           node_size=600, node_color=alliance_colours,
-                           node_shape="s", ax=ax)
+    nx.draw_networkx_nodes(
+        g,
+        pos,
+        nodelist=country_nodes,
+        node_size=country_sizes,
+        node_color="#6EE7B7",
+        ax=ax,
+    )
+    nx.draw_networkx_nodes(
+        g,
+        pos,
+        nodelist=alliance_nodes,
+        node_size=600,
+        node_color=alliance_colours,
+        node_shape="s",
+        ax=ax,
+    )
     nx.draw_networkx_labels(g, pos, ax=ax, font_size=6)
     nx.draw_networkx_edges(g, pos, ax=ax, alpha=0.4)
 
@@ -100,7 +108,7 @@ def plot_timeseries(model):
     fig = Figure(figsize=(7, 3))
     ax1, ax2 = fig.subplots(1, 2)
 
-    ax1.plot(df.index, df["Active Alliances"],  label="Active",  color="#3B82F6")
+    ax1.plot(df.index, df["Active Alliances"], label="Active", color="#3B82F6")
     ax1.plot(df.index, df["Dormant Alliances"], label="Dormant", color="#F97316")
     ax1.set_title("Alliance States")
     ax1.set_xlabel("Step")
@@ -161,4 +169,3 @@ page = SolaraViz(
     name="Dormant Alliances — MetaAgent Lifecycle Demo",
 )
 page  # noqa
-

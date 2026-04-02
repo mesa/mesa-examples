@@ -19,10 +19,9 @@ Or headless:
 from __future__ import annotations
 
 import mesa
-
-from .agents import Alliance, CountryAgent
 from mesa.experimental.meta_agents import create_meta_agent
 
+from .agents import Alliance, CountryAgent
 
 # Minimum combined power for two countries to consider forming an alliance
 ALLIANCE_FORMATION_THRESHOLD = 40.0
@@ -65,13 +64,15 @@ class DormantAlliancesModel(mesa.Model):
         # Collect a snapshot of active/dormant alliances each step
         self.datacollector = mesa.DataCollector(
             model_reporters={
-                "Active Alliances":   lambda m: m._count_alliances("ACTIVE"),
-                "Dormant Alliances":  lambda m: m._count_alliances("DORMANT"),
-                "Total Countries":    lambda m: len(m.agents_by_type.get(CountryAgent, [])),
+                "Active Alliances": lambda m: m._count_alliances("ACTIVE"),
+                "Dormant Alliances": lambda m: m._count_alliances("DORMANT"),
+                "Total Countries": lambda m: len(
+                    m.agents_by_type.get(CountryAgent, [])
+                ),
                 "Mean Country Power": lambda m: m._mean_power(),
             },
             agent_reporters={
-                "Power":    lambda a: getattr(a, "power", None),
+                "Power": lambda a: getattr(a, "power", None),
                 "Defeated": lambda a: getattr(a, "defeated", None),
             },
         )
@@ -102,8 +103,7 @@ class DormantAlliancesModel(mesa.Model):
         threshold and create a new Alliance MetaAgent for each eligible pair.
         """
         unaffiliated = [
-            c for c in self.agents_by_type.get(CountryAgent, [])
-            if c.alliance is None
+            c for c in self.agents_by_type.get(CountryAgent, []) if c.alliance is None
         ]
         self.rng.shuffle(unaffiliated)
 
@@ -130,13 +130,9 @@ class DormantAlliancesModel(mesa.Model):
         If a dormant alliance can recruit enough members to exceed half its
         founding size, it reactivates.
         """
-        dormant = [
-            a for a in self.agents_by_type.get(Alliance, [])
-            if a.is_dormant
-        ]
+        dormant = [a for a in self.agents_by_type.get(Alliance, []) if a.is_dormant]
         unaffiliated = [
-            c for c in self.agents_by_type.get(CountryAgent, [])
-            if c.alliance is None
+            c for c in self.agents_by_type.get(CountryAgent, []) if c.alliance is None
         ]
 
         for alliance in dormant:
@@ -216,4 +212,3 @@ if __name__ == "__main__":
     print("\n=== Final Alliance Snapshots ===")
     for alliance in model.agents_by_type.get(Alliance, []):
         print(" ", alliance.to_dict())
-
