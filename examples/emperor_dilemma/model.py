@@ -1,10 +1,7 @@
-import random
-
+from emperor_dilemma.agents import EmperorAgent
 from mesa import Model
 from mesa.datacollection import DataCollector
 from mesa.discrete_space.grid import OrthogonalMooreGrid
-
-from .agents import EmperorAgent
 
 
 class EmperorModel(Model):
@@ -81,7 +78,7 @@ class EmperorModel(Model):
                 by = (start_y + (i // int(num_believers**0.5 + 1))) % self.height
                 believer_coords.add((bx, by))
         else:
-            believer_coords = set(random.sample(all_coords, num_believers))
+            believer_coords = set(self.random.sample(all_coords, num_believers))
 
         for x, y in all_coords:
             if (x, y) in believer_coords:
@@ -89,7 +86,7 @@ class EmperorModel(Model):
                 conviction = 1.0
             else:
                 p_belief = -1
-                conviction = random.uniform(0.01, 0.38)
+                conviction = self.random.uniform(0.01, 0.38)
 
             agent = EmperorAgent(self, p_belief, conviction, self.k)
 

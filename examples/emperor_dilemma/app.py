@@ -1,3 +1,4 @@
+from emperor_dilemma.model import EmperorModel
 from mesa.visualization import (
     CommandConsole,
     Slider,
@@ -6,8 +7,6 @@ from mesa.visualization import (
     make_plot_component,
 )
 from mesa.visualization.components.portrayal_components import AgentPortrayalStyle
-
-from .model import EmperorModel
 
 # Colors matching Figure 2
 COLOR_COMPLY_QUIET = "#F0F8FF"  # AliceBlue
