@@ -1,3 +1,1 @@
-mesa
-matplotlib
-solara
+mesa[network,viz]~=3.0

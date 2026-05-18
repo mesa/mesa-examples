@@ -87,7 +87,6 @@ class AxelrodModel(Model):
         self.datacollector = DataCollector(
             model_reporters={"Cultural Regions": number_of_cultural_regions}
         )
-        self.running = True
         self.datacollector.collect(self)
 
     def step(self):
