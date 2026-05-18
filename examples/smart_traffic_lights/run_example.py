@@ -17,7 +17,6 @@ def final_results_from_simulation(smart_lights: bool):
 
 
 def percent_reduction(before, after):
-
     return np.round((before - after) / before * 100, 2)
 
 
