@@ -8,6 +8,9 @@ from mesa.visualization import (
     SolaraViz,
     make_space_component,
 )
+from mesa.visualization.user_param import (
+    Slider,
+)
 
 _COLORS = [
     "Aqua",
@@ -45,12 +48,11 @@ def color_patch_draw(cell):
     :return: the portrayal dictionary.
     """
     if cell is None:
-        raise AssertionError
-    portrayal = {"Shape": "rect", "w": 1, "h": 1, "Filled": "true", "Layer": 0}
-    portrayal["x"] = cell.get_row()
-    portrayal["y"] = cell.get_col()
-    portrayal["color"] = _COLORS[cell.state]
-    return portrayal
+        return
+    return {
+        "color": _COLORS[cell.state],
+        "size": 100,
+    }
 
 
 space_component = make_space_component(
@@ -58,10 +60,24 @@ space_component = make_space_component(
     draw_grid=False,
 )
 model = ColorPatches()
+model_params = {
+    "width": Slider(
+        "Grid Width",
+        grid_rows,
+        5,
+        100,
+    ),
+    "height": Slider(
+        "Grid Height",
+        grid_cols,
+        5,
+        100,
+    ),
+}
+
 page = SolaraViz(
     model,
     components=[space_component],
-    model_params={"width": grid_rows, "height": grid_cols},
+    model_params=model_params,
     name="Color Patches",
 )
-# webbrowser.open('http://127.0.0.1:8521')  # TODO: make this configurable

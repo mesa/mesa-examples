@@ -18,19 +18,17 @@ An agent's state represents its "opinion" and is shown by the color of the cell 
 
 ## How to Run
 
-To run the model interactively, run ``mesa runserver` in this directory. e.g.
+To run the model interactively, run Solara in this directory. e.g.
 
 ```
-    $ mesa runserver
+    $ solara run app.py
 ```
-
-Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and press Reset, then Run.
+Then open your browser to [http://localhost:8765/](http://localhost:8765/) and press Reset, then Run.
 
 ## Files
 
 * ``color_patches/model.py``: Defines the cell and model classes. The cell class governs each cell's behavior. The model class itself controls the lattice on which the cells live and interact.
-* ``color_patches/server.py``: Defines an interactive visualization.
-* ``run.py``: Launches an interactive visualization
+* ``app.py``: Launches an interactive SolaraViz visualization.
 
 ## Further Reading
 
