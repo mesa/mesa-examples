@@ -93,8 +93,8 @@ class TrafficModel(mesa.Model):
     def step(self):
         # Get cars by direction
         all_cars = self.agents_by_type[CarAgent]
-        east_cars = all_cars.select(lambda a: a.direction == Direction.EAST)
-        north_cars = all_cars.select(lambda a: a.direction == Direction.NORTH)
+        east_cars = [c for c in all_cars if c.direction == Direction.EAST]
+        north_cars = [c for c in all_cars if c.direction == Direction.NORTH]
 
         # Sort front-to-back: Cars with higher x (for East) or higher y (for North)
         # are "further ahead" and should move first to clear the path.
