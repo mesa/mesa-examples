@@ -29,6 +29,14 @@ class TrafficModel(mesa.Model):
     """
     The simulation model for the traffic network.
 
+    Args:
+        width: Grid width
+        height: Grid height
+        num_cars_east: Number of cars travelling east
+        num_cars_north: Number of cars travelling north
+        smart_lights: Whether the traffic light should use a smart algorithm
+        rng: Random seed for reproducibility
+
     Attributes:
         grid (mesa.space.MultiGrid): The spatial grid.
     """
@@ -40,13 +48,16 @@ class TrafficModel(mesa.Model):
         num_cars_east: int = 8,
         num_cars_north: int = 8,
         smart_lights: bool = False,
+        rng: int | None = None,
     ):
-        super().__init__()
+        super().__init__(rng=rng)
         self.width = width
         self.height = height
 
         # Initialize the new discrete_space grid
-        self.grid = OrthogonalVonNeumannGrid((width, height), torus=True, capacity=None)
+        self.grid = OrthogonalVonNeumannGrid(
+            (width, height), torus=True, capacity=None, random=self.random
+        )
 
         # Build a lookup table mapping (x, y) to Cell objects
         self.cells = {cell.coordinate: cell for cell in self.grid.all_cells}
