@@ -1,23 +1,16 @@
+from functools import partial
+
 from mesa import DataCollector, Model
 from mesa.discrete_space import OrthogonalMooreGrid
 
 from pathogen_outbreak.agents import Citizen
 
 
-def c_healthy(model):
-    return sum(1 for i in model.agents if i.state == "healthy")
+def count_state(state, model):
+    return sum(1 for i in model.agents if i.state == state)
 
 
-def c_infected(model):
-    return sum(1 for i in model.agents if i.state == "infected")
-
-
-def c_immune(model):
-    return sum(1 for i in model.agents if i.state == "immune")
-
-
-def c_dead(model):
-    return sum(1 for i in model.agents if i.state == "dead")
+c_infected = partial(count_state, "infected")
 
 
 class PathogenModel(Model):
@@ -42,10 +35,10 @@ class PathogenModel(Model):
 
         self.datacollector = DataCollector(
             model_reporters={
-                "healthy": c_healthy,
-                "immune": c_immune,
+                "healthy": partial(count_state, "healthy"),
+                "immune": partial(count_state, "immune"),
                 "infected": c_infected,
-                "dead": c_dead,
+                "dead": partial(count_state, "dead"),
                 "quarantine": lambda i: int(i.quarantine_status),
             }
         )
