@@ -1,0 +1,4 @@
+mesa[network]>=3.5
+solara
+matplotlib
+altair

@@ -1,0 +1,69 @@
+from functools import partial
+
+from mesa import DataCollector, Model
+from mesa.discrete_space import OrthogonalMooreGrid
+
+from .agents import Citizen
+
+
+def count_state(state, model):
+    return sum(1 for i in model.agents if i.state == state)
+
+
+c_infected = partial(count_state, "infected")
+
+
+class PathogenModel(Model):
+    def __init__(
+        self,
+        n=100,
+        infn=5,
+        width=20,
+        height=20,
+        quarantine_threshold_strt=25,
+        quarantine_threshold_stp=5,
+        compliance=0.25,
+        rng=None,
+    ):
+        super().__init__(rng=rng)
+        self.compliance_rate = compliance
+        self.quarantine_thresh_up = quarantine_threshold_strt
+        self.quarantine_thresh_lw = quarantine_threshold_stp
+        self.infected_count = 0
+        self.quarantine_status = False
+
+        self.grid = OrthogonalMooreGrid(
+            (width, height), capacity=None, torus=False, random=self.random
+        )
+
+        self.datacollector = DataCollector(
+            model_reporters={
+                "healthy": partial(count_state, "healthy"),
+                "immune": partial(count_state, "immune"),
+                "infected": c_infected,
+                "dead": partial(count_state, "dead"),
+                "quarantine": lambda i: int(i.quarantine_status),
+            }
+        )
+
+        for _ in range(n):
+            agent = Citizen(self)
+            cell = self.random.choice(list(self.grid.all_cells.cells))
+            agent.move_to(cell)
+
+        for i in range(infn):
+            self.agents[i].state = "infected"
+
+        self.datacollector.collect(self)
+
+    def step(self):
+        self.infected_count = c_infected(self)
+
+        if self.infected_count > self.quarantine_thresh_up:
+            self.quarantine_status = True
+        elif self.infected_count < self.quarantine_thresh_lw:
+            self.quarantine_status = False
+
+        self.datacollector.collect(self)
+
+        self.agents.do("step")
