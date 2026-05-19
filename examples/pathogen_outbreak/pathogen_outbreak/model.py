@@ -23,15 +23,18 @@ class PathogenModel(Model):
         quarantine_threshold_strt=25,
         quarantine_threshold_stp=5,
         compliance=0.25,
+        rng=None,
     ):
-        super().__init__()
+        super().__init__(rng=rng)
         self.compliance_rate = compliance
         self.quarantine_thresh_up = quarantine_threshold_strt
         self.quarantine_thresh_lw = quarantine_threshold_stp
         self.infected_count = 0
         self.quarantine_status = False
 
-        self.grid = OrthogonalMooreGrid((width, height), capacity=None, torus=False)
+        self.grid = OrthogonalMooreGrid(
+            (width, height), capacity=None, torus=False, random=self.random
+        )
 
         self.datacollector = DataCollector(
             model_reporters={

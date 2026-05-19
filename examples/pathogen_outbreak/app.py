@@ -1,4 +1,5 @@
 from mesa.visualization import SolaraViz, make_plot_component, make_space_component
+from mesa.visualization.components import AgentPortrayalStyle
 from pathogen_outbreak.model import PathogenModel
 
 
@@ -9,11 +10,11 @@ def make_agent(agent):
         "immune": "tab:blue",
         "dead": "tab:red",
     }
-    return {
-        "color": color_map.get(agent.state, "black"),
-        "size": 20,
-        "marker": "s" if not agent.compliant else "o",
-    }
+    return AgentPortrayalStyle(
+        color=color_map.get(agent.state, "black"),
+        size=20,
+        marker="s" if not agent.compliant else "o",
+    )
 
 
 model_params = {
@@ -51,7 +52,7 @@ model_params = {
     },
 }
 
-model = PathogenModel(n=100, infn=5, width=25, height=25)
+model = PathogenModel(n=100, infn=5, width=25, height=25, rng=42)
 
 renderer = make_space_component(make_agent)
 
