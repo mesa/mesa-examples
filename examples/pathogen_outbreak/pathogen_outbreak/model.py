@@ -3,7 +3,7 @@ from functools import partial
 from mesa import DataCollector, Model
 from mesa.discrete_space import OrthogonalMooreGrid
 
-from pathogen_outbreak.agents import Citizen
+from .agents import Citizen
 
 
 def count_state(state, model):
