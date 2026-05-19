@@ -1,3 +1,4 @@
-mesa>=3.5
+mesa[network]>=3.5
 solara
 matplotlib
+altair
