@@ -1,0 +1,7 @@
+mesa[viz]>=3.0
+networkx
+numpy
+pandas
+enum
+typing
+matplotlib
