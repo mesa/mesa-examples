@@ -1,0 +1,14 @@
+[model]
+title = "SIR Epidemic Model"
+abstract = "A Susceptible-Infected-Recovered epidemic model demonstrating disease spread on a 2D grid using Mesa's discrete space API. Agents move randomly, infected agents spread disease to susceptible neighbors, and recover after a fixed period."
+authors = ["Ved Prakash <vedprakash9162@gmail.com>"]
+
+[model.classification]
+domain = ["epidemiology", "public-health"]
+space = "Grid"
+time = "Discrete"
+complexity = "Basic"
+
+[model.mesa]
+mesa_version_min = "4.0"
+keywords = ["SIR", "epidemic", "infection", "grid", "CellAgent", "disease-spread"]
