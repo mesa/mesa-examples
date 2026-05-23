@@ -91,7 +91,9 @@ An implementation of Axelrod's model of cultural dissemination. Agents on a grid
 
 
 ## Continuous Space Examples
-_No user examples available yet._
+### [Brownian Particles Model](https://github.com/mesa/mesa-examples/tree/main/examples/brownian_particles)
+
+A minimal continuous space example — particles doing random walk (Brownian motion) with soft repulsion so they spread out naturally. Colour-coded by local density using a plasma colormap. Good starting point for `mesa.experimental.continuous_space`.
 
 
 ## Network Examples
