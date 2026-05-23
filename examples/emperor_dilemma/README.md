@@ -23,3 +23,29 @@ pip install mesa matplotlib solara
 ```bash
 solara run app.py
 ```
+
+## Extensions
+
+This model has been extended with the following additions:
+
+### Whistleblower Agents
+A new `WhistleblowerAgent` subclass that is immune to social pressure
+and always acts on private belief publicly. Use the **Fraction Whistleblowers**
+slider to introduce them into the simulation.
+
+### Belief Gap Metric
+Tracks the average distance between private belief and public behavior
+across all agents at each step. A value near 1.0 means the society is
+wearing a collective mask. A value near 0.0 means everyone is acting
+honestly.
+
+### Norm Collapse Detection
+The model records exactly which step compliance first drops below 50%,
+turning a visual observation into a measurable data point accessible
+via `model.collapse_step`.
+
+### Key Finding
+There is a sharp tipping point around 5-10% whistleblowers. Below this
+threshold the norm holds completely. Above it the norm collapses rapidly.
+This threshold behavior emerges from the local interaction rules rather
+than being explicitly programmed.
