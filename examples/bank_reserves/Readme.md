@@ -5,12 +5,12 @@
 A highly abstracted, simplified model of an economy, with only one type of agent and a single bank representing all banks in an economy. People (represented by circles) move randomly within the grid. If two or more people are on the same grid location, there is a 50% chance that they will trade with each other. If they trade, there is an equal chance of giving the other agent $5 or $2. A positive trade balance will be deposited in the bank as savings. If trading results in a negative balance, the agent will try to withdraw from its savings to cover the balance. If it does not have enough savings to cover the negative balance, it will take out a loan from the bank to cover the difference. The bank is required to keep a certain percentage of deposits as reserves. If run.py is used to run the model, then the percent of deposits the bank is required to retain is a user settable parameter. The amount the bank is able to loan at any given time is a function of the amount of deposits, its reserves, and its current total outstanding loan amount.
 
 The model demonstrates the following Mesa features:
- - MultiGrid for creating shareable space for agents
- - DataCollector for collecting data on individual model runs
- - Slider for adjusting initial model parameters
- - ModularServer for visualization of agent interaction
+ - `OrthogonalMooreGrid` for creating shareable space for agents
+ - `DataCollector` for collecting data on individual model runs
+ - `Slider` for adjusting initial model parameters
+ - `SolaraViz` with `SpaceRenderer` for visualization of agent interaction
  - Agent object inheritance
- - Using a BatchRunner to collect data on multiple combinations of model parameters
+ - Using `batch_run` to collect data on multiple combinations of model parameters
 
 ## Installation
 
