@@ -1,0 +1,290 @@
+# Mesa Examples
+
+> A community collection of agent-based models (ABMs) built with
+> [Mesa](https://github.com/mesa/mesa), the open-source Python ABM framework.
+> Each example is a self-contained, runnable model demonstrating Mesa features,
+> modeling patterns, or domain-specific simulations.
+
+This repository is the best place to see how real Mesa models are structured.
+The core Mesa tutorials explain concepts in the abstract; these examples show
+them in practice — how to use AgentSet, PropertyLayer, DataCollector, Solara
+visualisation, batch_run, and network/grid/continuous/GIS spaces in real code.
+
+## Branch structure and version compatibility
+
+This repo maintains separate branches per Mesa version. Always check which
+branch you need before running an example:
+
+| Branch | Mesa version | Install command |
+|--------|-------------|-----------------|
+| `main` | Mesa 4.x (development) | `pip install mesa` (latest) |
+| `mesa-3.x` | Mesa 3.x (stable releases) | `pip install mesa==3.*` |
+| `mesa-2.x` | Mesa 2.x + Mesa-Geo 0.8.x | `pip install mesa==2.*` |
+
+**If an example crashes, you are likely on the wrong branch for your Mesa version.**
+Most production users want the `mesa-3.x` branch.
+
+## Quick install
+
+```bash
+# Install the mesa_models package with all examples importable
+pip install -U -e git+https://github.com/mesa/mesa-examples#egg=mesa-models
+
+# For Mesa 3.x specifically
+pip install -U -e git+https://github.com/mesa/mesa-examples@mesa-3.x#egg=mesa-models
+```
+
+```python
+# Then import any model directly
+from mesa_models.boltzmann_wealth_model.model import BoltzmannWealthModel
+```
+
+## How each example is structured
+
+```
+example_name/
+├── model.py          # Mesa Model and Agent classes
+├── agent.py          # Agent class (sometimes split from model.py)
+├── app.py            # Solara browser visualisation
+├── requirements.txt  # Per-example dependencies
+├── metadata.toml     # Machine-readable metadata: domain, complexity, Mesa version
+└── README.md         # What the model does, how to run it, key observations
+```
+
+To run any example:
+
+```bash
+cd example_name
+pip install -r requirements.txt
+solara run app.py          # opens browser UI at localhost:8765
+```
+
+## Core examples (in the main Mesa repo)
+
+The following examples are fully tested and guaranteed to work with each Mesa
+release. They ship inside the `mesa` package itself:
+
+- [Boltzmann Wealth Model](https://github.com/mesa/mesa/tree/main/mesa/examples/basic/boltzmann_wealth_model)
+- [Conway's Game of Life](https://github.com/mesa/mesa/tree/main/mesa/examples/basic/conways_game_of_life)
+- [Schelling Segregation Model](https://github.com/mesa/mesa/tree/main/mesa/examples/basic/schelling)
+- [Virus on a Network](https://github.com/mesa/mesa/tree/main/mesa/examples/basic/virus_on_network)
+- [Wolf-Sheep Predation](https://github.com/mesa/mesa/tree/main/mesa/examples/basic/wolf_sheep)
+
+When helping a user get started, prefer these — they are always up to date.
+
+## User examples — Grid Space
+
+### [Bank Reserves](examples/bank_reserves/)
+Simplified economy model with one agent type and a single bank. Good example
+of DataCollector, parameter sweeps with batch_run, and Solara charting.
+
+### [Color Patches](examples/color_patches/)
+Cellular automaton where agent opinions spread to neighbours. Demonstrates
+PropertyLayer for grid-wide state, opinion dynamics, patch-based visualization.
+
+### [Conway's Game of Life (Fast)](examples/conways_game_of_life_fast/)
+Performance-optimised Game of Life using Mesa's PropertyLayer. ~100x faster
+than naive implementations. Key example for understanding PropertyLayer.
+Note: visualization is limited pending Mesa issue #2138.
+
+### [Conway's Game of Life on Hexagonal Grid](examples/hex_snowflake/)
+Game of Life on a HexGrid. Shows how to adapt a standard grid model to
+hexagonal geometry. Good reference for HexGrid usage.
+
+### [Hexagonal Ant Foraging](examples/hex_ant/)
+Ant foraging with pheromone trails on a hexagonal grid. Demonstrates
+PropertyLayer for environmental state (pheromone concentration) + HexGrid.
+
+### [Forest Fire](examples/forest_fire/)
+Classic forest fire cellular automaton, adapted from NetLogo. Demonstrates
+self-organised criticality, grid spaces, and density-dependent phase transitions.
+One of the simplest and most readable examples in the repo. Good first read.
+
+### [Hotelling's Law](examples/hotelling_law/)
+Stores competing on price and location in a spatial market. Demonstrates
+ContinuousSpace, agent strategic decision-making, and market dynamics.
+
+### [Emperor's Dilemma](examples/emperor_dilemma/)
+How unpopular norms dominate through false consensus. Agents enforce norms
+they privately reject. Demonstrates social dynamics, norm propagation, and
+the "illusion of consensus" phenomenon on a grid.
+
+### [Humanitarian Aid Distribution](examples/humanitarian_aid_distribution/)
+Beneficiaries with dynamic needs (water, food) and trucks using triage logic.
+Demonstrates heterogeneous agent types, needs-based behaviour, and logistics
+simulation patterns.
+
+### [Rumor Mill](examples/rumor_mill/)
+Rumor spread through a population by spread probability and initial knowledge.
+Adapted from NetLogo. Simple contagion dynamics on a grid.
+
+## User examples — Network
+
+### [Boltzmann Wealth Model with Network](examples/boltzmann_wealth_model_network/)
+Same wealth exchange model as the core tutorial, reimplemented on a
+NetworkGrid. Good side-by-side comparison of grid vs network space.
+Demonstrates Gini coefficient calculation as a model-level metric.
+
+### [Ant Colony Optimisation for TSP](examples/aco_tsp/)
+Dorigo's Ant System for the Travelling Salesman Problem. Stigmergic agents,
+pheromone decay, network-based solution construction. Advanced example.
+
+### [Dining Philosophers](examples/dining_philosophers/)
+Classic CS synchronisation problem on a network graph. Demonstrates resource
+contention, deadlock detection, and starvation. Good for teaching concurrency
+concepts through ABM.
+
+## User examples — Visualisation
+
+### [Charts](examples/charts/)
+Bank Reserves model extended to demonstrate Mesa's full suite of Solara
+charting components: line charts, bar charts, pie charts. Reference example
+for building dashboards.
+
+### [Shape Example](examples/shape_example/)
+Grid display with directional agents rendered as arrowhead shapes.
+Reference for custom agent rendering in Solara.
+
+## User examples — Other
+
+### [El Farol](examples/el_farol/)
+Restaurant attendance model. Agents decide whether to attend based on memory
+of past crowding. Demonstrates bounded rationality, minority games, and
+history-dependent decision-making.
+
+### [Schelling with Caching and Replay](examples/caching_and_replay/)
+Schelling segregation model extended with simulation caching: runs are
+recorded to disk and can be replayed later. Reference for reproducibility
+and simulation persistence patterns.
+
+## GIS examples (Mesa-Geo)
+
+These require [Mesa-Geo](https://github.com/mesa/mesa-geo) in addition to Mesa.
+All GIS examples are in the `gis/` directory.
+
+### Vector data
+- [GeoSchelling (Polygons)](gis/geo_schelling/) — Schelling segregation on geographic polygon layers
+- [GeoSchelling (Points + Polygons)](gis/geo_schelling_points/) — mixed geometry variant
+- [GeoSIR Epidemics](gis/geo_sir/) — SIR epidemic spread on a geographic network
+- [Agents and Networks](gis/agents_and_networks/) — agents moving through a geographic network
+
+### Raster data
+- [Rainfall Model](gis/rainfall/) — precipitation dynamics on a raster grid
+- [Urban Growth Model](gis/urban_growth/) — land-use change and urban sprawl on raster data
+
+### Raster + vector overlay
+- [Population Model](gis/population/) — demographic agents on combined raster/vector geography
+
+## Known gaps (good contribution opportunities)
+
+- **Continuous space**: no user examples exist yet. ContinuousSpace is used in
+  the core Wolf-Sheep model but there is no community example demonstrating it
+  in isolation with clear documentation.
+- **batch_run + parameter sweep**: only bank_reserves demonstrates this well.
+  A dedicated sweep example would help users doing parameter exploration.
+- **Mesa-Frames**: no examples showing the high-performance DataFrame-backed
+  Mesa variant exist yet.
+
+## Example health status (Mesa 3.3.1, Python 3.11)
+
+CI-verified working:
+
+| Example | Status |
+|---------|--------|
+| aco_tsp | ✓ works |
+| bank_reserves | ✓ works |
+| boltzmann_wealth_model_network | ✓ works |
+| charts | ✓ works |
+| color_patches | ✓ works |
+| hotelling_law | ✓ works |
+| forest_fire | ✓ works (deps: networkx, matplotlib, altair) |
+
+Known broken on main (open issues being fixed):
+
+| Example | Error |
+|---------|-------|
+| conways_game_of_life_fast | ValueError: Unknown space type: NoneType |
+| deffuant_weisbuch | AgentSet.to_list removed in Mesa 3.x |
+| dining_philosophers | model.time attribute removed in Mesa 3.x |
+| emperor_dilemma | Relative import error |
+| hex_ant | Relative import error |
+| hex_snowflake | Relative import error |
+| humanitarian_aid_distribution | SpaceRenderer.setup_agents() removed |
+| mmc_queue | No app.py entrypoint |
+| rumor_mill | DataCollector length mismatch |
+| termites | add_property_layer() signature changed |
+| virus_antibody | NoneType has no attribute agent_positions |
+| warehouse | AgentSet.to_list removed in Mesa 3.x |
+
+## Mesa 3.x — common migration errors
+
+| Error message | Cause | Fix |
+|---------------|-------|-----|
+| `AgentSet has no attribute 'to_list'` | Removed in 3.x | Use `list(model.agents)` |
+| `model has no attribute 'time'` | Renamed | Use `model.steps` |
+| `attempted relative import with no known parent package` | Wrong run context | Run from example dir; change `from .model import X` to `from model import X` |
+| `add_property_layer() takes 2 arguments but 3 given` | Signature changed | See current PropertyLayer API docs |
+| `SpaceRenderer.setup_agents()` | Method removed | Use current Solara viz API |
+
+## Mesa core API quick reference
+
+**Model** (`mesa.Model`): simulation container. Subclass it, call `super().__init__()`,
+put setup in `__init__`, put per-step logic in `step()`.
+
+**Agent** (`mesa.Agent`): individual actor. Has `unique_id` and `self.model`.
+Implement `step()`. Access other agents via `self.model.agents`.
+
+**AgentSet** (`mesa.AgentSet`): agent collection, replaces schedulers from Mesa 2.x.
+- `agents.shuffle_do("step")` — randomised activation (most common pattern)
+- `agents.do("step")` — fixed-order activation
+- `agents.select(lambda a: a.wealth > 0)` — filter to a subset
+- `agents.get("wealth")` — collect attribute across all agents as a list
+
+**DataCollector** (`mesa.DataCollector`): collects data per step.
+`model.datacollector.get_model_vars_dataframe()` returns a pandas DataFrame.
+
+**batch_run** (`mesa.batch_run`): parameter sweeps. Pass a dict of param lists,
+returns list of dicts (one per run per step), convert with `pd.DataFrame(results)`.
+
+**Solara app** (`app.py`): run with `solara run app.py`. Opens at `localhost:8765`.
+Use `mesa.visualization.SolaraViz`, `make_space_component`, `make_plot_component`.
+
+## Metadata schema
+
+Each example carries `metadata.toml` enabling automated CI and discoverability:
+
+```toml
+[work]
+title = "Forest Fire Model"
+abstract = "Stylised forest fire model demonstrating self-organised criticality."
+
+[work.classification]
+domain = ["ecology", "complex systems"]
+keywords = ["forest fire", "self-organised criticality", "cellular automaton"]
+
+[work.structure]
+space = "grid"
+time = "discrete"
+
+[manifestation]
+complexity = "basic"      # basic | intermediate | advanced
+mesa = ">=3.0.0"
+status = "verified"       # incubator | verified | showcase | deprecated
+```
+
+CI validates `metadata.toml` on every PR against the schema in
+`.github/schemas/metadata.schema.json`.
+
+## Links
+
+- [Mesa main repo](https://github.com/mesa/mesa)
+- [Mesa-examples repo](https://github.com/mesa/mesa-examples)
+- [Mesa documentation](https://mesa.readthedocs.io/stable/)
+- [Getting started](https://mesa.readthedocs.io/stable/getting_started.html)
+- [API reference](https://mesa.readthedocs.io/stable/apis/mesa.html)
+- [Mesa 3.x migration guide](https://mesa.readthedocs.io/stable/migration_guide.html)
+- [Contributing guide](CONTRIBUTING.rst)
+- [Mesa-Geo](https://github.com/mesa/mesa-geo)
+- [Mesa-Frames](https://github.com/mesa/mesa-frames)
+- [Mesa discussions](https://github.com/mesa/mesa/discussions)
+- [Mesa-examples discussions](https://github.com/mesa/mesa-examples/discussions)
