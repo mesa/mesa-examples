@@ -30,7 +30,9 @@ class DoubleAuctionModel(mesa.Model):
         self._volume_since_last_tick: int = 0
 
         reservation_prices = self.rng.uniform(0, max_valuation, size=n_buyers).tolist()
-        Buyer.create_agents(model=self, n=n_buyers, reservation_price=reservation_prices)
+        Buyer.create_agents(
+            model=self, n=n_buyers, reservation_price=reservation_prices
+        )
 
         costs = self.rng.uniform(0, max_valuation, size=n_sellers).tolist()
         Seller.create_agents(model=self, n=n_sellers, cost=costs)
@@ -41,10 +43,12 @@ class DoubleAuctionModel(mesa.Model):
                 "Volume": lambda m: m._volume_since_last_tick,
                 "CumulativeVolume": lambda m: m.cumulative_volume,
                 "Spread": lambda m: m.order_book.spread(),
-                "BestBid": lambda m: (m.order_book.best_bid().price
-                                       if m.order_book.best_bid() else None),
-                "BestAsk": lambda m: (m.order_book.best_ask().price
-                                       if m.order_book.best_ask() else None),
+                "BestBid": lambda m: (
+                    m.order_book.best_bid().price if m.order_book.best_bid() else None
+                ),
+                "BestAsk": lambda m: (
+                    m.order_book.best_ask().price if m.order_book.best_ask() else None
+                ),
             },
             agent_reporters={
                 "Wealth": lambda a: a.wealth(),

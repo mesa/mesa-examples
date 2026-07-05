@@ -1,8 +1,9 @@
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from model import DoubleAuctionModel, Buyer, Seller
+from model import Buyer, DoubleAuctionModel, Seller
 
 
 def test_model_creates_correct_agent_counts():
@@ -29,9 +30,11 @@ def test_buyers_start_with_zero_inventory():
 def test_each_agent_schedules_its_own_first_arrival():
     model = DoubleAuctionModel(n_buyers=5, n_sellers=5, rng=1)
     model.run_for(1)
-    assert (model.cumulative_volume > 0
-            or len(model.order_book.bids) > 0
-            or len(model.order_book.asks) > 0)
+    assert (
+        model.cumulative_volume > 0
+        or len(model.order_book.bids) > 0
+        or len(model.order_book.asks) > 0
+    )
 
 
 def test_run_for_advances_time_and_steps():
@@ -54,7 +57,7 @@ def test_datacollector_produces_one_row_per_tick():
     model_df = model.datacollector.get_model_vars_dataframe()
     agent_df = model.datacollector.get_agent_vars_dataframe()
     assert len(model_df) == 10
-    assert len(agent_df) == 10 * 20  
+    assert len(agent_df) == 10 * 20
 
 
 def test_no_agent_ever_transacts_at_a_loss():

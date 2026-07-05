@@ -8,7 +8,7 @@ class Order:
 
     agent_id: int
     price: float
-    side: str        # "bid" or "ask"
+    side: str  # "bid" or "ask"
     timestamp: float  # model.time at submission; used for FIFO tie-breaks
 
 
@@ -49,7 +49,7 @@ class OrderBook:
         book = self.bids if side == "bid" else self.asks
         book[:] = [o for o in book if o.agent_id != agent_id]
 
-    def best_bid(self) -> Optional[Order]:
+    def best_bid(self) -> Order | None:
         """Return the highest bid, using earliest submission as the tie-breaker."""
 
         if not self.bids:
@@ -57,14 +57,14 @@ class OrderBook:
         # Highest price wins; earliest timestamp breaks ties (price-time priority)
         return max(self.bids, key=lambda o: (o.price, -o.timestamp))
 
-    def best_ask(self) -> Optional[Order]:
+    def best_ask(self) -> Order | None:
         """Return the lowest ask, using earliest submission as the tie-breaker."""
 
         if not self.asks:
             return None
         return min(self.asks, key=lambda o: (o.price, o.timestamp))
 
-    def spread(self) -> Optional[float]:
+    def spread(self) -> float | None:
         """Return best ask minus best bid, or None when either side is empty."""
 
         bb, ba = self.best_bid(), self.best_ask()
@@ -72,7 +72,7 @@ class OrderBook:
             return None
         return ba.price - bb.price
 
-    def try_match(self, time: float) -> Optional[Trade]:
+    def try_match(self, time: float) -> Trade | None:
         """Match the best bid and ask if they cross, clearing at their midpoint."""
 
         bb, ba = self.best_bid(), self.best_ask()

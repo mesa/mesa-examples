@@ -8,10 +8,10 @@ class Trader(mesa.Agent):
         """Initialize a trader and schedule its first market arrival."""
 
         super().__init__(model)
-        self.private_value = private_value   # reservation price (buyer) or cost (seller)
+        self.private_value = private_value  # reservation price (buyer) or cost (seller)
         self.cash = 0.0
         self.inventory = 0
-        self.done_trading = False             # True once this agent's single unit has traded
+        self.done_trading = False  # True once this agent's single unit has traded
         self.side: str = ""
         first_delay = self.model.rng.exponential(self.model.mean_interarrival)
         self.model.schedule_event(self.act, after=first_delay)
@@ -73,7 +73,9 @@ class Seller(Trader):
 
         super().__init__(model, private_value=cost)
         self.side = "ask"
-        self.inventory = 1  # sellers start endowed with the one unit they intend to sell
+        self.inventory = (
+            1  # sellers start endowed with the one unit they intend to sell
+        )
 
     def act(self):
         """Cancel any stale ask, submit a new random ask, and try to trade."""

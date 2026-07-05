@@ -1,5 +1,13 @@
-from .model import DoubleAuctionModel
 from .agents import Buyer, Seller, Trader
-from .order_book import OrderBook, Order, Trade
+from .model import DoubleAuctionModel
+from .order_book import Order, OrderBook, Trade
 
-__all__ = ["DoubleAuctionModel", "Buyer", "Seller", "Trader", "OrderBook", "Order", "Trade"]
+__all__ = [
+    "Buyer",
+    "DoubleAuctionModel",
+    "Order",
+    "OrderBook",
+    "Seller",
+    "Trade",
+    "Trader",
+]
