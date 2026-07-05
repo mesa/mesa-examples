@@ -24,8 +24,7 @@ The model demonstrates the following Mesa features:
 
 ## Installation
 
-Install the Mesa examples dependencies from the `mesa-examples` package. From
-the `mesa-examples` directory, use:
+Install the Mesa examples package from the `mesa-examples` repository root:
 
 ```bash
 pip install -e .
@@ -55,16 +54,16 @@ To run a scripted simulation and generate a summary plot, run
 python notebook/run_simulation.py
 ```
 
-The script prints recent model data, compares transaction prices with the
-theoretical competitive equilibrium from the sampled private values, and saves a
+The script prints recent model data, compares transaction prices with a
+uniform-price equilibrium reference from the sampled private values, and saves a
 figure to `notebook/simulation_results.png`.
 
 ## Tests
 
-To run the tests for this example from the repository root:
+To run the tests for this example from the `mesa-examples` repository root:
 
 ```bash
-python -m pytest mesa-examples/examples/zi_double_auction/tests
+python -m pytest examples/zi_double_auction/tests
 ```
 
 The tests check agent counts, initial inventories, event scheduling, time
@@ -84,6 +83,8 @@ completed traders from the order book.
 - `notebook/app.py`: Launches the interactive Solara visualization.
 - `notebook/run_simulation.py`: Runs a scripted simulation and creates plots.
 - `tests/test_model.py`: Contains regression tests for the model behavior.
+- `tests/test_orderbook.py`: Contains unit tests for order book matching,
+  cancellation, spread, and price-time priority.
 
 ## Further Reading
 

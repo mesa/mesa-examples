@@ -7,6 +7,7 @@ from model import DoubleAuctionModel
 
 
 def theoretical_equilibrium(model: DoubleAuctionModel):
+    """Compute a uniform-price equilibrium reference from private values."""
 
     buyers = [a for a in model.agents if type(a).__name__ == "Buyer"]
     sellers = [a for a in model.agents if type(a).__name__ == "Seller"]
@@ -27,12 +28,14 @@ def theoretical_equilibrium(model: DoubleAuctionModel):
 
 def run(n_buyers=25, n_sellers=25, max_valuation=100.0,
         mean_interarrival=1.0, duration=300, rng=42):
+    """Run the model for a fixed duration and return model and data frames."""
+
     model = DoubleAuctionModel(
         n_buyers=n_buyers, n_sellers=n_sellers,
         max_valuation=max_valuation, mean_interarrival=mean_interarrival,
         rng=rng,
     )
-    model.run_for(duration)  # NOT a manual step() loop 
+    model.run_for(duration)
 
     model_df = model.datacollector.get_model_vars_dataframe()
     agent_df = model.datacollector.get_agent_vars_dataframe()
@@ -40,6 +43,8 @@ def run(n_buyers=25, n_sellers=25, max_valuation=100.0,
 
 
 def plot_results(model, model_df, save_path="simulation_results.png"):
+    """Plot equilibrium, transaction prices, cumulative volume, and spread."""
+
     demand, supply, eq_qty, eq_price = theoretical_equilibrium(model)
 
     fig, axes = plt.subplots(1, 3, figsize=(16, 5))
@@ -92,7 +97,7 @@ def plot_results(model, model_df, save_path="simulation_results.png"):
         print(f"Absolute deviation: {abs(last_5 - eq_price):.2f} "
               f"({100 * abs(last_5 - eq_price) / eq_price:.1f}% of eq. price)")
         print(f"Actual trades executed: {model.cumulative_volume} "
-              f"(theoretical efficient max: {eq_qty})")
+              f"(uniform-price equilibrium quantity: {eq_qty})")
 
 
 if __name__ == "__main__":

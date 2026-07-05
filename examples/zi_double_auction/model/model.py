@@ -5,6 +5,7 @@ from .order_book import OrderBook
 
 
 class DoubleAuctionModel(mesa.Model):
+    """Continuous double-auction model with zero-intelligence buyers and sellers."""
 
     def __init__(
         self,
@@ -14,7 +15,8 @@ class DoubleAuctionModel(mesa.Model):
         mean_interarrival: float = 1.0,
         rng: int | None = None,
     ):
-        
+        """Create traders, the order book, and the model data collector."""
+
         super().__init__(rng=rng)
 
         self.max_valuation = max_valuation
@@ -55,6 +57,8 @@ class DoubleAuctionModel(mesa.Model):
         )
 
     def handle_arrival(self):
+        """Settle a trade if the latest submitted order crosses the book."""
+
         trade = self.order_book.try_match(self.time)
         if trade is None:
             return
@@ -71,5 +75,7 @@ class DoubleAuctionModel(mesa.Model):
         self._volume_since_last_tick += 1
 
     def step(self):
+        """Collect one tick of data and reset the per-tick volume counter."""
+
         self.datacollector.collect(self)
         self._volume_since_last_tick = 0
