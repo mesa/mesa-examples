@@ -32,5 +32,3 @@ page = SolaraViz(
     model_params=model_params,
     name="Continuous Double Auction — Zero-Intelligence Traders",
 )
-
-page
