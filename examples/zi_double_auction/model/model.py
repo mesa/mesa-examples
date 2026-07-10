@@ -28,7 +28,7 @@ class DoubleAuctionModel(mesa.Model):
         self.price_history: list[tuple[float, float]] = []  # (time, price)
 
         self._volume_since_last_tick: int = 0
-
+        self.steps: int = 0
         reservation_prices = self.rng.uniform(0, max_valuation, size=n_buyers).tolist()
         Buyer.create_agents(
             model=self, n=n_buyers, reservation_price=reservation_prices
@@ -81,5 +81,6 @@ class DoubleAuctionModel(mesa.Model):
     def step(self):
         """Collect one tick of data and reset the per-tick volume counter."""
 
+        self.steps += 1
         self.datacollector.collect(self)
         self._volume_since_last_tick = 0
