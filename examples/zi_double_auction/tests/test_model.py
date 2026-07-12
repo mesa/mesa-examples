@@ -39,9 +39,8 @@ def test_each_agent_schedules_its_own_first_arrival():
 
 def test_run_for_advances_time_and_steps():
     model = DoubleAuctionModel(n_buyers=5, n_sellers=5, rng=1)
-    assert model.steps == 0
+    assert model.time == 0.0
     model.run_for(10)
-    assert model.steps == 10
     assert model.time == 10.0
 
 

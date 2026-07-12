@@ -60,22 +60,23 @@ class DoubleAuctionModel(mesa.Model):
         )
 
     def handle_arrival(self):
-        """Settle a trade if the latest submitted order crosses the book."""
-
-        trade = self.order_book.try_match(self.time)
-        if trade is None:
-            return
+        """Settle trades while the book remains crossed after an order arrival."""
 
         agents_by_id = {a.unique_id: a for a in self.agents}
-        buyer = agents_by_id[trade.buyer_id]
-        seller = agents_by_id[trade.seller_id]
-        buyer.settle_purchase(trade.price)
-        seller.settle_sale(trade.price)
+        while True:
+            trade = self.order_book.try_match(self.time)
+            if trade is None:
+                break
 
-        self.clearing_price = trade.price
-        self.price_history.append((trade.time, trade.price))
-        self.cumulative_volume += 1
-        self._volume_since_last_tick += 1
+            buyer = agents_by_id[trade.buyer_id]
+            seller = agents_by_id[trade.seller_id]
+            buyer.settle_purchase(trade.price)
+            seller.settle_sale(trade.price)
+
+            self.clearing_price = trade.price
+            self.price_history.append((trade.time, trade.price))
+            self.cumulative_volume += 1
+            self._volume_since_last_tick += 1
 
     def step(self):
         """Collect one tick of data and reset the per-tick volume counter."""
