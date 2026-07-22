@@ -147,3 +147,8 @@ This folder contains an implementation of El Farol restaurant model. Agents (res
 ### [Schelling Model with Caching and Replay](https://github.com/mesa/mesa-examples/tree/main/examples/caching_and_replay)
 
 This example applies caching on the Mesa [Schelling](https://github.com/mesa/mesa-examples/tree/main/examples/schelling) example. It enables a simulation run to be "cached" or in other words recorded. The recorded simulation run is persisted on the local file system and can be replayed at any later point.
+
+### [Continuous Double Auction (ZI-C) Market Model](https://github.com/mesa/mesa-examples/tree/main/examples/zi_double_auction)
+
+A continuous double-auction market with zero-intelligence traders. Buyers and sellers each have a private reservation price or cost, and submit randomized, budget-constrained bids and asks as they arrive asynchronously through Mesa's event-driven scheduler. The order book matches on price-time priority and clears at the midpoint price, converging naturally toward the market's theoretical equilibrium.
+
