@@ -1,5 +1,6 @@
 from mesa import Model
 from mesa.discrete_space import OrthogonalMooreGrid
+from mesa.discrete_space.property_layer import PropertyLayer
 
 from .agents import Termite
 
@@ -23,15 +24,24 @@ class TermiteModel(Model):
         self.num_termites = num_termites
         self.wood_chip_density = wood_chip_density
 
+        # Create a grid with the specified width and height.
+        # Uses Orthogonal Moore neighborhood and toroidal wrapping.
         self.grid = OrthogonalMooreGrid((width, height), torus=True, random=self.random)
 
+        # Create a numpy array of the same shape as the grid.
+        # Each cell is randomly assigned True (has wood chip) or False (no wood chip).
+        # Probability of True is determined by wood_chip_density.
         wood_chips = self.rng.choice(
             [True, False],
             size=(width, height),
             p=[self.wood_chip_density, 1 - self.wood_chip_density],
         )
 
-        self.grid.add_property_layer("woodcell", wood_chips)
+        # Wrap the numpy array in a PropertyLayer so the grid can track it by name
+        woodcell = PropertyLayer.from_data("woodcell", wood_chips)
+
+        # Attach the PropertyLayer to the grid, makes layer accessible via grid.properties["woodcell"]
+        self.grid.add_property_layer(woodcell)
 
         # Create agents and randomly distribute them over the grid
         Termite.create_agents(
