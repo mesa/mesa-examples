@@ -1,6 +1,5 @@
-import numpy as np
-
 import mesa
+import numpy as np
 from mesa.discrete_space import HexGrid
 
 try:
