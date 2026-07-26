@@ -72,7 +72,7 @@ def post_process(ax):
 
 woodchips_space = make_mpl_space_component(
     agent_portrayal=agent_portrayal,
-    propertylayer_portrayal=wood_chip_portrayal,
+    property_layer_portrayal=wood_chip_portrayal,
     post_process=post_process,
     draw_grid=False,
 )

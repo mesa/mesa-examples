@@ -1,6 +1,5 @@
 from mesa import Model
 from mesa.discrete_space import OrthogonalMooreGrid
-from mesa.discrete_space.property_layer import PropertyLayer
 
 from .agents import Termite
 
@@ -37,11 +36,8 @@ class TermiteModel(Model):
             p=[self.wood_chip_density, 1 - self.wood_chip_density],
         )
 
-        # Wrap the numpy array in a PropertyLayer so the grid can track it by name
-        woodcell = PropertyLayer.from_data("woodcell", wood_chips)
-
-        # Attach the PropertyLayer to the grid, makes layer accessible via grid.properties["woodcell"]
-        self.grid.add_property_layer(woodcell)
+        # Attach the numpy array to the grid as a named property layer.
+        self.grid.add_property_layer("woodcell", wood_chips)
 
         # Create agents and randomly distribute them over the grid
         Termite.create_agents(
