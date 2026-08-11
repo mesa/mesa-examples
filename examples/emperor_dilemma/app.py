@@ -6,14 +6,14 @@ from mesa.visualization import (
     make_plot_component,
 )
 from mesa.visualization.components.portrayal_components import AgentPortrayalStyle
+from model import EmperorModel
 
-from .model import EmperorModel
-
-# Colors matching Figure 2
-COLOR_COMPLY_QUIET = "#F0F8FF"  # AliceBlue
-COLOR_DEVIATE_QUIET = "lightgray"  # Light Gray
-COLOR_COMPLY_ENFORCE = "dimgray"  # Dark Gray
-COLOR_DEVIATE_ENFORCE = "black"  # Black
+# --- Colors ---
+COLOR_COMPLY_QUIET = "#F0F8FF"
+COLOR_DEVIATE_QUIET = "lightgray"
+COLOR_COMPLY_ENFORCE = "dimgray"
+COLOR_DEVIATE_ENFORCE = "black"
+COLOR_WHISTLEBLOWER = "#E63946"
 
 
 def emperor_portrayal(agent):
@@ -25,6 +25,10 @@ def emperor_portrayal(agent):
         marker="s",
         zorder=1,
     )
+
+    if agent.agent_type == "whistleblower":
+        portrayal.update(("color", COLOR_WHISTLEBLOWER))
+        return portrayal
 
     if agent.compliance == 1:
         if agent.enforcement == 1:
@@ -45,6 +49,12 @@ def post_process_lines(ax):
     ax.set_ylabel("Rate")
 
 
+def post_process_gap(ax):
+    ax.legend(loc="center left", bbox_to_anchor=(1, 0.9))
+    ax.set_ylabel("Belief Gap (0=honest, 1=mask)")
+    ax.set_ylim(0, 1)
+
+
 lineplot_component = make_plot_component(
     {
         "Compliance": "tab:green",
@@ -54,9 +64,16 @@ lineplot_component = make_plot_component(
     post_process=post_process_lines,
 )
 
+belief_gap_component = make_plot_component(
+    {
+        "Belief Gap": "tab:purple",
+        "Whistleblowers Defying": "tab:orange",
+    },
+    post_process=post_process_gap,
+)
+
 
 def post_process_space(ax):
-    """Configures the space plot axes."""
     ax.set_aspect("equal")
     ax.set_xticks([])
     ax.set_yticks([])
@@ -79,7 +96,8 @@ model_params = {
         "values": [True, False],
         "label": "Cluster Believers (Homophily)?",
     },
-    "width": 40,
+    "fraction_whistleblowers": Slider("Fraction Whistleblowers", 0.0, 0.0, 0.5, 0.01),
+    "width": 25,
     "height": 25,
 }
 
@@ -95,7 +113,7 @@ renderer.draw_agents()
 page = SolaraViz(
     model,
     renderer,
-    components=[lineplot_component, CommandConsole],
+    components=[lineplot_component, belief_gap_component, CommandConsole],
     model_params=model_params,
     name="The Emperor's Dilemma",
 )
