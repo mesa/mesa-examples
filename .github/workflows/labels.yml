@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   label:
-    runs-on: ubuntu-lates
+    runs-on: ubuntu-latest
     steps:
       - name: Label PR by changed files
         if: >

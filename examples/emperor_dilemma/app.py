@@ -7,7 +7,10 @@ from mesa.visualization import (
 )
 from mesa.visualization.components.portrayal_components import AgentPortrayalStyle
 
-from .model import EmperorModel
+try:
+    from .model import EmperorModel
+except ImportError:
+    from model import EmperorModel
 
 # Colors matching Figure 2
 COLOR_COMPLY_QUIET = "#F0F8FF"  # AliceBlue

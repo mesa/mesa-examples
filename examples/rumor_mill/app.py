@@ -33,6 +33,14 @@ model_params = {
         "max": 1.0,
         "step": 0.01,
     },
+    "recovery_rate": {
+        "type": "SliderFloat",
+        "value": 0.0,
+        "label": "Recovery (Forgetting) Rate",
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.01,
+    },
     "eight_neightborhood": {
         "type": "Checkbox",
         "value": False,

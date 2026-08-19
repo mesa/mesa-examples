@@ -18,6 +18,7 @@ class RumorMillModel(Model):
         rumor_spread_chance=0.5,
         eight_neightborhood=False,
         rng=None,
+        recovery_rate=0.0,
     ):
         """
         Initialize the Rumor Mill model.
@@ -34,6 +35,7 @@ class RumorMillModel(Model):
         self.number_of_agents = width * height
         self.know_rumor_ratio = know_rumor_ratio
         self.rumor_spread_chance = rumor_spread_chance
+        self.recovery_rate = recovery_rate
 
         # Create grid with appropriate neighborhood type
         if eight_neightborhood:
@@ -58,6 +60,7 @@ class RumorMillModel(Model):
             self.number_of_agents,
             list(self.grid.all_cells.cells),
             rumor_spread_chance=self.rumor_spread_chance,
+            recovery_rate=self.recovery_rate,
             color=colors,
         )
 
@@ -67,6 +70,7 @@ class RumorMillModel(Model):
                 agent.knows_rumor = True
                 agent.times_heard = 1
                 agent.newly_learned = True  # They learned it initially
+                agent.has_known_rumor_before = True
 
         # Set up data collection
         self.datacollector = mesa.DataCollector(
@@ -74,6 +78,7 @@ class RumorMillModel(Model):
                 "Percentage_Knowing_Rumor": self.compute_percentage_knowing_rumor,
                 "Times_Heard_Rumor_Per_Step": self.compute_new_rumor_times_heard,
                 "New_People_Knowing_Rumor": self.compute_new_people_ratio_knowing_rumor,
+                "Percentage_Recovered_This_Step": self.compute_recovered_ratio,
             }
         )
         self.datacollector.collect(self)
@@ -84,6 +89,7 @@ class RumorMillModel(Model):
         for agent in self.agents:
             agent.newly_learned = False
             agent.times_heard_this_step = 0
+            agent.just_recovered = False
         self.agents.shuffle_do("step")  # Activate all agents in random order
         self.datacollector.collect(self)  # Collect data for this step
 
@@ -108,6 +114,15 @@ class RumorMillModel(Model):
         new_knowers = sum(1 for agent in self.agents if agent.newly_learned)
         return (
             (new_knowers / self.number_of_agents) * 100
+            if self.number_of_agents > 0
+            else 0
+        )
+
+    def compute_recovered_ratio(self):
+        """Calculate percentage of agents who forgot the rumor this step."""
+        recovered = sum(1 for agent in self.agents if agent.just_recovered)
+        return (
+            (recovered / self.number_of_agents) * 100
             if self.number_of_agents > 0
             else 0
         )

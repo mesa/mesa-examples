@@ -13,6 +13,10 @@ This is an introductory Mesa example that demonstrates:
 The model is adapted from the NetLogo Rumor Mill model by Uri Wilensky (1999).
 
 **Key Enhancement**: This implementation adds a `rumor_spread_chance` parameter that controls the probability of successful rumor transmission. This allows exploring how transmission uncertainty affects rumor spread dynamics, compared to the deterministic spreading in the original NetLogo model.
+- `recovery_rate` lets informed agents forget the rumor and become uninformed again. Without it, the model is monotonic — the informed percentage can only trend upward. With recovery, the population can settle into three different regimes depending on the balance of `rumor_spread_chance` and `recovery_rate`:
+  - **Extinction**: recovery outpaces spread and the rumor dies out
+  - **Equilibrium**: spread and recovery balance out, producing sustained fluctuations
+  - **Saturation**: spread outpaces recovery and the rumor reaches nearly everyone
 
 ## How It Works
 
@@ -20,10 +24,11 @@ Agents are placed on a grid. Some agents start knowing a rumor (red), others don
 
 Each simulation step:
 1. All per-step counters are reset
-2. Each agent who knows the rumor tells one random neighbor
-3. The neighbor hears the rumor (counter increments)
-4. The neighbor learns the rumor with probability `rumor_spread_chance`
-5. Data is collected tracking spread metrics
+2. An agent who knows the rumor may first forget it, with probability `recovery_rate`, becoming uninformed again
+3. Otherwise, it tells one random neighbor
+4. The neighbor hears the rumor (counter increments)
+5. The neighbor learns the rumor with probability `rumor_spread_chance`
+6. Data is collected tracking spread metrics
 
 Key distinction: Agents can **hear** the rumor multiple times, but only **learn** it once (when they first successfully receive it based on the spread chance)
 
@@ -51,6 +56,7 @@ This opens a web interface where you can:
 
 - **know_rumor_ratio** (0.0-1.0): Initial percentage of agents who know the rumor
 - **rumor_spread_chance** (0.0-1.0): Probability of successful rumor transmission
+- **recovery_rate** (0.0-1.0): Probability an informed agent forgets the rumor each step (default `0.0`, matching the original model's behavior)
 - **eight_neighborhood** (True/False): Use 8 neighbors (Moore) vs 4 neighbors (Von Neumann)
 - **width/height**: Grid dimensions
 
@@ -61,7 +67,9 @@ This opens a web interface where you can:
 - `times_heard`: Total cumulative times agent has heard the rumor
 - `times_heard_this_step`: Times agent heard the rumor in current step
 - `newly_learned`: Flag for agents who just learned the rumor (never heard before)
-- `step()`: Tell a random neighbor if you know the rumor
+- `just_recovered`: Flag for agents who forgot the rumor this step
+- `recovery_rate`: This agent's chance of forgetting the rumor each step
+- `step()`: Possibly forget the rumor; otherwise tell a random neighbor if you know it
 
 **model.py** - Defines the RumorMillModel
 - Creates grid and agents
@@ -70,11 +78,17 @@ This opens a web interface where you can:
   - `Percentage_Knowing_Rumor`: Percentage of all agents who know the rumor
   - `Times_Heard_Rumor_Per_Step`: Total times rumor was heard this step (whether learned or not)
   - `New_People_Knowing_Rumor`: Percentage of new learners this step (people who never heard it before)
+  - `Percentage_Recovered_This_Step`: Percentage of agents who forgot the rumor this step
 
 **app.py** - Visualization interface
 - Grid display with color-coded agents (red = knows, blue = doesn't know)
 - Interactive parameter controls
 - Real-time charts tracking rumor spread and new learners
+
+**tests.py** - Automated tests
+- Confirms `recovery_rate=0.0` reproduces the original, monotonic behavior
+- Confirms `recovery_rate=1.0` fully resets the informed population after one step
+- Confirms the parameter is correctly passed to every agent and tracked in the data collector
 
 ## Running Programmatically
 
@@ -86,7 +100,8 @@ model = RumorMillModel(
     height=10,
     know_rumor_ratio=0.3,
     rumor_spread_chance=0.5,
-    eight_neightborhood=False
+    recovery_rate=0.05,
+    eight_neightborhood=False,
 )
 
 for i in range(100):
