@@ -1,0 +1,7 @@
+mesa[rec]>=3.0
+networkx>=3.0
+numpy>=1.24
+pandas>=2.0
+matplotlib>=3.7
+seaborn>=0.12
+solara>=1.0
