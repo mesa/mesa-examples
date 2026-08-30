@@ -97,6 +97,9 @@ compliance rates at the population level affect outbreak dynamics,
 analyzing changes in infection, death and immunity rates.
 
 
+### [Painted Desert Challenge Model](https://github.com/mesa/mesa-examples/tree/main/examples/painted_desert)
+An extension of the classic Termites model where agents sort multiple colors of wood chips into distinct piles. It demonstrates emergent self-organization and decentralized decision-making as simple local rules lead to global patterns of order.
+
 ## Continuous Space Examples
 _No user examples available yet._
 
