@@ -1,13 +1,8 @@
 from bank_reserves.agents import Person
 from bank_reserves.model import BankReservesModel
-from mesa.visualization import (
-    SolaraViz,
-    make_plot_component,
-    make_space_component,
-)
-from mesa.visualization.user_param import (
-    Slider,
-)
+from mesa.visualization import SolaraViz, SpaceRenderer, make_plot_component
+from mesa.visualization.components.portrayal_components import AgentPortrayalStyle
+from mesa.visualization.user_param import Slider
 
 # The colors here are taken from Matplotlib's tab10 palette
 # Green
@@ -22,28 +17,18 @@ def person_portrayal(agent):
     if agent is None:
         return
 
-    portrayal = {}
+    if not isinstance(agent, Person):
+        return
 
-    # update portrayal characteristics for each Person object
-    if isinstance(agent, Person):
-        portrayal["Shape"] = "circle"
-        portrayal["r"] = 0.5
-        portrayal["Layer"] = 0
-        portrayal["Filled"] = "true"
-
+    # set agent color based on savings and loans
+    if agent.savings > agent.model.rich_threshold:
+        color = RICH_COLOR
+    elif agent.loans > 10:
+        color = POOR_COLOR
+    else:
         color = MID_COLOR
 
-        # set agent color based on savings and loans
-        if agent.savings > agent.model.rich_threshold:
-            color = RICH_COLOR
-        if agent.savings < 10 and agent.loans < 10:
-            color = MID_COLOR
-        if agent.loans > 10:
-            color = POOR_COLOR
-
-        portrayal["color"] = color
-
-    return portrayal
+    return AgentPortrayalStyle(color=color, size=50, marker="o")
 
 
 def post_process_space(ax):
@@ -81,20 +66,21 @@ model_params = {
     ),
 }
 
-space_component = make_space_component(
-    person_portrayal,
-    draw_grid=False,
-    post_process=post_process_space,
-)
+model = BankReservesModel()
+
+renderer = SpaceRenderer(model, backend="matplotlib").setup_agents(person_portrayal)
+renderer.post_process = post_process_space
+renderer.draw_agents()
+
 lineplot_component = make_plot_component(
     {"Rich": RICH_COLOR, "Poor": POOR_COLOR, "Middle Class": MID_COLOR},
     post_process=post_process_lines,
 )
-model = BankReservesModel()
 
 page = SolaraViz(
     model,
-    components=[space_component, lineplot_component],
+    renderer,
+    components=[lineplot_component],
     model_params=model_params,
     name="Bank Reserves Model",
 )
