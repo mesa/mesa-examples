@@ -83,11 +83,12 @@ class DeffuantWeisbuchModel(Model):
         self.datacollector.collect(self)
 
     def compute_variance(self):
-        opinions = [agent.opinion for agent in self.agents]  # type: ignore[attr-defined]
-        return statistics.variance(opinions) if opinions else 0
+        if not self.agents:
+            return 0
+        return self.agents.agg("opinion", statistics.variance)
 
     def compute_cluster_count(self, delta: float = 0.01) -> int:
-        opinions = sorted(agent.opinion for agent in self.agents)  # type: ignore[attr-defined]
+        opinions = sorted(self.agents.get("opinion"))
 
         if not opinions:
             return 0
