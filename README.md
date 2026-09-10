@@ -98,7 +98,10 @@ analyzing changes in infection, death and immunity rates.
 
 
 ## Continuous Space Examples
-_No user examples available yet._
+
+### [Search and Rescue](https://github.com/mesa/mesa-examples/tree/main/examples/search_and_rescue)
+
+Responders sweep a disaster area in continuous space to reach casualties before their survival deadlines, organising themselves into crews, task forces and a single incident command. The command structure lives entirely in Mesa's meta-agent membership backend: a medic is simultaneously a `member` of its home crew and `on_call` to the medical pool, gaining a third `attached` edge when another crew borrows it. Includes a `run_scenarios` parameter sweep over crew size and specialist policy that runs identically on a sequential or process-pool execution backend, showing that pooling scarce specialists beats embedding them while smaller crews widen the commander's span of control.
 
 
 ## Network Examples

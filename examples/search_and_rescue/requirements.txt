@@ -1,0 +1,8 @@
+mesa[rec]>=4.0.0a0
+numpy
+pandas
+matplotlib
+pytest
+# solara 1.61 is incompatible with the ipyvue 3.x line that ipyvuetify 3.x
+# pulls in: the dashboard fails to mount with "GlobalVue.use is not a function".
+ipyvuetify<3
