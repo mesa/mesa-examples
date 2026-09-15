@@ -1,0 +1,3 @@
+mesa>=3.0
+mesa-llm>=0.2.0
+matplotlib
