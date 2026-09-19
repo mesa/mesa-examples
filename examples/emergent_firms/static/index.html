@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Endogenous Firm Formation – Axtell 1999</title>
+    <meta name="description"
+        content="Interactive visualization of the Endogenous Firm Formation model (Axtell 1999) with emergent market dynamics.">
+    <link rel="stylesheet" href="/static/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+</head>
+
+<body>
+
+    <header>
+        <h1>Endogenous Firm Formation</h1>
+        <span class="header-step" id="stepDisplay">Step: 0</span>
+    </header>
+
+    <div class="app-shell">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h2>Parameters</h2>
+            <div class="param-group">
+                <div class="param-row">
+                    <label for="p-seed">Random Seed</label>
+                    <input type="number" id="p-seed" value="42" min="0">
+                </div>
+                <div class="param-row">
+                    <label for="p-agents">Number of Agents</label>
+                    <input type="number" id="p-agents" value="1000" min="50" max="5000" step="50">
+                </div>
+                <div class="param-row">
+                    <label for="p-a">Production (a)</label>
+                    <input type="number" id="p-a" value="1.0" min="0.1" max="5" step="0.1">
+                </div>
+                <div class="param-row">
+                    <label for="p-b">Production (b)</label>
+                    <input type="number" id="p-b" value="1.0" min="0.1" max="5" step="0.1">
+                </div>
+                <div class="param-row">
+                    <label for="p-beta">Returns Exponent (β)</label>
+                    <input type="number" id="p-beta" value="2.0" min="1.0" max="4.0" step="0.1">
+                </div>
+                <div class="param-row">
+                    <label for="p-friends">Friends per Agent</label>
+                    <input type="number" id="p-friends" value="2" min="1" max="10" step="1">
+                </div>
+                <div class="param-row checkbox-row">
+                    <input type="checkbox" id="p-makefriends">
+                    <label for="p-makefriends">Make Friends on Join</label>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" id="btnInit">Init</button>
+                <button class="btn btn-secondary" id="btnReset">Reset</button>
+            </div>
+
+            <h2 style="margin-top:0.5rem;">Simulate</h2>
+            <div class="step-row">
+                <input type="number" id="stepCount" value="1" min="1" max="100">
+                <button class="btn btn-primary" id="btnStep">Step</button>
+                <button class="btn btn-run" id="btnRun">▶ Run</button>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <main class="main">
+            <nav class="tab-bar">
+                <button class="tab-btn active" data-tab="model">Model</button>
+                <button class="tab-btn" data-tab="firm">Firm View</button>
+                <button class="tab-btn" data-tab="agent">Agent View</button>
+            </nav>
+
+            <div class="tab-content">
+                <!-- ===== MODEL TAB ===== -->
+                <div class="tab-panel active" id="panel-model">
+                    <div class="chart-grid">
+                        <div class="card chart-card">
+                            <h3>Number of Firms</h3>
+                            <div class="chart-wrap"><canvas id="chartFirmCount"></canvas></div>
+                        </div>
+                        <div class="card chart-card">
+                            <h3>Firm Size</h3>
+                            <div class="chart-wrap"><canvas id="chartFirmSize"></canvas></div>
+                        </div>
+                        <div class="card chart-card">
+                            <h3>Total Output</h3>
+                            <div class="chart-wrap"><canvas id="chartOutput"></canvas></div>
+                        </div>
+                        <div class="card chart-card">
+                            <h3>Total Effort</h3>
+                            <div class="chart-wrap"><canvas id="chartEffort"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== FIRM TAB ===== -->
+                <div class="tab-panel" id="panel-firm">
+                    <div class="view-header">
+                        <div class="firm-badge" id="firmBadge">Firm –</div>
+                        <select id="firmSelect">
+                            <option value="">– init model first –</option>
+                        </select>
+                    </div>
+                    <div class="stat-row" id="firmStats"></div>
+                    <div class="viz-row">
+                        <div class="card chart-card">
+                            <h3>Firm Output · Free Riders · Effort</h3>
+                            <div class="chart-wrap"><canvas id="chartFirmOutput"></canvas></div>
+                        </div>
+                        <div class="card network-card">
+                            <h3>Workers (Network Diagram)</h3>
+                            <div id="eulerContainer"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== AGENT TAB ===== -->
+                <div class="tab-panel" id="panel-agent">
+                    <div class="view-header">
+                        <h3
+                            style="color:var(--text-dim);font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em;">
+                            Agent</h3>
+                        <select id="agentSelect">
+                            <option value="">– init model first –</option>
+                        </select>
+                    </div>
+                    <div class="stat-row" id="agentStats"></div>
+                    <div class="viz-row">
+                        <div class="card chart-card">
+                            <h3>Effort &amp; Income</h3>
+                            <div class="chart-wrap"><canvas id="chartAgentHistory"></canvas></div>
+                        </div>
+                        <div class="card network-card">
+                            <h3>Friends Network</h3>
+                            <div id="friendsContainer"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="status-bar">
+        <span id="statusMsg">Ready – click Init to start</span>
+        <span>Axtell (1999) · Mesa</span>
+    </footer>
+
+    <div class="d3-tooltip" id="tooltip" style="display:none;"></div>
+
+    <script src="/static/app.js"></script>
+</body>
+
+</html>
