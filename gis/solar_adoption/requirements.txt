@@ -1,0 +1,7 @@
+mesa>=3.0.0
+mesa-geo>=0.9.0
+geopandas
+rasterio
+numpy
+solara
+shapely
