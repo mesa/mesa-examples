@@ -1,0 +1,4 @@
+mesa>=3.0.0
+pandas>=2.0.0
+matplotlib>=3.7.0
+solara
