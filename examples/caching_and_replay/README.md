@@ -2,56 +2,70 @@
 
 ## Summary
 
-This example applies caching on the Mesa [Schelling example](https://github.com/mesa/mesa-examples/tree/main/examples/schelling).
-It enables a simulation run to be "cached" or in other words recorded. The recorded simulation run is persisted on the local file system and can be replayed at any later point.
+This example demonstrates how to record and replay Mesa simulations using the [Mesa-Replay](https://github.com/Logende/mesa-replay) library. It wraps the standard [Schelling segregation model](https://github.com/mesa/mesa-examples/tree/main/examples/schelling) with `CacheableModel`, allowing you to:
 
-It uses the [Mesa-Replay](https://github.com/Logende/mesa-replay) library and puts the Schelling model inside a so-called `CacheableModel` wrapper that we name `CacheableSchelling`.
-From the user's perspective, the new model behaves the same way as the original Schelling model, but additionally supports caching.
+- **Record** simulations by saving the model state at each step to a cache file
+- **Replay** previously recorded simulations to examine specific runs
 
-Note that the main purpose of this example is to demonstrate that caching and replaying simulation runs is possible.
-The example is designed to be accessible.
-In practice, someone who wants to replay their simulation might not necessarily embed a replay button into the web view, but instead have a dedicated script to run a simulation that is being cached, separate from a script to replay a simulation run from a given cache file.
-More examples of caching and replay can be found in the [Mesa-Replay Repository](https://github.com/Logende/mesa-replay/tree/main/examples).
+The cacheable model behaves identically to a regular Mesa model but with added recording/replay capabilities. More examples can be found in the [Mesa-Replay repository](https://github.com/Logende/mesa-replay/tree/main/examples).
 
 ## Installation
 
-To install the dependencies use pip and the requirements.txt in this directory. e.g.
+Install dependencies:
 
-```
-    $ pip install -r requirements.txt
+```bash
+pip install -r requirements.txt
 ```
 
 ## How to Run
 
-To run the model interactively, run ``mesa runserver`` in this directory. e.g.
+### Interactive Visualization
 
-```
-    $ mesa runserver
-```
+Run the cacheable version with replay controls:
 
-or
-
-Directly run the file ``run.py`` in the terminal. e.g.
-
-```
-    $ python run.py
+```bash
+solara run run.py
 ```
 
-Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and press Reset, then Run.
+Or run the standard (non-cacheable) version:
 
-First, run the **simulation** with the 'Replay' switch disabled.
-When the simulation run is finished (e.g. all agents are happy, no more new steps are simulated), the run will automatically be stored in a cache file.
+```bash
+solara run server.py
+```
 
-Next, **replay** your latest cached simulation run by enabling the Replay switch and then pressing Reset.
+Then open [http://localhost:8765](http://localhost:8765) in your browser.
+
+### Recording a Simulation
+
+1. Uncheck the **'Replay cached run?'** checkbox
+2. Adjust the **Cache File Path** if desired (default: `./my_cache_file_path.cache`)
+3. Click **Reset**, then **Run**
+4. The cache is saved automatically when the simulation completes
+
+### Replaying a Simulation
+
+1. Check the **'Replay cached run?'** checkbox
+2. Ensure the cache file path matches your recorded file
+3. Click **Reset**, then **Run**
+4. The simulation will replay the exact recorded sequence
+
+## Notes
+
+- The cache file is written when the simulation completes (when `model.running` becomes `False`)
+- During recording, model states are held in memory and written once at the end
+- For large simulations, consider the memory requirements of caching all steps
+- By default, every step is cached. For large runs, you can adjust `cache_step_rate` to cache fewer steps
 
 ## Files
 
-* ``run.py``: Launches a model visualization server and uses `CacheableModelSchelling` as simulation model
-* ``cacheablemodel.py``: Implements `CacheableModelSchelling` to make the original Schelling model cacheable
-* ``model.py``: Taken from the original Mesa Schelling example
-* ``server.py``: Taken from the original Mesa Schelling example
+* `run.py` - Cacheable model visualization with replay controls
+* `cacheablemodel.py` - CacheableSchelling implementation with Mesa 3.x support
+* `model.py` - Standard Schelling segregation model
+* `server.py` - Standard (non-cacheable) visualization
+* `requirements.txt` - Required packages
 
 ## Further Reading
 
 * [Mesa-Replay library](https://github.com/Logende/mesa-replay)
-* [More caching and replay examples](https://github.com/Logende/mesa-replay/tree/main/examples)
+* [Mesa-Replay examples](https://github.com/Logende/mesa-replay/tree/main/examples)
+* [Original Schelling model](https://github.com/mesa/mesa-examples/tree/main/examples/schelling)
