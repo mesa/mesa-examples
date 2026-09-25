@@ -1,0 +1,6 @@
+[model]
+name = "Needs-Based Wolf-Sheep"
+description = "Wolf-Sheep predation model with explicit needs-based behavioral drives (hunger, fear) exploring behavioral framework patterns from Mesa discussion #2538."
+authors = ["Dashami Jituri"]
+mesa_version = ">=3.0"
+tags = ["predator-prey", "behavioral-framework", "needs-based", "drives"]
