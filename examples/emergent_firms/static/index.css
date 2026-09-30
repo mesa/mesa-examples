@@ -389,3 +389,110 @@ header h1 {
 
 /* ---------- Loading state ---------- */
 .loading { opacity: 0.5; pointer-events: none; }
+
+/* ---------- End Simulation button ---------- */
+.btn-end {
+    flex: 1;
+    padding: 0.5rem 0;
+    background: linear-gradient(135deg, #a78bfa, #6c8cff);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+.btn-end:hover { box-shadow: 0 0 14px var(--accent-glow); filter: brightness(1.1); }
+.btn-end:disabled { opacity: 0.5; cursor: not-allowed; filter: none; box-shadow: none; }
+
+/* Progress bar */
+.progress-bar-wrap {
+    width: 100%;
+    height: 22px;
+    background: var(--bg-base);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-top: 0.4rem;
+    position: relative;
+    overflow: hidden;
+}
+.progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent), #a78bfa);
+    border-radius: var(--radius-sm);
+    transition: width 0.15s ease;
+}
+.progress-bar-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text);
+    pointer-events: none;
+}
+
+/* ---------- Results overlay ---------- */
+.results-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: var(--bg-base);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.results-header {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border);
+}
+.results-header h2 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--accent), #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.results-summary {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    margin-left: auto;
+}
+.results-tab-bar { padding: 0 1.5rem; }
+
+/* Results panels */
+.results-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.25rem 1.5rem;
+}
+.results-panel { display: none; }
+.results-panel.active { display: block; }
+
+/* Three-column chart grid */
+.chart-grid-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+.chart-card-tall {
+    min-height: 340px;
+    max-height: 420px;
+}
+
+/* Full-height network containers */
+.network-card-full {
+    min-height: calc(100vh - 180px);
+}
+.network-card-full > div {
+    flex: 1;
+    min-height: 500px;
+}
+

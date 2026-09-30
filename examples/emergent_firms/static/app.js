@@ -26,6 +26,9 @@ const firmSelect    = $('#firmSelect');
 const agentSelect   = $('#agentSelect');
 const tooltip       = $('#tooltip');
 const btnRun        = $('#btnRun');
+const btnEnd        = $('#btnEnd');
+const btnBackToSim  = $('#btnBackToSim');
+const resultsPage   = $('#resultsPage');
 
 // ---------- Helpers ----------
 function getParams() {
@@ -77,8 +80,10 @@ function makeChart(canvasId, datasets, yLabel = '') {
 }
 
 // Model charts
-const chartFirmCount = makeChart('chartFirmCount',
-    [{ label: 'Firms', data: [], borderColor: '#6c8cff', backgroundColor: 'rgba(108,140,255,0.1)', fill: true, tension: 0.3, pointRadius: 0 }], 'Count');
+const chartFirmCount = makeChart('chartFirmCount', [
+    { label: 'Firms', data: [], borderColor: '#6c8cff', backgroundColor: 'rgba(108,140,255,0.1)', fill: true, tension: 0.3, pointRadius: 0 },
+    { label: 'New Firms', data: [], borderColor: '#fb923c', borderDash: [5, 3], tension: 0.3, pointRadius: 0 },
+], 'Count');
 
 const chartFirmSize = makeChart('chartFirmSize', [
     { label: 'Average', data: [], borderColor: '#6c8cff', tension: 0.3, pointRadius: 0 },
@@ -133,24 +138,27 @@ const chartAgentHistory = makeChart('chartAgentHistory', [
 
 
 function updateModelCharts(ts) {
-    const labels = ts['Number of Firms'].map((_, i) => i);
+    // Skip step 0 (initialization: all agents are singleton firms)
+    const labels = ts['Number of Firms'].slice(1).map((_, i) => i + 1);
+
     chartFirmCount.data.labels = labels;
-    chartFirmCount.data.datasets[0].data = ts['Number of Firms'];
+    chartFirmCount.data.datasets[0].data = ts['Number of Firms'].slice(1);
+    chartFirmCount.data.datasets[1].data = ts['New Firms'].slice(1);
     chartFirmCount.update();
 
     chartFirmSize.data.labels = labels;
-    chartFirmSize.data.datasets[0].data = ts['Average Firm Size'];
-    chartFirmSize.data.datasets[1].data = ts['Largest Firm Size'];
+    chartFirmSize.data.datasets[0].data = ts['Average Firm Size'].slice(1);
+    chartFirmSize.data.datasets[1].data = ts['Largest Firm Size'].slice(1);
     chartFirmSize.update();
 
     chartOutput.data.labels = labels;
-    chartOutput.data.datasets[0].data = ts['Total Output'];
-    chartOutput.data.datasets[1].data = ts['Output Largest Firm'];
+    chartOutput.data.datasets[0].data = ts['Total Output'].slice(1);
+    chartOutput.data.datasets[1].data = ts['Output Largest Firm'].slice(1);
     chartOutput.update();
 
     chartEffort.data.labels = labels;
-    chartEffort.data.datasets[0].data = ts['Total Effort'];
-    chartEffort.data.datasets[1].data = ts['Total Effort Largest Firm'];
+    chartEffort.data.datasets[0].data = ts['Total Effort'].slice(1);
+    chartEffort.data.datasets[1].data = ts['Total Effort Largest Firm'].slice(1);
     chartEffort.update();
 }
 
@@ -558,7 +566,7 @@ btnInit.addEventListener('click', async () => {
 
 // Step
 btnStep.addEventListener('click', async () => {
-    const n = parseInt($('#stepCount').value) || 1;
+    const n = 1;
     status(`Stepping ${n}...`);
     btnStep.disabled = true;
     try {
@@ -601,8 +609,14 @@ btnRun.addEventListener('click', () => {
 });
 
 async function runLoop() {
+    const MAX_STEP = 1000;
     while (running) {
-        const n = parseInt($('#stepCount').value) || 1;
+        if (currentStep >= MAX_STEP) {
+            running = false;
+            status(`Auto-stopped at step ${MAX_STEP}`);
+            break;
+        }
+        const n = 1;
         try {
             const snap = await api('/api/step', { steps: n });
             if (snap.error) { running = false; status('Error: ' + snap.error); break; }
@@ -619,3 +633,195 @@ async function runLoop() {
     btnRun.textContent = '\u25b6 Run';
     btnRun.classList.remove('running');
 }
+
+
+// --- End Simulation click: stop immediately and show results ---
+btnEnd.addEventListener('click', async () => {
+    // Stop any running loop
+    running = false;
+    btnRun.textContent = '\u25b6 Run';
+    btnRun.classList.remove('running');
+
+    btnEnd.disabled = true;
+    status('Loading results...');
+
+    try {
+        const results = await api('/api/results');
+        if (results.error) { status('Error: ' + results.error); return; }
+        showResultsPage(results);
+    } catch (e) {
+        status('Error fetching results: ' + e.message);
+    } finally {
+        btnEnd.disabled = false;
+    }
+});
+
+// --- Back button ---
+btnBackToSim.addEventListener('click', () => {
+    resultsPage.style.display = 'none';
+});
+
+// --- Show the results page ---
+let resultsChartSize = null;
+let resultsChartOutput = null;
+let resultsChartProductivity = null;
+
+function showResultsPage(data) {
+    resultsPage.style.display = 'flex';
+    document.getElementById('resultsTitle').textContent = `Simulation Results — Step ${data.step}`;
+    document.getElementById('resultsSummary').textContent =
+        `${data.total_workers} workers · ${data.living_firms} living firms · ${data.collapsed_firms} collapsed`;
+
+    renderLogLogPlots(data.firms);
+}
+
+// ============================================================
+//  OLS Power-Law Fit  (log-log linear regression)
+//  Fits log(y) = m·log(x) + b  →  y = e^b · x^m
+//  Returns { slope, intercept, r2, fitPoints }
+// ============================================================
+
+function fitPowerLaw(points) {
+    // Filter to positive values only (log requires > 0)
+    const valid = points.filter(p => p.x > 0 && p.y > 0);
+    const n = valid.length;
+    if (n < 2) return null;
+
+    const lx = valid.map(p => Math.log(p.x));
+    const ly = valid.map(p => Math.log(p.y));
+
+    const sumX = lx.reduce((a, b) => a + b, 0);
+    const sumY = ly.reduce((a, b) => a + b, 0);
+    const sumXY = lx.reduce((a, v, i) => a + v * ly[i], 0);
+    const sumX2 = lx.reduce((a, v) => a + v * v, 0);
+
+    const denom = n * sumX2 - sumX * sumX;
+    if (Math.abs(denom) < 1e-12) return null;
+
+    const slope = (n * sumXY - sumX * sumY) / denom;
+    const intercept = (sumY - slope * sumX) / n;
+
+    // R² (coefficient of determination)
+    const meanY = sumY / n;
+    const ssTot = ly.reduce((a, v) => a + (v - meanY) ** 2, 0);
+    const ssRes = ly.reduce((a, v, i) => a + (v - (slope * lx[i] + intercept)) ** 2, 0);
+    const r2 = ssTot > 0 ? 1 - ssRes / ssTot : 0;
+
+    // Generate fit line points spanning the data range
+    const xMin = Math.min(...valid.map(p => p.x));
+    const xMax = Math.max(...valid.map(p => p.x));
+    const fitPoints = [];
+    const steps = 50;
+    for (let i = 0; i <= steps; i++) {
+        const logX = Math.log(xMin) + (Math.log(xMax) - Math.log(xMin)) * (i / steps);
+        const x = Math.exp(logX);
+        const y = Math.exp(intercept) * Math.pow(x, slope);
+        fitPoints.push({ x, y });
+    }
+
+    return { slope, intercept, r2, fitPoints };
+}
+
+// ============================================================
+//  Log-Log Scatter Plots with Fit Line (Chart.js)
+// ============================================================
+
+function logLogChartOpts(xLabel, yLabel) {
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 0 },
+        scales: {
+            x: {
+                type: 'logarithmic',
+                title: { display: true, text: xLabel, color: '#8b8fa5' },
+                ticks: { color: '#8b8fa5' },
+                grid: { color: 'rgba(255,255,255,0.04)' },
+            },
+            y: {
+                type: 'logarithmic',
+                title: { display: true, text: yLabel, color: '#8b8fa5' },
+                ticks: { color: '#8b8fa5' },
+                grid: { color: 'rgba(255,255,255,0.04)' },
+            },
+        },
+        plugins: {
+            legend: { labels: { color: '#e4e6ed', boxWidth: 12 } },
+            tooltip: {
+                callbacks: {
+                    label: (ctx) => {
+                        if (ctx.datasetIndex === 1) return ''; // suppress fit line tooltips
+                        return `(${ctx.parsed.x.toFixed(1)}, ${ctx.parsed.y.toFixed(2)})`;
+                    },
+                },
+            },
+        },
+    };
+}
+
+function makeLogLogChart(canvasId, xLabel, yLabel, dotColor, fitColor) {
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    return new Chart(ctx, {
+        type: 'scatter',
+        data: {
+            datasets: [
+                {
+                    label: 'Data',
+                    data: [],
+                    backgroundColor: dotColor,
+                    borderColor: dotColor,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                },
+                {
+                    label: 'Fit',
+                    data: [],
+                    borderColor: fitColor,
+                    borderWidth: 2,
+                    borderDash: [6, 3],
+                    pointRadius: 0,
+                    showLine: true,
+                    fill: false,
+                    tension: 0,
+                },
+            ],
+        },
+        options: logLogChartOpts(xLabel, yLabel),
+    });
+}
+
+function applyFit(chart, dataPoints, dotLabel, fitLabel) {
+    chart.data.datasets[0].data = dataPoints;
+    chart.data.datasets[0].label = dotLabel;
+
+    const fit = fitPowerLaw(dataPoints);
+    if (fit) {
+        chart.data.datasets[1].data = fit.fitPoints;
+        chart.data.datasets[1].label = `${fitLabel} (slope=${fit.slope.toFixed(2)}, R²=${fit.r2.toFixed(3)})`;
+    }
+    chart.update();
+}
+
+function renderLogLogPlots(firms) {
+    // Destroy previous chart instances if they exist
+    if (resultsChartSize) resultsChartSize.destroy();
+    if (resultsChartOutput) resultsChartOutput.destroy();
+    if (resultsChartProductivity) resultsChartProductivity.destroy();
+
+    // Rank-Size plot
+    const sizeData = firms.map((f, i) => ({ x: i + 1, y: f.size })).filter(d => d.y > 0);
+    resultsChartSize = makeLogLogChart('chartLogSize', 'Rank', 'Firm Size', '#6c8cff', 'rgba(108,140,255,0.5)');
+    applyFit(resultsChartSize, sizeData, 'Firm Size', 'Power-law fit');
+
+    // Rank-Output plot
+    const outputSorted = [...firms].sort((a, b) => b.output - a.output);
+    const outputData = outputSorted.map((f, i) => ({ x: i + 1, y: f.output })).filter(d => d.y > 0);
+    resultsChartOutput = makeLogLogChart('chartLogOutput', 'Rank', 'Firm Output', '#34d399', 'rgba(52,211,153,0.5)');
+    applyFit(resultsChartOutput, outputData, 'Firm Output', 'Power-law fit');
+
+    // Productivity plot: size vs output/worker
+    const prodData = firms.map(f => ({ x: f.size, y: f.productivity })).filter(d => d.x > 0 && d.y > 0);
+    resultsChartProductivity = makeLogLogChart('chartLogProductivity', 'Firm Size', 'Output / Worker', '#fb923c', 'rgba(251,146,60,0.5)');
+    applyFit(resultsChartProductivity, prodData, 'Productivity', 'Power-law fit');
+}
+

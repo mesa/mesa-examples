@@ -244,3 +244,58 @@ async def api_agent(agent_id: int):
         "friends": friends_data,
         "edges": edges,
     }
+
+
+@app.get("/api/results")
+async def api_results():
+    """Aggregate end-of-simulation data for the results page."""
+    if model is None:
+        return {"error": "Model not initialized"}
+
+    firms = get_firms(model)
+    workers = get_workers(model)
+
+    # --- Living firms ---
+    living_ids = set()
+    firm_data = []
+    for f in firms:
+        living_ids.add(f.unique_id)
+        firm_data.append({
+            "id": f.unique_id,
+            "size": f.size,
+            "output": round(f.output, 4),
+            "productivity": round(f.output / f.size, 4) if f.size > 0 else 0.0,
+            "age": f.age,
+            "alive": True,
+        })
+
+    # --- Collapsed firms (from firm_history) ---
+    for fid, hist in model.firm_history.items():
+        if fid not in living_ids and len(hist["output"]) > 0:
+            # Use peak size (max output period) as a proxy for historical size
+            peak_output = max(hist["output"])
+            lifespan = len(hist["step"])
+            last_output = hist["output"][-1]
+            # Estimate peak size from number of steps with output
+            firm_data.append({
+                "id": fid,
+                "size": 0,
+                "output": round(last_output, 4),
+                "peak_output": round(peak_output, 4),
+                "productivity": 0.0,
+                "age": lifespan,
+                "alive": False,
+            })
+
+    firm_data.sort(key=lambda x: x["size"], reverse=True)
+
+    return {
+        "step": model.steps,
+        "total_firms": len(firm_data),
+        "living_firms": len(living_ids),
+        "collapsed_firms": len(firm_data) - len(living_ids),
+        "total_workers": len(workers),
+        "firms": firm_data,
+    }
+
+

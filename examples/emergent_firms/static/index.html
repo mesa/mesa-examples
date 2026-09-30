@@ -61,9 +61,9 @@
 
             <h2 style="margin-top:0.5rem;">Simulate</h2>
             <div class="step-row">
-                <input type="number" id="stepCount" value="1" min="1" max="100">
                 <button class="btn btn-primary" id="btnStep">Step</button>
                 <button class="btn btn-run" id="btnRun">▶ Run</button>
+                <button class="btn btn-end" id="btnEnd">⏹ End</button>
             </div>
         </aside>
 
@@ -143,6 +143,31 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- ===== RESULTS PAGE OVERLAY ===== -->
+    <div class="results-overlay" id="resultsPage" style="display:none;">
+        <div class="results-header">
+            <button class="btn btn-secondary" id="btnBackToSim">← Back to Simulation</button>
+            <h2 id="resultsTitle">Simulation Results</h2>
+            <div class="results-summary" id="resultsSummary"></div>
+        </div>
+        <div class="results-content">
+            <div class="chart-grid chart-grid-3">
+                <div class="card chart-card chart-card-tall">
+                    <h3>Firm Size (Rank–Size)</h3>
+                    <div class="chart-wrap"><canvas id="chartLogSize"></canvas></div>
+                </div>
+                <div class="card chart-card chart-card-tall">
+                    <h3>Firm Output (Rank–Output)</h3>
+                    <div class="chart-wrap"><canvas id="chartLogOutput"></canvas></div>
+                </div>
+                <div class="card chart-card chart-card-tall">
+                    <h3>Productivity (Size vs Output/Worker)</h3>
+                    <div class="chart-wrap"><canvas id="chartLogProductivity"></canvas></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <footer class="status-bar">

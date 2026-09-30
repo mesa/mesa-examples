@@ -78,7 +78,6 @@ class FirmModel(mesa.Model):
 
         self.steps = 0
         self.new_firms_count = 0
-        self.hypernetwork_records = []
         # Per-firm history: firm_id -> {output: [], free_riders: [], avg_effort: [], step: []}
         self.firm_history = defaultdict(lambda: {"output": [], "free_riders": [], "avg_effort": [], "step": []})
 
@@ -134,7 +133,6 @@ class FirmModel(mesa.Model):
             },
         )
         self.datacollector.collect(self)
-        self.record_hypernetwork()
         self._record_firm_history()
 
     def step(self):
@@ -155,7 +153,6 @@ class FirmModel(mesa.Model):
 
         self.steps += 1
         self.datacollector.collect(self)
-        self.record_hypernetwork()
         self._record_firm_history()
 
     def _record_firm_history(self):
@@ -171,17 +168,6 @@ class FirmModel(mesa.Model):
             h["avg_effort"].append(round(avg_e, 4))
             h["step"].append(self.steps)
 
-    def record_hypernetwork(self):
-        """Append worker allocation defining the specific hypernetwork projections."""
-        for w in get_workers(self):
-            firm = w.firm
-            if firm:
-                self.hypernetwork_records.append({
-                    "Step": self.steps,
-                    "Worker_ID": w.unique_id,
-                    "Firm_ID": firm.unique_id
-                })
-
     def get_network_df(self):
         """Retrieve fixed Agent-to-Agent Social Network Edges"""
         edges = []
@@ -189,7 +175,3 @@ class FirmModel(mesa.Model):
             for friend in w.friends:
                 edges.append({"Source": w.unique_id, "Target": friend.unique_id})
         return pd.DataFrame(edges)
-
-    def get_hypernetwork_df(self):
-        """Retrieve dynamic Worker-to-Firm assignment Network"""
-        return pd.DataFrame(self.hypernetwork_records)
