@@ -6,7 +6,7 @@ import mesa
 from mesa.discrete_space import OrthogonalMooreGrid
 from mesa.discrete_space.cell_agent import CellAgent
 from mesa.experimental.scenarios import Scenario
-from mesa.meta_agents import MetaAgents
+from mesa.experimental.meta_agents import MetaAgents
 
 from .agents import InventoryAgent, RouteAgent, SensorAgent, WorkerAgent
 from .make_warehouse import get_warehouse_coords, make_warehouse
