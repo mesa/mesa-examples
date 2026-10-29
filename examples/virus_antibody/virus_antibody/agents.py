@@ -205,6 +205,8 @@ class VirusAgent(CellularAgent):
     def generate_dna(self, dna=None):
         if dna is None:
             return [self.random.randint(0, 9) for _ in range(3)]
+        # Work on a copy, so a parent keeps its own genome when it spawns a child.
+        dna = list(dna)
         idx = self.random.randint(0, 2)
         chance = self.random.random()
         if chance < self.mutation_rate / 2:

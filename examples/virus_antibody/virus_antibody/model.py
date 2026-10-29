@@ -4,6 +4,8 @@ Virus/Antibody Model
 A mesa implementation of the Virus/Antibody model, where antibodies and viruses interact in a continuous space.
 """
 
+import copy
+
 import numpy as np
 from mesa import Model
 from mesa.datacollection import DataCollector
@@ -115,7 +117,7 @@ class VirusAntibodyModel(Model):
             position=viruses_positions,
             duplication_rate=self.virus_duplication_rate,
             mutation_rate=self.virus_mutation_rate,
-            dna=dna,
+            dna=[copy.deepcopy(dna) for _ in range(self.initial_viruses)],
         )
 
         self.datacollector.collect(self)
