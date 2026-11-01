@@ -14,7 +14,15 @@ def get_models(directory):
                     os.sep, "."
                 )
 
-                module = importlib.import_module(module_name)
+                try:
+                    module = importlib.import_module(module_name)
+                except Exception as exc:
+                    # Report an unimportable example as one failing test. Raising
+                    # here would abort collection for the whole file, so a single
+                    # broken import would hide every other example's result.
+                    models.append(pytest.param(exc, id=module_name))
+                    continue
+
                 for item in dir(module):
                     obj = getattr(module, item)
                     if (
@@ -29,6 +37,9 @@ def get_models(directory):
 
 @pytest.mark.parametrize("model_class", get_models("examples"))
 def test_model_steps(model_class):
+    if isinstance(model_class, Exception):
+        pytest.fail(f"example could not be imported: {model_class!r}")
+
     model = model_class()  # Assume no arguments are needed
     model.run_for(10)
     assert model.time == 10.0
