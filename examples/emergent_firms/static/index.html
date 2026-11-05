@@ -52,6 +52,10 @@
                     <input type="checkbox" id="p-makefriends">
                     <label for="p-makefriends">Make Friends on Join</label>
                 </div>
+                <div class="param-row" id="maxFriendsRow" style="opacity:0.5;">
+                    <label for="p-maxfriends">Max Friends Cap</label>
+                    <input type="number" id="p-maxfriends" value="10" min="2" max="50" step="1" disabled>
+                </div>
             </div>
 
             <div class="btn-group">
@@ -64,6 +68,15 @@
                 <button class="btn btn-primary" id="btnStep">Step</button>
                 <button class="btn btn-run" id="btnRun">▶ Run</button>
                 <button class="btn btn-end" id="btnEnd">⏹ End</button>
+            </div>
+            <div class="param-row speed-row">
+                <label for="p-steps-per-tick">Steps / Tick</label>
+                <select id="p-steps-per-tick">
+                    <option value="1" selected>1× (1 step)</option>
+                    <option value="5">5× (5 steps)</option>
+                    <option value="10">10× (10 steps)</option>
+                    <option value="25">25× (25 steps)</option>
+                </select>
             </div>
         </aside>
 
@@ -92,29 +105,62 @@
                             <div class="chart-wrap"><canvas id="chartOutput"></canvas></div>
                         </div>
                         <div class="card chart-card">
-                            <h3>Total Effort</h3>
+                            <h3>Normalized Effort</h3>
                             <div class="chart-wrap"><canvas id="chartEffort"></canvas></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- ===== FIRM TAB ===== -->
+                <!-- ===== FIRM TAB (RANK CLOCK) ===== -->
                 <div class="tab-panel" id="panel-firm">
-                    <div class="view-header">
-                        <div class="firm-badge" id="firmBadge">Firm –</div>
-                        <select id="firmSelect">
-                            <option value="">– init model first –</option>
-                        </select>
-                    </div>
-                    <div class="stat-row" id="firmStats"></div>
-                    <div class="viz-row">
-                        <div class="card chart-card">
-                            <h3>Firm Output · Free Riders · Effort</h3>
-                            <div class="chart-wrap"><canvas id="chartFirmOutput"></canvas></div>
+                    <div class="rank-clock-toolbar">
+                        <div class="rc-controls">
+                            <div class="rc-control-group">
+                                <span class="rc-control-label">Rank By</span>
+                                <div class="segmented-control" id="rcMetricToggle">
+                                    <button type="button" class="seg-btn active" data-metric="size">Firm Size</button>
+                                    <button type="button" class="seg-btn" data-metric="output">Output</button>
+                                </div>
+                            </div>
+                            <div class="rc-control-group">
+                                <label class="rc-control-label" for="rcTopN">Cutoff</label>
+                                <select id="rcTopN">
+                                    <option value="10">Top 10</option>
+                                    <option value="25" selected>Top 25</option>
+                                    <option value="50">Top 50</option>
+                                    <option value="100">Top 100</option>
+                                </select>
+                            </div>
+                            <div class="rc-control-group">
+                                <label class="rc-control-label" for="rcFirmFilter">Focus</label>
+                                <select id="rcFirmFilter">
+                                    <option value="">All Top Firms</option>
+                                </select>
+                                <button type="button" class="btn btn-secondary rc-clear-btn" id="rcClearFocus" style="display:none;">Clear</button>
+                            </div>
                         </div>
-                        <div class="card network-card">
-                            <h3>Workers (Network Diagram)</h3>
-                            <div id="eulerContainer"></div>
+                        <div class="stat-row rc-stats" id="rankClockStats"></div>
+                    </div>
+
+                    <div class="rank-clock-grid">
+                        <div class="card rank-clock-card">
+                            <div class="rc-card-header">
+                                <h3>Firm Rank Clock <span class="rc-subtitle" id="rcSubtitle">Rank 1 at center · clockwise over time</span></h3>
+                                <div class="rc-legend-inline">
+                                    <span class="rc-legend-item"><span class="rc-dot rc-dot-active"></span>Current Rank</span>
+                                    <span class="rc-legend-item"><span class="rc-dot rc-dot-entry"></span>Entry</span>
+                                    <span class="rc-legend-item"><span class="rc-dot rc-dot-exit"></span>Exited Top-N</span>
+                                </div>
+                            </div>
+                            <div class="rank-clock-canvas" id="rankClockContainer"></div>
+                        </div>
+
+                        <div class="card rc-leaderboard-card">
+                            <div class="rc-card-header">
+                                <h3>Top-N Firms <span class="rc-count-badge" id="rcFirmCountBadge">0</span></h3>
+                            </div>
+                            <div class="rc-leaderboard-hint">Hover or click a firm to trace its rank spiral</div>
+                            <div class="rc-leaderboard-list" id="rcLeaderboard"></div>
                         </div>
                     </div>
                 </div>
@@ -163,7 +209,7 @@
                     <div class="chart-wrap"><canvas id="chartLogOutput"></canvas></div>
                 </div>
                 <div class="card chart-card chart-card-tall">
-                    <h3>Productivity (Size vs Output/Worker)</h3>
+                    <h3>Output by Firm Size (Size vs Avg Output)</h3>
                     <div class="chart-wrap"><canvas id="chartLogProductivity"></canvas></div>
                 </div>
             </div>

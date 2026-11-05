@@ -99,7 +99,8 @@ header h1 {
     font-weight: 500;
 }
 .param-row input[type="number"],
-.param-row input[type="text"] {
+.param-row input[type="text"],
+.param-row select {
     width: 100%;
     padding: 0.4rem 0.5rem;
     background: var(--bg-base);
@@ -111,7 +112,21 @@ header h1 {
     outline: none;
     transition: border-color var(--transition);
 }
-.param-row input:focus { border-color: var(--accent); }
+.param-row input:focus,
+.param-row select:focus { border-color: var(--accent); }
+
+.param-row.speed-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: 0.15rem;
+}
+.param-row.speed-row select {
+    width: auto;
+    min-width: 120px;
+    cursor: pointer;
+}
 
 .param-row.checkbox-row {
     flex-direction: row;
@@ -494,5 +509,368 @@ header h1 {
 .network-card-full > div {
     flex: 1;
     min-height: 500px;
+}
+
+/* ---------- Rank Clock (Firm View) ---------- */
+.rank-clock-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+    margin-bottom: 0.9rem;
+}
+
+.rc-controls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+}
+
+.rc-control-group {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.rc-control-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+    white-space: nowrap;
+}
+
+.rc-control-group select {
+    padding: 0.38rem 0.6rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.8rem;
+    outline: none;
+    cursor: pointer;
+    transition: border-color var(--transition);
+}
+.rc-control-group select:focus {
+    border-color: var(--accent);
+}
+#rcFirmFilter {
+    min-width: 175px;
+    max-width: 240px;
+}
+
+.segmented-control {
+    display: inline-flex;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 2px;
+    gap: 2px;
+}
+
+.seg-btn {
+    padding: 0.3rem 0.75rem;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-dim);
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+.seg-btn:hover {
+    color: var(--text);
+}
+.seg-btn.active {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.rc-clear-btn {
+    flex: none;
+    padding: 0.36rem 0.65rem;
+    font-size: 0.75rem;
+}
+
+.stat-row.rc-stats {
+    margin-bottom: 0;
+    gap: 0.55rem;
+}
+.rc-stats .stat-chip {
+    padding: 0.35rem 0.7rem;
+    min-width: 82px;
+}
+.rc-stats .stat-chip .stat-value {
+    font-size: 1rem;
+}
+
+.rank-clock-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 290px;
+    gap: 1rem;
+    height: calc(100vh - 195px);
+    min-height: 480px;
+}
+
+@media (max-width: 1100px) {
+    .rank-clock-grid {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+    .rank-clock-card {
+        min-height: 500px;
+    }
+    .rc-leaderboard-card {
+        max-height: 360px;
+    }
+}
+
+.rank-clock-card,
+.rc-leaderboard-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.rc-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.rc-card-header h3 {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.rc-subtitle {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.74rem;
+    color: rgba(139, 143, 165, 0.75);
+}
+
+.rc-legend-inline {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+}
+
+.rc-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.rc-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.rc-dot-active {
+    background: var(--green);
+    box-shadow: 0 0 6px rgba(52, 211, 153, 0.6);
+}
+.rc-dot-entry {
+    background: var(--accent);
+}
+.rc-dot-exit {
+    background: transparent;
+    border: 1.5px solid var(--text-dim);
+}
+
+.rank-clock-canvas {
+    flex: 1;
+    min-height: 360px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rank-clock-canvas svg,
+.rank-clock-canvas canvas {
+    display: block;
+    user-select: none;
+}
+
+.rc-empty-msg {
+    fill: var(--text-dim);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.rc-ring {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.08);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+}
+.rc-ring-inner {
+    fill: rgba(108, 140, 255, 0.05);
+    stroke: rgba(108, 140, 255, 0.38);
+    stroke-width: 1.4;
+    stroke-dasharray: none;
+}
+.rc-ring-outer {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.16);
+    stroke-width: 1.2;
+    stroke-dasharray: none;
+}
+
+.rc-spoke {
+    stroke: rgba(255, 255, 255, 0.05);
+    stroke-width: 1;
+}
+.rc-spoke-start {
+    stroke: rgba(108, 140, 255, 0.35);
+    stroke-width: 1.2;
+}
+.rc-spoke-now {
+    stroke: rgba(52, 211, 153, 0.55);
+    stroke-width: 1.5;
+    stroke-dasharray: 4 2;
+}
+
+.rc-rank-label {
+    fill: var(--text-dim);
+    font-size: 9.5px;
+    font-weight: 600;
+}
+.rc-step-label {
+    fill: var(--text-dim);
+    font-size: 10px;
+    font-weight: 500;
+}
+.rc-center-label {
+    fill: var(--accent);
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.rc-firm-group {
+    transition: opacity 0.12s ease;
+}
+
+.rc-count-badge {
+    background: var(--bg-glass);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.1rem 0.45rem;
+    font-size: 0.7rem;
+    color: var(--text);
+}
+
+.rc-leaderboard-hint {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    margin-bottom: 0.5rem;
+}
+
+.rc-leaderboard-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding-right: 0.2rem;
+}
+
+.rc-lb-row {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.42rem 0.55rem;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.14s ease;
+}
+.rc-lb-row:hover {
+    background: rgba(108, 140, 255, 0.09);
+    border-color: rgba(108, 140, 255, 0.25);
+}
+.rc-lb-row.active {
+    background: rgba(108, 140, 255, 0.16);
+    border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(108, 140, 255, 0.18);
+}
+.rc-lb-row.dimmed {
+    opacity: 0.45;
+}
+
+.rc-lb-swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.rc-lb-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.rc-lb-title {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.35rem;
+}
+
+.rc-lb-meta {
+    font-size: 0.69rem;
+    color: var(--text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rc-lb-rank {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.1rem 0.4rem;
+    border-radius: 6px;
+    background: rgba(52, 211, 153, 0.15);
+    color: var(--green);
+    white-space: nowrap;
+}
+.rc-lb-rank.exited {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-dim);
+    font-weight: 500;
+}
+.rc-lb-rank.dissolved {
+    background: rgba(248, 113, 113, 0.12);
+    color: var(--red);
+    font-weight: 500;
 }
 
