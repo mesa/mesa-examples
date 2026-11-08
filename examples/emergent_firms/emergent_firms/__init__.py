@@ -4,4 +4,3 @@ from .agents import Firm, Worker
 from .model import FirmModel, FirmScenario
 
 __all__ = ["Firm", "FirmModel", "FirmScenario", "Worker"]
-

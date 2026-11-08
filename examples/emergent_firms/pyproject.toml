@@ -15,4 +15,3 @@ dependencies = [
     "numpy",
     "pandas",
 ]
-

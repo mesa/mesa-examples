@@ -57,10 +57,10 @@ class Firm(mesa.Agent):
             return
 
         # Production Function: O(E) = aE + bE^beta
-        E = self.total_effort
+        e_sum = self.total_effort
         beta = self.model.beta
-        e_beta = E * E if beta == 2.0 else (E ** beta)
-        self.output = float(self.model.a * E + self.model.b * e_beta)
+        e_beta = e_sum * e_sum if beta == 2.0 else (e_sum**beta)
+        self.output = float(self.model.a * e_sum + self.model.b * e_beta)
         if n > self.peak_size:
             self.peak_size = n
         if self.output > self.peak_output:
@@ -107,10 +107,9 @@ class Worker(mesa.Agent):
         self.effort_history: list[float] = []
         self.income_history: list[float] = []
         # Precompute constant leisure^((1 - theta)) vector once per worker
-        if 0.0 < self.theta < 1.0:
-            self._leisure_pow = _LEISURE_GRID ** (1.0 - self.theta)
-        else:
-            self._leisure_pow = None
+        self._leisure_pow = (
+            _LEISURE_GRID ** (1.0 - self.theta) if 0.0 < self.theta < 1.0 else None
+        )
 
     @property
     def firm(self):
@@ -144,19 +143,19 @@ class Worker(mesa.Agent):
         """
         current = self.firm
         if current is not None and firm == current:
-            E_other = max(0.0, current.total_effort - self.effort)
-            N = current.size
+            e_other = max(0.0, current.total_effort - self.effort)
+            n_members = current.size
         elif firm is None:
-            E_other = 0.0
-            N = 1
+            e_other = 0.0
+            n_members = 1
         else:
-            E_other = firm.total_effort
-            N = firm.size + 1
+            e_other = firm.total_effort
+            n_members = firm.size + 1
 
-        E_tot = E_other + _EFFORT_GRID
+        e_tot = e_other + _EFFORT_GRID
         beta = self.model.beta
-        e_beta = E_tot * E_tot if beta == 2.0 else (E_tot ** beta)
-        incomes = (self.model.a * E_tot + self.model.b * e_beta) * (1.0 / N)
+        e_beta = e_tot * e_tot if beta == 2.0 else (e_tot**beta)
+        incomes = (self.model.a * e_tot + self.model.b * e_beta) * (1.0 / n_members)
 
         theta = self.theta
         if theta == 1.0:

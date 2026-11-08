@@ -1,12 +1,12 @@
-import mesa
-import pandas as pd
-import numpy as np
 from collections import defaultdict
+
+import mesa
+import numpy as np
+import pandas as pd
+from mesa.experimental.meta_agents import MetaAgents
 from mesa.experimental.scenarios import Scenario
 
-from mesa.experimental.meta_agents import MetaAgents
-
-from .agents import Worker, Firm
+from .agents import Firm, Worker
 
 
 class FirmScenario(Scenario):
@@ -56,7 +56,7 @@ def max_firm_size(model):
     if hasattr(model, "_stats"):
         return model._stats["max_firm_size"]
     firms = get_firms(model)
-    return max([f.size for f in firms]) if firms else 0
+    return max(f.size for f in firms) if firms else 0
 
 
 def avg_effort(model):
@@ -95,7 +95,7 @@ def total_effort_largest(model):
 def total_output(model):
     if hasattr(model, "_stats"):
         return model._stats["total_output"]
-    return sum([f.output for f in get_firms(model)])
+    return sum(f.output for f in get_firms(model))
 
 
 def max_firm_output(model):
@@ -171,7 +171,7 @@ class FirmModel(mesa.Model):
         # Initialize the MetaAgents membership manager
         MetaAgents(self)
 
-        # 1. Initialize homogenous initial state: agents starting lone singleton firms
+        # 1. Initialize homogeneous initial state: agents starting lone singleton firms
         workers = []
         for _ in range(self.num_agents):
             theta = self.random.random()
@@ -196,7 +196,7 @@ class FirmModel(mesa.Model):
 
         # 3. Initial evaluation of states
         for w in workers:
-            e, u, _ = w.evaluate_firm(w.firm)
+            e, _, _ = w.evaluate_firm(w.firm)
             w.effort = e
             if w.firm is not None:
                 w.firm._total_effort = e

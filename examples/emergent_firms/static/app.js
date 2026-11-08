@@ -877,17 +877,17 @@ function paintRankClockDisplay() {
 }
 
 function rcFindStepIdxLE(pts, targetStep) {
-    let lo = 0, hi = pts.length - 1, ans = -1;
+    let lo = 0, hi = pts.length - 1, foundIdx = -1;
     while (lo <= hi) {
         const mid = (lo + hi) >> 1;
         if (pts[mid][0] <= targetStep) {
-            ans = mid;
+            foundIdx = mid;
             lo = mid + 1;
         } else {
             hi = mid - 1;
         }
     }
-    return ans;
+    return foundIdx;
 }
 
 function rcHitTest(mx, my) {
@@ -1629,4 +1629,3 @@ function renderLogLogPlots(firms) {
     resultsChartProductivity = makeLogLogChart('chartLogProductivity', 'Firm Size', 'Avg Firm Output', '#fb923c', 'rgba(251,146,60,0.5)');
     applyFit(resultsChartProductivity, sizeOutputData, 'Avg Firm Output', 'Power-law fit');
 }
-

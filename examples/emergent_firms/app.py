@@ -1,21 +1,18 @@
 """FastAPI backend for the Emergent Firm Formation visualization."""
 
-import os
 from contextlib import asynccontextmanager
+import os
 
+from emergent_firms.model import FirmModel, FirmScenario, get_firms, get_workers
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from emergent_firms.model import FirmModel, FirmScenario, get_firms, get_workers
-from emergent_firms.agents import Worker, Firm
-
-
 # ---------------------------------------------------------------------------
-# Global model state
+# Application model state (avoids PLW0603 global statement)
 # ---------------------------------------------------------------------------
-model: FirmModel | None = None
+_STATE: dict[str, FirmModel | None] = {"model": None}
 
 
 class InitParams(BaseModel):
@@ -55,75 +52,84 @@ _CHART_SERIES = (
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _current_step() -> int:
+def _current_step(m: FirmModel) -> int:
     """Authoritative simulation period count (immune to wrapper double-increments)."""
-    return getattr(model, "_period", model.steps)
+    return getattr(m, "_period", m.steps)
 
 
-def _model_timeseries() -> dict:
+def _model_timeseries(m: FirmModel) -> dict:
     """Return all datacollector model-level time-series directly from model_vars (no DataFrame copy)."""
-    model_vars = getattr(model.datacollector, "model_vars", None)
+    model_vars = getattr(m.datacollector, "model_vars", None)
     if model_vars is not None:
         return {col: list(vals) for col, vals in model_vars.items()}
-    df = model.datacollector.get_model_vars_dataframe()
+    df = m.datacollector.get_model_vars_dataframe()
     return {col: df[col].tolist() for col in df.columns}
 
 
-def _timeseries_delta(since_step: int) -> dict:
+def _timeseries_delta(m: FirmModel, since_step: int) -> dict:
     """Return only newly collected values after since_step (skipping step 0)."""
     start = max(1, since_step + 1)
-    end = _current_step() + 1
-    model_vars = model.datacollector.model_vars
+    end = _current_step(m) + 1
+    model_vars = m.datacollector.model_vars
     return {col: model_vars[col][start:end] for col in _CHART_SERIES}
 
 
-def _firms_summary() -> list[dict]:
+def _firms_summary(m: FirmModel) -> list[dict]:
     """Return [{id, size, output, age}, ...] sorted by size desc."""
-    firms = get_firms(model)
+    firms = get_firms(m)
     return sorted(
-        [{"id": f.unique_id, "size": f.size, "output": round(f.output, 4), "age": f.age} for f in firms],
+        [
+            {
+                "id": f.unique_id,
+                "size": f.size,
+                "output": round(f.output, 4),
+                "age": f.age,
+            }
+            for f in firms
+        ],
         key=lambda x: x["size"],
         reverse=True,
     )
 
 
-def _largest_firm_id() -> int | None:
-    firms = get_firms(model)
+def _largest_firm_id(m: FirmModel) -> int | None:
+    firms = get_firms(m)
     if not firms:
         return None
     return max(firms, key=lambda f: f.size).unique_id
 
 
-def _snapshot() -> dict:
+def _snapshot(m: FirmModel) -> dict:
     """Full snapshot returned after init/reset (and legacy step calls)."""
-    worker_ids = sorted([w.unique_id for w in get_workers(model)])
-    firms = get_firms(model)
+    worker_ids = sorted(w.unique_id for w in get_workers(m))
+    firms = get_firms(m)
     return {
-        "step": _current_step(),
+        "step": _current_step(m),
         "num_firms": len(firms),
-        "timeseries": _model_timeseries(),
-        "firms": _firms_summary(),
-        "largest_firm_id": _largest_firm_id(),
+        "timeseries": _model_timeseries(m),
+        "firms": _firms_summary(m),
+        "largest_firm_id": _largest_firm_id(m),
         "worker_ids": worker_ids,
     }
 
 
-def _rank_clock_delta(since_step: int, metric: str, top_n: int, total_living_firms: int) -> dict:
+def _rank_clock_delta(
+    m: FirmModel, since_step: int, metric: str, top_n: int, total_living_firms: int
+) -> dict:
     """Return O(delta_steps) rank-clock incremental update for steps (since_step + 1)..current_step."""
-    step = _current_step()
+    step = _current_step(m)
     metric_key = "output" if metric == "output" else "size"
     top_n = max(5, min(100, top_n))
-    snapshots = model.rank_snapshots.get(metric_key, [])
+    snapshots = m.rank_snapshots.get(metric_key, [])
 
     # snapshots[0] corresponds to step 1
     start_idx = max(0, since_step)
     new_slices = [
-        [list(item) for item in step_top[:top_n]]
-        for step_top in snapshots[start_idx:step]
+        [list(item) for item in step_top[:top_n]] for step_top in snapshots[start_idx:step]
     ]
 
     dissolved_ids: list[int] = []
-    dissolved_by_step = getattr(model, "dissolved_by_step", None)
+    dissolved_by_step = getattr(m, "dissolved_by_step", None)
     if dissolved_by_step is not None:
         for step_dissolved in dissolved_by_step[start_idx:step]:
             if step_dissolved:
@@ -140,14 +146,14 @@ def _rank_clock_delta(since_step: int, metric: str, top_n: int, total_living_fir
     }
 
 
-def _agent_payload(agent_id: int, since_step: int | None = None) -> dict:
+def _agent_payload(m: FirmModel, agent_id: int, since_step: int | None = None) -> dict:
     """Build O(1) detail or incremental delta for one worker."""
-    step = _current_step()
-    workers_by_id = getattr(model, "workers_by_id", None)
+    step = _current_step(m)
+    workers_by_id = getattr(m, "workers_by_id", None)
     if workers_by_id is not None:
         worker = workers_by_id.get(agent_id)
     else:
-        worker = next((w for w in get_workers(model) if w.unique_id == agent_id), None)
+        worker = next((w for w in get_workers(m) if w.unique_id == agent_id), None)
 
     if worker is None:
         return {"error": f"Agent {agent_id} not found"}
@@ -199,8 +205,9 @@ def _agent_payload(agent_id: int, since_step: int | None = None) -> dict:
 # ---------------------------------------------------------------------------
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(_app: FastAPI):
     yield
+
 
 app = FastAPI(lifespan=lifespan)
 
@@ -216,7 +223,6 @@ async def index():
 
 @app.post("/api/init")
 async def api_init(params: InitParams):
-    global model
     scenario = FirmScenario(
         num_agents=params.num_agents,
         a=params.a,
@@ -227,75 +233,81 @@ async def api_init(params: InitParams):
         max_friends=params.max_friends,
         rng=params.rng,
     )
-    model = FirmModel(scenario=scenario)
-    return _snapshot()
+    m = FirmModel(scenario=scenario)
+    _STATE["model"] = m
+    return _snapshot(m)
 
 
 @app.post("/api/step")
 async def api_step(params: StepParams):
-    if model is None:
+    m = _STATE["model"]
+    if m is None:
         return {"error": "Model not initialized"}
     for _ in range(params.steps):
-        model.step()
+        m.step()
 
     if params.since_step is None:
-        return _snapshot()
+        return _snapshot(m)
 
-    num_firms_now = len(get_firms(model))
+    num_firms_now = len(get_firms(m))
     resp: dict = {
-        "step": _current_step(),
+        "step": _current_step(m),
         "since_step": params.since_step,
         "num_firms": num_firms_now,
-        "ts_delta": _timeseries_delta(params.since_step),
+        "ts_delta": _timeseries_delta(m, params.since_step),
     }
     if params.active_tab == "firm":
         resp["rc_delta"] = _rank_clock_delta(
+            m,
             params.since_step,
             params.rc_metric,
             params.rc_top_n,
             num_firms_now,
         )
     elif params.active_tab == "agent" and params.agent_id is not None:
-        resp["agent_delta"] = _agent_payload(params.agent_id, since_step=params.since_step)
+        resp["agent_delta"] = _agent_payload(m, params.agent_id, since_step=params.since_step)
     return resp
 
 
 @app.post("/api/reset")
 async def api_reset():
-    global model
-    if model is None:
+    prev = _STATE["model"]
+    if prev is None:
         return {"error": "Model not initialized"}
     # Re-create with same scenario parameters
     scenario = FirmScenario(
-        num_agents=model.num_agents,
-        a=model.a,
-        b=model.b,
-        beta=model.beta,
-        num_friends=model.num_friends,
-        make_friends=model.make_friends,
-        max_friends=model.max_friends,
+        num_agents=prev.num_agents,
+        a=prev.a,
+        b=prev.b,
+        beta=prev.beta,
+        num_friends=prev.num_friends,
+        make_friends=prev.make_friends,
+        max_friends=prev.max_friends,
         rng=42,
     )
-    model = FirmModel(scenario=scenario)
-    return _snapshot()
+    m = FirmModel(scenario=scenario)
+    _STATE["model"] = m
+    return _snapshot(m)
 
 
 @app.get("/api/firms")
 async def api_firms():
-    if model is None:
+    m = _STATE["model"]
+    if m is None:
         return {"error": "Model not initialized"}
-    return _firms_summary()
+    return _firms_summary(m)
 
 
 @app.get("/api/firm/{firm_id}")
 async def api_firm(firm_id: int):
     """Detail for one firm: workers + internal friend edges."""
-    if model is None:
+    m = _STATE["model"]
+    if m is None:
         return {"error": "Model not initialized"}
 
     # Find the firm
     firm = None
-    for f in get_firms(model):
+    for f in get_firms(m):
         if f.unique_id == firm_id:
             firm = f
             break
@@ -308,21 +320,23 @@ async def api_firm(firm_id: int):
     worker_data = []
     internal_edges = []
     for w in workers:
-        worker_data.append({
-            "id": w.unique_id,
-            "effort": round(w.effort, 4),
-            "income": round(w.income, 4),
-            "utility": round(w.utility, 4),
-            "theta": round(w.theta, 4),
-            "num_friends": len(w.friends),
-        })
+        worker_data.append(
+            {
+                "id": w.unique_id,
+                "effort": round(w.effort, 4),
+                "income": round(w.income, 4),
+                "utility": round(w.utility, 4),
+                "theta": round(w.theta, 4),
+                "num_friends": len(w.friends),
+            }
+        )
         # Edges to friends who are also in this firm
         for fr in w.friends:
             if fr.unique_id in worker_ids:
                 internal_edges.append({"source": w.unique_id, "target": fr.unique_id})
 
     # Per-firm history (full life of this firm)
-    history = model.firm_history.get(
+    history = m.firm_history.get(
         firm.unique_id,
         {"size": [], "output": [], "free_riders": [], "avg_effort": [], "step": []},
     )
@@ -341,14 +355,15 @@ async def api_firm(firm_id: int):
 @app.get("/api/rank_clock")
 async def api_rank_clock(metric: str = "size", top_n: int = 25):
     """Return firm rank trajectories over time for the Rank Clock visualization."""
-    if model is None:
+    m = _STATE["model"]
+    if m is None:
         return {"error": "Model not initialized"}
 
     metric_key = "output" if metric == "output" else "size"
     top_n = max(5, min(100, top_n))
 
-    snapshots = model.rank_snapshots.get(metric_key, [])
-    living_map = {f.unique_id: f for f in get_firms(model)}
+    snapshots = m.rank_snapshots.get(metric_key, [])
+    living_map = {f.unique_id: f for f in get_firms(m)}
 
     # Assemble per-firm trajectories across steps 1..T
     # Each point is [step, rank, size, output]
@@ -398,7 +413,7 @@ async def api_rank_clock(metric: str = "size", top_n: int = 25):
             current_ranks[fid] = rank_idx + 1
 
     firms_out = []
-    firm_peaks = getattr(model, "firm_peaks", None)
+    firm_peaks = getattr(m, "firm_peaks", None)
     for fid, entry in trajectories.items():
         living_firm = living_map.get(fid)
         alive = living_firm is not None
@@ -408,27 +423,35 @@ async def api_rank_clock(metric: str = "size", top_n: int = 25):
             total_peak_output = max(pk[1], entry["peak_output"])
             lifespan = living_firm.age if alive else pk[2]
         else:
-            hist = model.firm_history.get(fid)
-            total_peak_size = max(hist["size"]) if hist and hist.get("size") else entry["peak_size"]
-            total_peak_output = max(hist["output"]) if hist and hist.get("output") else entry["peak_output"]
-            lifespan = living_firm.age if alive else (len(hist["step"]) if hist else entry["last_age"])
+            hist = m.firm_history.get(fid)
+            total_peak_size = (
+                max(hist["size"]) if hist and hist.get("size") else entry["peak_size"]
+            )
+            total_peak_output = (
+                max(hist["output"]) if hist and hist.get("output") else entry["peak_output"]
+            )
+            lifespan = (
+                living_firm.age if alive else (len(hist["step"]) if hist else entry["last_age"])
+            )
 
-        firms_out.append({
-            "id": fid,
-            "alive": alive,
-            "in_top_n_now": fid in current_ranks,
-            "current_rank": current_ranks.get(fid),
-            "current_size": living_firm.size if alive else 0,
-            "current_output": round(living_firm.output, 4) if alive else 0.0,
-            "age": lifespan,
-            "peak_rank": entry["peak_rank"],
-            "peak_size": total_peak_size,
-            "peak_output": round(total_peak_output, 4),
-            "steps_in_top_n": len(entry["points"]),
-            "first_step": entry["first_step"],
-            "last_step": entry["last_step"],
-            "points": entry["points"],
-        })
+        firms_out.append(
+            {
+                "id": fid,
+                "alive": alive,
+                "in_top_n_now": fid in current_ranks,
+                "current_rank": current_ranks.get(fid),
+                "current_size": living_firm.size if alive else 0,
+                "current_output": round(living_firm.output, 4) if alive else 0.0,
+                "age": lifespan,
+                "peak_rank": entry["peak_rank"],
+                "peak_size": total_peak_size,
+                "peak_output": round(total_peak_output, 4),
+                "steps_in_top_n": len(entry["points"]),
+                "first_step": entry["first_step"],
+                "last_step": entry["last_step"],
+                "points": entry["points"],
+            }
+        )
 
     # Sort: currently in top_n first (by current_rank asc), then historical by peak_rank asc & longevity desc
     firms_out.sort(
@@ -441,7 +464,7 @@ async def api_rank_clock(metric: str = "size", top_n: int = 25):
     )
 
     return {
-        "step": _current_step(),
+        "step": _current_step(m),
         "metric": metric_key,
         "top_n": top_n,
         "total_living_firms": len(living_map),
@@ -454,61 +477,65 @@ async def api_rank_clock(metric: str = "size", top_n: int = 25):
 @app.get("/api/agent/{agent_id}")
 async def api_agent(agent_id: int):
     """Detail for one agent: history + friends network."""
-    if model is None:
+    m = _STATE["model"]
+    if m is None:
         return {"error": "Model not initialized"}
-    return _agent_payload(agent_id, since_step=None)
+    return _agent_payload(m, agent_id, since_step=None)
 
 
 @app.get("/api/results")
 async def api_results():
     """Aggregate end-of-simulation data for the results page."""
-    if model is None:
+    m = _STATE["model"]
+    if m is None:
         return {"error": "Model not initialized"}
 
-    firms = get_firms(model)
-    workers = get_workers(model)
+    firms = get_firms(m)
+    workers = get_workers(m)
 
     # --- Living firms ---
     living_ids = set()
     firm_data = []
     for f in firms:
         living_ids.add(f.unique_id)
-        firm_data.append({
-            "id": f.unique_id,
-            "size": f.size,
-            "output": round(f.output, 4),
-            "productivity": round(f.output / f.size, 4) if f.size > 0 else 0.0,
-            "age": f.age,
-            "alive": True,
-        })
+        firm_data.append(
+            {
+                "id": f.unique_id,
+                "size": f.size,
+                "output": round(f.output, 4),
+                "productivity": round(f.output / f.size, 4) if f.size > 0 else 0.0,
+                "age": f.age,
+                "alive": True,
+            }
+        )
 
     # --- Collapsed firms (from firm_history / O(1) firm_peaks) ---
-    firm_peaks = getattr(model, "firm_peaks", None)
-    for fid, hist in model.firm_history.items():
+    firm_peaks = getattr(m, "firm_peaks", None)
+    for fid, hist in m.firm_history.items():
         if fid not in living_ids and len(hist["output"]) > 0:
             pk = firm_peaks.get(fid) if firm_peaks is not None else None
             peak_output = pk[1] if pk is not None else max(hist["output"])
             lifespan = pk[2] if pk is not None else len(hist["step"])
             last_output = hist["output"][-1]
-            firm_data.append({
-                "id": fid,
-                "size": 0,
-                "output": round(last_output, 4),
-                "peak_output": round(peak_output, 4),
-                "productivity": 0.0,
-                "age": lifespan,
-                "alive": False,
-            })
+            firm_data.append(
+                {
+                    "id": fid,
+                    "size": 0,
+                    "output": round(last_output, 4),
+                    "peak_output": round(peak_output, 4),
+                    "productivity": 0.0,
+                    "age": lifespan,
+                    "alive": False,
+                }
+            )
 
     firm_data.sort(key=lambda x: x["size"], reverse=True)
 
     return {
-        "step": _current_step(),
+        "step": _current_step(m),
         "total_firms": len(firm_data),
         "living_firms": len(living_ids),
         "collapsed_firms": len(firm_data) - len(living_ids),
         "total_workers": len(workers),
         "firms": firm_data,
     }
-
-
