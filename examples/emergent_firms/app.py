@@ -8,8 +8,8 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from .model import FirmModel, FirmScenario, get_firms, get_workers
-from .agents import Worker, Firm
+from emergent_firms.model import FirmModel, FirmScenario, get_firms, get_workers
+from emergent_firms.agents import Worker, Firm
 
 
 # ---------------------------------------------------------------------------

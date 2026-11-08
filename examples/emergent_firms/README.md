@@ -2,7 +2,7 @@
 
 ## Summary
 
-This model implements the endogenous firm formation framework described in The Emergence of Firms in a Population of Agents: Local Increasing Retruns, Unstable Nash Equilibria, and Power Law Size Distributions (Axtell, 1999). It demonstrates how firms can emerge, grow, shrink, and dissolve purely from the decentralized decisions of boundedly-rational workers — without any top-down market mechanism or central planner.
+This model implements the endogenous firm formation framework described in The Emergence of Firms in a Population of Agents: Local Increasing Returns, Unstable Nash Equilibria, and Power Law Size Distributions (Axtell, 1999). It demonstrates how firms can emerge, grow, shrink, and dissolve purely from the decentralized decisions of boundedly-rational workers — without any top-down market mechanism or central planner.
 
 Each worker is endowed with a Cobb-Douglas utility function over income and leisure, parameterized by an idiosyncratic preference θ. Every period a randomly activated worker evaluates three options:
 
@@ -50,8 +50,8 @@ Use the control panel to configure parameters, initialize the model, and step th
 
 ## Files
 
-* `model.py` — Model class (`FirmModel`), scenario parameters (`FirmScenario`), model-level reporters, and data collection logic including hypernetwork tracking.
-* `agents.py` — `Worker` agent (utility optimization, firm evaluation, movement decisions) and `Firm` meta-agent (production, income allocation).
+* `emergent_firms/model.py` — Model class (`FirmModel`), scenario parameters (`FirmScenario`), model-level reporters, and data collection logic.
+* `emergent_firms/agents.py` — `Worker` agent (utility optimization, firm evaluation, movement decisions) and `Firm` meta-agent (production, income allocation).
 * `app.py` — FastAPI backend serving the interactive visualization, with REST endpoints for init, step, reset, and drill-down queries.
 * `static/index.html` — Single-page dashboard UI.
 * `static/index.css` — Dashboard styling.
