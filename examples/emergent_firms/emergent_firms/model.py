@@ -4,10 +4,7 @@ import numpy as np
 from collections import defaultdict
 from mesa.experimental.scenarios import Scenario
 
-try:
-    from mesa.meta_agents import MetaAgents
-except ImportError:
-    from mesa.experimental.meta_agents import MetaAgents
+from mesa.experimental.meta_agents import MetaAgents
 
 from .agents import Worker, Firm
 
