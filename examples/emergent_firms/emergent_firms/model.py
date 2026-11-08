@@ -20,6 +20,7 @@ class FirmScenario(Scenario):
     make_friends: bool = False
     max_friends: int = 10
 
+
 # --- Model Reporters ---
 def get_firms(model):
     living = getattr(model, "_living_firms", None)
@@ -158,7 +159,13 @@ class FirmModel(mesa.Model):
         self._stats: dict[str, float | int] = {}
         # Per-firm history: firm_id -> {size: [], output: [], free_riders: [], avg_effort: [], step: []}
         self.firm_history = defaultdict(
-            lambda: {"size": [], "output": [], "free_riders": [], "avg_effort": [], "step": []}
+            lambda: {
+                "size": [],
+                "output": [],
+                "free_riders": [],
+                "avg_effort": [],
+                "step": [],
+            }
         )
         # O(1) lifetime peak lookup: firm_id -> [peak_size, peak_output, steps_recorded]
         self.firm_peaks: dict[int, list] = {}

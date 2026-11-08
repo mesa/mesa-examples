@@ -1,7 +1,7 @@
 """FastAPI backend for the Emergent Firm Formation visualization."""
 
-from contextlib import asynccontextmanager
 import os
+from contextlib import asynccontextmanager
 
 from emergent_firms.model import FirmModel, FirmScenario, get_firms, get_workers
 from fastapi import FastAPI
@@ -51,6 +51,7 @@ _CHART_SERIES = (
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _current_step(m: FirmModel) -> int:
     """Authoritative simulation period count (immune to wrapper double-increments)."""
@@ -125,7 +126,8 @@ def _rank_clock_delta(
     # snapshots[0] corresponds to step 1
     start_idx = max(0, since_step)
     new_slices = [
-        [list(item) for item in step_top[:top_n]] for step_top in snapshots[start_idx:step]
+        [list(item) for item in step_top[:top_n]]
+        for step_top in snapshots[start_idx:step]
     ]
 
     dissolved_ids: list[int] = []
@@ -179,11 +181,15 @@ def _agent_payload(m: FirmModel, agent_id: int, since_step: int | None = None) -
     edges = []
     for fr in worker.friends:
         fr_firm = fr.firm
-        friends_data.append({
-            "id": fr.unique_id,
-            "firm_id": fr_firm.unique_id if fr_firm else None,
-            "same_firm": (fr_firm == current_firm) if (current_firm is not None and fr_firm is not None) else False,
-        })
+        friends_data.append(
+            {
+                "id": fr.unique_id,
+                "firm_id": fr_firm.unique_id if fr_firm else None,
+                "same_firm": (fr_firm == current_firm)
+                if (current_firm is not None and fr_firm is not None)
+                else False,
+            }
+        )
         edges.append({"source": agent_id, "target": fr.unique_id})
 
     return {
@@ -203,6 +209,7 @@ def _agent_payload(m: FirmModel, agent_id: int, since_step: int | None = None) -
 # ---------------------------------------------------------------------------
 # App
 # ---------------------------------------------------------------------------
+
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
@@ -265,7 +272,9 @@ async def api_step(params: StepParams):
             num_firms_now,
         )
     elif params.active_tab == "agent" and params.agent_id is not None:
-        resp["agent_delta"] = _agent_payload(m, params.agent_id, since_step=params.since_step)
+        resp["agent_delta"] = _agent_payload(
+            m, params.agent_id, since_step=params.since_step
+        )
     return resp
 
 
@@ -428,10 +437,14 @@ async def api_rank_clock(metric: str = "size", top_n: int = 25):
                 max(hist["size"]) if hist and hist.get("size") else entry["peak_size"]
             )
             total_peak_output = (
-                max(hist["output"]) if hist and hist.get("output") else entry["peak_output"]
+                max(hist["output"])
+                if hist and hist.get("output")
+                else entry["peak_output"]
             )
             lifespan = (
-                living_firm.age if alive else (len(hist["step"]) if hist else entry["last_age"])
+                living_firm.age
+                if alive
+                else (len(hist["step"]) if hist else entry["last_age"])
             )
 
         firms_out.append(

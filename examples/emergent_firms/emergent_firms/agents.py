@@ -14,6 +14,7 @@ class Firm(mesa.Agent):
     Membership is tracked by the model's MetaAgents manager
     (model.meta_agents) rather than a local set.
     """
+
     def __init__(self, model, **kwargs):
         super().__init__(model)
         self.output = 0.0
@@ -94,6 +95,7 @@ class Worker(mesa.Agent):
     """
     Boundedly-rational individual optimizing its utility.
     """
+
     def __init__(self, model, theta):
         super().__init__(model)
         self.theta = float(theta)
@@ -135,7 +137,7 @@ class Worker(mesa.Agent):
         if income <= 0.0 or leisure <= 0.0:
             return 0.0
 
-        return (income ** theta) * (leisure ** (1.0 - theta))
+        return (income**theta) * (leisure ** (1.0 - theta))
 
     def evaluate_firm(self, firm):
         """
@@ -163,7 +165,7 @@ class Worker(mesa.Agent):
         elif theta == 0.0:
             utils = _LEISURE_GRID
         else:
-            utils = (incomes ** theta) * self._leisure_pow
+            utils = (incomes**theta) * self._leisure_pow
 
         best_idx = int(np.argmax(utils))
         return float(_EFFORT_GRID[best_idx]), float(utils[best_idx]), firm
@@ -203,15 +205,23 @@ class Worker(mesa.Agent):
         if action == "stay":
             self.effort = best_e
             if current_firm is not None and current_firm._total_effort is not None:
-                current_firm._total_effort = max(0.0, current_firm._total_effort + (best_e - old_e))
+                current_firm._total_effort = max(
+                    0.0, current_firm._total_effort + (best_e - old_e)
+                )
         else:
             if current_firm is not None:
                 self.model.meta_agents.remove_member(current_firm, self)
                 self._firm = None
-                new_size = (current_firm._size - 1) if current_firm._size is not None else len(current_firm.workers)
+                new_size = (
+                    (current_firm._size - 1)
+                    if current_firm._size is not None
+                    else len(current_firm.workers)
+                )
                 current_firm._size = new_size
                 if current_firm._total_effort is not None:
-                    current_firm._total_effort = max(0.0, current_firm._total_effort - old_e)
+                    current_firm._total_effort = max(
+                        0.0, current_firm._total_effort - old_e
+                    )
                 if new_size == 0:
                     if hasattr(self.model, "_dissolved_step_buf"):
                         self.model._dissolved_step_buf.append(current_firm.unique_id)
@@ -236,7 +246,11 @@ class Worker(mesa.Agent):
             elif action == "join":
                 self.model.meta_agents.add_member(best_f, self)
                 self._firm = best_f
-                best_f._size = (best_f._size + 1) if best_f._size is not None else len(best_f.workers)
+                best_f._size = (
+                    (best_f._size + 1)
+                    if best_f._size is not None
+                    else len(best_f.workers)
+                )
                 if best_f._total_effort is not None:
                     best_f._total_effort += best_e
                 if best_f._size > best_f.peak_size:
@@ -245,7 +259,8 @@ class Worker(mesa.Agent):
                 # retaining highest-utility friends when at max_friends capacity
                 if self.model.make_friends:
                     potential = [
-                        w for w in best_f.workers
+                        w
+                        for w in best_f.workers
                         if w is not self and w not in self._friends_set
                     ]
                     if potential:
@@ -263,7 +278,10 @@ class Worker(mesa.Agent):
                                 ),
                             )
                             worst_friend = self.friends[worst_idx]
-                            worst_score = (firm_utils.get(worst_friend.firm, -1.0), worst_friend.effort)
+                            worst_score = (
+                                firm_utils.get(worst_friend.firm, -1.0),
+                                worst_friend.effort,
+                            )
                             if worst_score < (best_u, chosen.effort):
                                 self._friends_set.discard(worst_friend)
                                 self.friends[worst_idx] = chosen
