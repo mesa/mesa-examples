@@ -169,4 +169,3 @@ This example applies caching on the Mesa [Schelling](https://github.com/mesa/mes
 ### [Continuous Double Auction (ZI-C) Market Model](https://github.com/mesa/mesa-examples/tree/main/examples/zi_double_auction)
 
 A continuous double-auction market with zero-intelligence traders. Buyers and sellers each have a private reservation price or cost, and submit randomized, budget-constrained bids and asks as they arrive asynchronously through Mesa's event-driven scheduler. The order book matches on price-time priority and clears at the midpoint price, converging naturally toward the market's theoretical equilibrium.
-
