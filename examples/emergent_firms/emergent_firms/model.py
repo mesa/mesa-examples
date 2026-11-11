@@ -204,7 +204,7 @@ class FirmModel(mesa.Model):
         self._workers: list[Worker] = workers
         self.workers_by_id: dict[int, Worker] = {w.unique_id: w for w in workers}
 
-        # 2. Create social network in O(N * num_friends) without O(N^2) candidate lists
+        # 2. Create social network
         n_workers = len(workers)
         k_friends = self.num_friends
         if k_friends > 0 and n_workers > 1:
