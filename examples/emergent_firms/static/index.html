@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Endogenous Firm Formation – Axtell 1999</title>
+    <meta name="description"
+        content="Interactive visualization of the Endogenous Firm Formation model (Axtell 1999) with emergent market dynamics.">
+    <link rel="stylesheet" href="/static/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"
+        integrity="sha384-T/4KgSWuZEPozpPz7rnnp/5lDSnpY1VPJCojf1S81uTHS1E38qgLfMgVsAeRCWc4"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"
+        integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+    <header>
+        <h1>Endogenous Firm Formation</h1>
+        <span class="header-step" id="stepDisplay">Step: 0</span>
+    </header>
+
+    <div class="app-shell">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h2>Parameters</h2>
+            <div class="param-group">
+                <div class="param-row">
+                    <label for="p-seed">Random Seed</label>
+                    <input type="number" id="p-seed" value="42" min="0">
+                </div>
+                <div class="param-row">
+                    <label for="p-agents">Number of Agents</label>
+                    <input type="number" id="p-agents" value="1000" min="50" max="5000" step="50">
+                </div>
+                <div class="param-row">
+                    <label for="p-a">Production (a)</label>
+                    <input type="number" id="p-a" value="1.0" min="0.1" max="5" step="0.1">
+                </div>
+                <div class="param-row">
+                    <label for="p-b">Production (b)</label>
+                    <input type="number" id="p-b" value="1.0" min="0.1" max="5" step="0.1">
+                </div>
+                <div class="param-row">
+                    <label for="p-beta">Returns Exponent (β)</label>
+                    <input type="number" id="p-beta" value="2.0" min="1.0" max="4.0" step="0.1">
+                </div>
+                <div class="param-row">
+                    <label for="p-friends">Friends per Agent</label>
+                    <input type="number" id="p-friends" value="2" min="1" max="10" step="1">
+                </div>
+                <div class="param-row checkbox-row">
+                    <input type="checkbox" id="p-makefriends">
+                    <label for="p-makefriends">Make Friends on Join</label>
+                </div>
+                <div class="param-row" id="maxFriendsRow" style="opacity:0.5;">
+                    <label for="p-maxfriends">Max Friends Cap</label>
+                    <input type="number" id="p-maxfriends" value="10" min="2" max="50" step="1" disabled>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" id="btnInit">Init</button>
+                <button class="btn btn-secondary" id="btnReset">Reset</button>
+            </div>
+
+            <h2 style="margin-top:0.5rem;">Simulate</h2>
+            <div class="step-row">
+                <button class="btn btn-primary" id="btnStep">Step</button>
+                <button class="btn btn-run" id="btnRun">▶ Run</button>
+                <button class="btn btn-end" id="btnEnd">⏹ End</button>
+            </div>
+            <div class="param-row speed-row">
+                <label for="p-steps-per-tick">Steps / Tick</label>
+                <select id="p-steps-per-tick">
+                    <option value="1" selected>1× (1 step)</option>
+                    <option value="5">5× (5 steps)</option>
+                    <option value="10">10× (10 steps)</option>
+                    <option value="25">25× (25 steps)</option>
+                </select>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <main class="main">
+            <nav class="tab-bar">
+                <button class="tab-btn active" data-tab="model">Model</button>
+                <button class="tab-btn" data-tab="firm">Firm View</button>
+                <button class="tab-btn" data-tab="agent">Agent View</button>
+            </nav>
+
+            <div class="tab-content">
+                <!-- ===== MODEL TAB ===== -->
+                <div class="tab-panel active" id="panel-model">
+                    <div class="chart-grid">
+                        <div class="card chart-card">
+                            <h3>Number of Firms</h3>
+                            <div class="chart-wrap"><canvas id="chartFirmCount"></canvas></div>
+                        </div>
+                        <div class="card chart-card">
+                            <h3>Firm Size</h3>
+                            <div class="chart-wrap"><canvas id="chartFirmSize"></canvas></div>
+                        </div>
+                        <div class="card chart-card">
+                            <h3>Total Output</h3>
+                            <div class="chart-wrap"><canvas id="chartOutput"></canvas></div>
+                        </div>
+                        <div class="card chart-card">
+                            <h3>Normalized Effort</h3>
+                            <div class="chart-wrap"><canvas id="chartEffort"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== FIRM TAB (RANK CLOCK) ===== -->
+                <div class="tab-panel" id="panel-firm">
+                    <div class="rank-clock-toolbar">
+                        <div class="rc-controls">
+                            <div class="rc-control-group">
+                                <span class="rc-control-label">Rank By</span>
+                                <div class="segmented-control" id="rcMetricToggle">
+                                    <button type="button" class="seg-btn active" data-metric="size">Firm Size</button>
+                                    <button type="button" class="seg-btn" data-metric="output">Output</button>
+                                </div>
+                            </div>
+                            <div class="rc-control-group">
+                                <label class="rc-control-label" for="rcTopN">Cutoff</label>
+                                <select id="rcTopN">
+                                    <option value="10">Top 10</option>
+                                    <option value="25" selected>Top 25</option>
+                                    <option value="50">Top 50</option>
+                                    <option value="100">Top 100</option>
+                                </select>
+                            </div>
+                            <div class="rc-control-group">
+                                <label class="rc-control-label" for="rcFirmFilter">Focus</label>
+                                <select id="rcFirmFilter">
+                                    <option value="">All Top Firms</option>
+                                </select>
+                                <button type="button" class="btn btn-secondary rc-clear-btn" id="rcClearFocus" style="display:none;">Clear</button>
+                            </div>
+                        </div>
+                        <div class="stat-row rc-stats" id="rankClockStats"></div>
+                    </div>
+
+                    <div class="rank-clock-grid">
+                        <div class="card rank-clock-card">
+                            <div class="rc-card-header">
+                                <h3>Firm Rank Clock <span class="rc-subtitle" id="rcSubtitle">Rank 1 at center · clockwise over time</span></h3>
+                                <div class="rc-legend-inline">
+                                    <span class="rc-legend-item"><span class="rc-dot rc-dot-active"></span>Current Rank</span>
+                                    <span class="rc-legend-item"><span class="rc-dot rc-dot-entry"></span>Entry</span>
+                                    <span class="rc-legend-item"><span class="rc-dot rc-dot-exit"></span>Exited Top-N</span>
+                                </div>
+                            </div>
+                            <div class="rank-clock-canvas" id="rankClockContainer"></div>
+                        </div>
+
+                        <div class="card rc-leaderboard-card">
+                            <div class="rc-card-header">
+                                <h3>Top-N Firms <span class="rc-count-badge" id="rcFirmCountBadge">0</span></h3>
+                            </div>
+                            <div class="rc-leaderboard-hint">Hover or click a firm to trace its rank spiral</div>
+                            <div class="rc-leaderboard-list" id="rcLeaderboard"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== AGENT TAB ===== -->
+                <div class="tab-panel" id="panel-agent">
+                    <div class="view-header">
+                        <h3
+                            style="color:var(--text-dim);font-size:0.78rem;text-transform:uppercase;letter-spacing:0.05em;">
+                            Agent</h3>
+                        <select id="agentSelect">
+                            <option value="">– init model first –</option>
+                        </select>
+                    </div>
+                    <div class="stat-row" id="agentStats"></div>
+                    <div class="viz-row">
+                        <div class="card chart-card">
+                            <h3>Effort &amp; Income</h3>
+                            <div class="chart-wrap"><canvas id="chartAgentHistory"></canvas></div>
+                        </div>
+                        <div class="card network-card">
+                            <h3>Friends Network</h3>
+                            <div id="friendsContainer"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ===== RESULTS PAGE OVERLAY ===== -->
+    <div class="results-overlay" id="resultsPage" style="display:none;">
+        <div class="results-header">
+            <button class="btn btn-secondary" id="btnBackToSim">← Back to Simulation</button>
+            <h2 id="resultsTitle">Simulation Results</h2>
+            <div class="results-summary" id="resultsSummary"></div>
+        </div>
+        <div class="results-content">
+            <div class="chart-grid chart-grid-3">
+                <div class="card chart-card chart-card-tall">
+                    <h3>Firm Size (Rank–Size)</h3>
+                    <div class="chart-wrap"><canvas id="chartLogSize"></canvas></div>
+                </div>
+                <div class="card chart-card chart-card-tall">
+                    <h3>Firm Output (Rank–Output)</h3>
+                    <div class="chart-wrap"><canvas id="chartLogOutput"></canvas></div>
+                </div>
+                <div class="card chart-card chart-card-tall">
+                    <h3>Output by Firm Size (Size vs Avg Output)</h3>
+                    <div class="chart-wrap"><canvas id="chartLogProductivity"></canvas></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="status-bar">
+        <span id="statusMsg">Ready – click Init to start</span>
+        <span>Axtell (1999) · Mesa</span>
+    </footer>
+
+    <div class="d3-tooltip" id="tooltip" style="display:none;"></div>
+
+    <script src="/static/app.js"></script>
+</body>
+
+</html>

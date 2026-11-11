@@ -39,6 +39,7 @@ Table of Contents
 * [Grid Space Examples](#grid-space-examples)
 * [Continuous Space Examples](#continuous-space-examples)
 * [Network Examples](#network-examples)
+* [Meta-Agent Examples](#meta-agent-examples)
 * [Visualization Examples](#visualization-examples)
 * [GIS Examples](#gis-examples)
 * [Other Examples](#other-examples)
@@ -116,6 +117,16 @@ This is based on Dorigo's Ant System "Swarm Intelligence" algorithm for generati
 A classic synchronization problem demonstrating resource contention, deadlock, and starvation on a network graph.
 
 
+## Meta-Agent Examples
+
+### [Pseudo-Warehouse Model](https://github.com/mesa/mesa-examples/tree/main/examples/warehouse)
+
+A 3D warehouse simulation demonstrating deliberate meta-agent composition with Mesa's `MetaAgents` API. Each warehouse robot is assembled as a meta-agent from specialized routing, sensing, and worker sub-agents (`RouteAgent`, `SensorAgent`, and `WorkerAgent`) to retrieve inventory items and deliver them to loading docks.
+
+### [Endogenous Firm Formation Model](https://github.com/mesa/mesa-examples/tree/main/examples/emergent_firms)
+
+An implementation of Axtell's (1999) endogenous firm formation model showcasing emergent meta-agents. Boundedly-rational workers interact over a social network to form, join, and dissolve `Firm` meta-agents under increasing returns to scale and free-rider incentives, reproducing power-law firm size and output distributions alongside an interactive Rank Clock dashboard.
+
 
 ## Visualization Examples
 
@@ -158,4 +169,3 @@ This example applies caching on the Mesa [Schelling](https://github.com/mesa/mes
 ### [Continuous Double Auction (ZI-C) Market Model](https://github.com/mesa/mesa-examples/tree/main/examples/zi_double_auction)
 
 A continuous double-auction market with zero-intelligence traders. Buyers and sellers each have a private reservation price or cost, and submit randomized, budget-constrained bids and asks as they arrive asynchronously through Mesa's event-driven scheduler. The order book matches on price-time priority and clears at the midpoint price, converging naturally toward the market's theoretical equilibrium.
-
