@@ -10,18 +10,18 @@ Each worker is endowed with a Cobb-Douglas utility function over income and leis
 2. **Start** a new singleton firm
 3. **Join** a friend's firm
 
-The worker chooses whichever option maximizes their expected utility via a 101-point line search over effort levels. Firms are *meta-agents* whose output follows a super-linear production function O(E) = aE + bE^β, where E is total worker effort. Income is split equally among firm members, creating a public-goods tension: larger firms produce more per-capita output, but free-riding erodes individual incentives. The one optional change from the original model is agents can expand their network from 2 to n. (Although larger networks, will cause the model to slow significantly).
+The worker chooses whichever option maximizes their expected utility via a 101-point line search over effort levels. Firms are *meta-agents* whose output follows a super-linear production function O(E) = aE + bE^β, where E is total worker effort. Income is split equally among firm members, creating a public-goods tension: larger firms produce more per-capita output, but free-riding erodes individual incentives. The one optional change from the original model is agents can expand their network from 2 to n (although larger networks will cause the model to slow significantly).
 
 The resulting dynamics reproduce several empirical regularities observed in real economies, including right-skewed firm-size distributions, persistent firm entry and exit, and heterogeneous effort levels across workers.
 
-**Of Note:** This model does not use the Solara visualization/interface module, instead is uses a custom javascript visualization/interface. See install and run instructions below.
+**Of Note:** This model does not use the Solara visualization/interface module; instead it uses a custom JavaScript visualization/interface. See install and run instructions below.
 
 ## Installation
 
-Install the dependencies with `pip`:
+Install the dependencies (including Mesa's pre-release for `mesa.experimental.meta_agents`) with `pip`:
 
 ```bash
-pip install mesa[rec] fastapi uvicorn
+pip install --pre "mesa[rec]>=4.0.0a0" fastapi uvicorn numpy pandas
 ```
 
 ## How to Run

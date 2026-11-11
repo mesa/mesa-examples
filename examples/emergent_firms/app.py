@@ -7,31 +7,33 @@ from emergent_firms.model import FirmModel, FirmScenario, get_firms, get_workers
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
+MAX_STEPS_PER_REQUEST = 100
 
 # ---------------------------------------------------------------------------
 # Application model state (avoids PLW0603 global statement)
 # ---------------------------------------------------------------------------
-_STATE: dict[str, FirmModel | None] = {"model": None}
+_STATE: dict[str, FirmModel | int | None] = {"model": None, "rng": 42}
 
 
 class InitParams(BaseModel):
-    num_agents: int = 1000
-    a: float = 1.0
-    b: float = 1.0
-    beta: float = 2.0
-    num_friends: int = 2
+    num_agents: int = Field(default=1000, ge=2, le=10000)
+    a: float = Field(default=1.0, ge=0.0, le=100.0)
+    b: float = Field(default=1.0, ge=0.0, le=100.0)
+    beta: float = Field(default=2.0, ge=1.0, le=10.0)
+    num_friends: int = Field(default=2, ge=0, le=500)
     make_friends: bool = False
-    max_friends: int = 10
-    rng: int = 42
+    max_friends: int = Field(default=10, ge=0, le=500)
+    rng: int = Field(default=42, ge=0)
 
 
 class StepParams(BaseModel):
-    steps: int = 1
+    steps: int = Field(default=1, ge=1, le=MAX_STEPS_PER_REQUEST)
     since_step: int | None = None
     active_tab: str | None = None
     rc_metric: str = "size"
-    rc_top_n: int = 25
+    rc_top_n: int = Field(default=25, ge=5, le=100)
     agent_id: int | None = None
 
 
@@ -230,18 +232,23 @@ async def index():
 
 @app.post("/api/init")
 async def api_init(params: InitParams):
+    num_agents = max(2, min(10000, int(params.num_agents)))
+    num_friends = max(0, min(int(params.num_friends), num_agents - 1))
+    max_friends = max(num_friends, min(int(params.max_friends), num_agents - 1))
+    seed = max(0, int(params.rng))
     scenario = FirmScenario(
-        num_agents=params.num_agents,
-        a=params.a,
-        b=params.b,
-        beta=params.beta,
-        num_friends=params.num_friends,
-        make_friends=params.make_friends,
-        max_friends=params.max_friends,
-        rng=params.rng,
+        num_agents=num_agents,
+        a=max(0.0, float(params.a)),
+        b=max(0.0, float(params.b)),
+        beta=max(1.0, min(10.0, float(params.beta))),
+        num_friends=num_friends,
+        make_friends=bool(params.make_friends),
+        max_friends=max_friends,
+        rng=seed,
     )
     m = FirmModel(scenario=scenario)
     _STATE["model"] = m
+    _STATE["rng"] = seed
     return _snapshot(m)
 
 
@@ -250,7 +257,8 @@ async def api_step(params: StepParams):
     m = _STATE["model"]
     if m is None:
         return {"error": "Model not initialized"}
-    for _ in range(params.steps):
+    steps = max(1, min(MAX_STEPS_PER_REQUEST, int(params.steps)))
+    for _ in range(steps):
         m.step()
 
     if params.since_step is None:
@@ -283,7 +291,8 @@ async def api_reset():
     prev = _STATE["model"]
     if prev is None:
         return {"error": "Model not initialized"}
-    # Re-create with same scenario parameters
+    seed = getattr(prev, "initial_seed", _STATE.get("rng", 42))
+    # Re-create with same scenario parameters and seed
     scenario = FirmScenario(
         num_agents=prev.num_agents,
         a=prev.a,
@@ -292,7 +301,7 @@ async def api_reset():
         num_friends=prev.num_friends,
         make_friends=prev.make_friends,
         max_friends=prev.max_friends,
-        rng=42,
+        rng=seed,
     )
     m = FirmModel(scenario=scenario)
     _STATE["model"] = m
@@ -314,12 +323,11 @@ async def api_firm(firm_id: int):
     if m is None:
         return {"error": "Model not initialized"}
 
-    # Find the firm
-    firm = None
-    for f in get_firms(m):
-        if f.unique_id == firm_id:
-            firm = f
-            break
+    firms_by_id = getattr(m, "firms_by_id", None)
+    if firms_by_id is not None:
+        firm = firms_by_id.get(firm_id)
+    else:
+        firm = next((f for f in get_firms(m) if f.unique_id == firm_id), None)
     if firm is None:
         return {"error": f"Firm {firm_id} not found"}
 

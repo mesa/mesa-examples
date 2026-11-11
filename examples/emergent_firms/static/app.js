@@ -50,21 +50,34 @@ const resultsPage        = $('#resultsPage');
 const MAX_STEP = 1000;
 
 // ---------- Helpers ----------
+function intParam(sel, fallback) {
+    const v = Number.parseInt($(sel)?.value, 10);
+    return Number.isFinite(v) ? v : fallback;
+}
+
+function floatParam(sel, fallback) {
+    const v = Number.parseFloat($(sel)?.value);
+    return Number.isFinite(v) ? v : fallback;
+}
+
 function getParams() {
+    const numAgents = Math.max(2, Math.min(10000, intParam('#p-agents', 1000)));
+    const numFriends = Math.max(0, Math.min(numAgents - 1, intParam('#p-friends', 2)));
+    const maxFriends = Math.max(numFriends, Math.min(numAgents - 1, intParam('#p-maxfriends', 10)));
     return {
-        rng:          parseInt($('#p-seed').value)        || 42,
-        num_agents:   parseInt($('#p-agents').value)      || 1000,
-        a:            parseFloat($('#p-a').value)         || 1.0,
-        b:            parseFloat($('#p-b').value)         || 1.0,
-        beta:         parseFloat($('#p-beta').value)      || 2.0,
-        num_friends:  parseInt($('#p-friends').value)     || 2,
-        make_friends: $('#p-makefriends').checked,
-        max_friends:  parseInt($('#p-maxfriends').value)  || 10,
+        rng:          Math.max(0, intParam('#p-seed', 42)),
+        num_agents:   numAgents,
+        a:            Math.max(0, floatParam('#p-a', 1.0)),
+        b:            Math.max(0, floatParam('#p-b', 1.0)),
+        beta:         Math.max(1.0, floatParam('#p-beta', 2.0)),
+        num_friends:  numFriends,
+        make_friends: Boolean($('#p-makefriends')?.checked),
+        max_friends:  maxFriends,
     };
 }
 
 function getStepsPerTick() {
-    return parseInt(stepsPerTickSelect?.value, 10) || 1;
+    return Math.max(1, Math.min(100, intParam('#p-steps-per-tick', 1)));
 }
 
 function getActiveTab() {
@@ -76,7 +89,17 @@ async function api(path, body = null) {
         ? { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) }
         : { method: 'GET' };
     const res = await fetch(path, opts);
-    return res.json();
+    let data = null;
+    try {
+        data = await res.json();
+    } catch (_err) {
+        throw new Error(`HTTP ${res.status} (${res.statusText || 'invalid JSON response'})`);
+    }
+    if (!res.ok) {
+        const detail = data?.detail || data?.error || `HTTP ${res.status}`;
+        throw new Error(typeof detail === 'string' ? detail : JSON.stringify(detail));
+    }
+    return data;
 }
 
 function status(msg) { statusMsg.textContent = msg; }
@@ -373,7 +396,13 @@ function syncRankClockAuxDom(force = false) {
 }
 
 async function loadRankClock() {
-    const data = await api(`/api/rank_clock?metric=${rankClockMetric}&top_n=${rankClockTopN}`);
+    let data;
+    try {
+        data = await api(`/api/rank_clock?metric=${rankClockMetric}&top_n=${rankClockTopN}`);
+    } catch (e) {
+        status('Error loading Rank Clock: ' + e.message);
+        return;
+    }
     if (data.error) {
         rankClockData = { step: 0, metric: rankClockMetric, top_n: rankClockTopN, rank1_turnovers: 0, total_living_firms: 0, firms: [] };
         rcFirmMap = new Map();
@@ -517,7 +546,13 @@ function updateAgentChart(history) {
 async function loadAgentView(agentId) {
     if (agentId == null) return;
     selectedAgentId = agentId;
-    const data = await api(`/api/agent/${agentId}`);
+    let data;
+    try {
+        data = await api(`/api/agent/${agentId}`);
+    } catch (e) {
+        status('Error loading agent view: ' + e.message);
+        return;
+    }
     if (data.error) { status(data.error); return; }
     renderAgentStats(data);
     updateAgentChart(data.history);
@@ -1338,6 +1373,8 @@ btnInit.addEventListener('click', async () => {
         if (snap.error) { status('Error: ' + snap.error); return; }
         await handleInitSnapshot(snap);
         status(`Model initialized – ${snap.num_firms ?? snap.firms.length} firms`);
+    } catch (e) {
+        status('Error initializing model: ' + e.message);
     } finally { btnInit.disabled = false; }
 });
 
@@ -1359,6 +1396,8 @@ btnStep.addEventListener('click', async () => {
         } else {
             status(`Step ${resp.step} – ${resp.num_firms} firms`);
         }
+    } catch (e) {
+        status('Error stepping model: ' + e.message);
     } finally { btnStep.disabled = false; }
 });
 
@@ -1369,6 +1408,7 @@ btnReset.addEventListener('click', async () => {
     btnRun.classList.remove('running');
     resultsPage.style.display = 'none';
     status('Resetting...');
+    btnReset.disabled = true;
     pinnedFirmId = null;
     hoveredFirmId = null;
     rankClockData = null;
@@ -1376,12 +1416,16 @@ btnReset.addEventListener('click', async () => {
     rcPrevRank1Id = null;
     loadedAgentViewStep = -1;
     loadedAgentViewId = null;
-    const snap = await api('/api/reset', {});
-    if (snap.error) { status('Error: ' + snap.error); return; }
-    agentListPopulated = false;
-    agentSelect.innerHTML = '<option value="">loading...</option>';
-    await handleInitSnapshot(snap);
-    status('Model reset');
+    try {
+        const snap = await api('/api/reset', {});
+        if (snap.error) { status('Error: ' + snap.error); return; }
+        agentListPopulated = false;
+        agentSelect.innerHTML = '<option value="">loading...</option>';
+        await handleInitSnapshot(snap);
+        status('Model reset');
+    } catch (e) {
+        status('Error resetting model: ' + e.message);
+    } finally { btnReset.disabled = false; }
 });
 
 // Run / Stop toggle

@@ -27,11 +27,17 @@ class Firm(mesa.Agent):
         living = getattr(model, "_living_firms", None)
         if living is not None:
             living[self] = None
+        by_id = getattr(model, "firms_by_id", None)
+        if by_id is not None:
+            by_id[self.unique_id] = self
 
     def remove(self):
         living = getattr(self.model, "_living_firms", None)
         if living is not None:
             living.pop(self, None)
+        by_id = getattr(self.model, "firms_by_id", None)
+        if by_id is not None:
+            by_id.pop(self.unique_id, None)
         super().remove()
 
     @property
@@ -228,6 +234,9 @@ class Worker(mesa.Agent):
                     living = getattr(self.model, "_living_firms", None)
                     if living is not None:
                         living.pop(current_firm, None)
+                    by_id = getattr(self.model, "firms_by_id", None)
+                    if by_id is not None:
+                        by_id.pop(current_firm.unique_id, None)
                     self.model.meta_agents.dissolve(current_firm)
 
             self.effort = best_e
@@ -238,6 +247,9 @@ class Worker(mesa.Agent):
                 living = getattr(self.model, "_living_firms", None)
                 if living is not None:
                     living[new_firm] = None
+                by_id = getattr(self.model, "firms_by_id", None)
+                if by_id is not None:
+                    by_id[new_firm.unique_id] = new_firm
                 self._firm = new_firm
                 new_firm._size = 1
                 new_firm._total_effort = best_e

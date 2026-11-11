@@ -142,20 +142,31 @@ def avg_utility_largest(model):
 
 class FirmModel(mesa.Model):
     def __init__(self, scenario: FirmScenario = FirmScenario):
+        raw_rng = (
+            getattr(scenario, "rng", 42)
+            if not isinstance(scenario, type)
+            else 42
+        )
         super().__init__(scenario=scenario)
-        self.num_agents = self.scenario.num_agents
-        self.a = self.scenario.a
-        self.b = self.scenario.b
-        self.beta = self.scenario.beta
-        self.num_friends = self.scenario.num_friends
-        self.make_friends = self.scenario.make_friends
-        self.max_friends = max(self.scenario.max_friends, self.num_friends)
+        self.num_agents = max(2, int(self.scenario.num_agents))
+        self.a = max(0.0, float(self.scenario.a))
+        self.b = max(0.0, float(self.scenario.b))
+        self.beta = max(1.0, float(self.scenario.beta))
+        self.num_friends = max(
+            0, min(int(self.scenario.num_friends), self.num_agents - 1)
+        )
+        self.make_friends = bool(self.scenario.make_friends)
+        self.max_friends = max(
+            self.num_friends, min(int(self.scenario.max_friends), self.num_agents - 1)
+        )
+        self.initial_seed = raw_rng if isinstance(raw_rng, int) else 42
 
         if not hasattr(self, "steps"):
             self.steps = 0
         self._period = 0
         self.new_firms_count = 0
         self._living_firms: dict[Firm, None] = {}
+        self.firms_by_id: dict[int, Firm] = {}
         self._stats: dict[str, float | int] = {}
         # Per-firm history: firm_id -> {size: [], output: [], free_riders: [], avg_effort: [], step: []}
         self.firm_history = defaultdict(
@@ -167,10 +178,7 @@ class FirmModel(mesa.Model):
                 "step": [],
             }
         )
-        # O(1) lifetime peak lookup: firm_id -> [peak_size, peak_output, steps_recorded]
         self.firm_peaks: dict[int, list] = {}
-        # Per-step top-100 rank snapshots for the Rank Clock (steps >= 1)
-        # Each step stores [(firm_id, size, output, age), ...] ordered Rank 1..100
         self.rank_snapshots = {"size": [], "output": []}
         self._dissolved_step_buf: list[int] = []
         self.dissolved_by_step: list[list[int]] = []
@@ -187,6 +195,7 @@ class FirmModel(mesa.Model):
             self.meta_agents.create("Firm", [w], mesa_agent_type=Firm)
             f = w.firm
             self._living_firms[f] = None
+            self.firms_by_id[f.unique_id] = f
             f._size = 1
             f._total_effort = 0.0
             f.peak_size = 1
@@ -195,11 +204,17 @@ class FirmModel(mesa.Model):
         self._workers: list[Worker] = workers
         self.workers_by_id: dict[int, Worker] = {w.unique_id: w for w in workers}
 
-        # 2. Create social network
-        for w in workers:
-            candidates = [other for other in workers if other is not w]
-            w.friends = self.random.sample(candidates, self.num_friends)
-            w._friends_set = set(w.friends)
+        # 2. Create social network in O(N * num_friends) without O(N^2) candidate lists
+        n_workers = len(workers)
+        k_friends = self.num_friends
+        if k_friends > 0 and n_workers > 1:
+            pool = range(n_workers - 1)
+            for i, w in enumerate(workers):
+                w.friends = [
+                    workers[j + 1 if j >= i else j]
+                    for j in self.random.sample(pool, k_friends)
+                ]
+                w._friends_set = set(w.friends)
 
         # 3. Initial evaluation of states
         for w in workers:
