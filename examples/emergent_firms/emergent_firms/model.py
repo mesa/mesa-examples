@@ -142,11 +142,7 @@ def avg_utility_largest(model):
 
 class FirmModel(mesa.Model):
     def __init__(self, scenario: FirmScenario = FirmScenario):
-        raw_rng = (
-            getattr(scenario, "rng", 42)
-            if not isinstance(scenario, type)
-            else 42
-        )
+        raw_rng = getattr(scenario, "rng", 42) if not isinstance(scenario, type) else 42
         super().__init__(scenario=scenario)
         self.num_agents = max(2, int(self.scenario.num_agents))
         self.a = max(0.0, float(self.scenario.a))
