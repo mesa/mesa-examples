@@ -3,6 +3,7 @@
 
 # external requirements
 mesa-geo~=0.9.0
+shapely>=2.1
 geopandas
 numpy
 pandas

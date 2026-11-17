@@ -152,9 +152,9 @@ class AgentsAndNetworks(mesa.Model):
 
         buildings_df = gpd.read_file(buildings_file)
         if campus == "gmu":
-            buildings_df.fillna(0.0, inplace=True)
-            buildings_df.rename(columns={"NAME": "name"}, inplace=True)
-        buildings_df.drop("Id", axis=1, inplace=True)
+            buildings_df = buildings_df.fillna(0.0)
+            buildings_df = buildings_df.rename(columns={"NAME": "name"})
+        buildings_df = buildings_df.drop("Id", axis=1)
         buildings_df.index.name = "unique_id"
         buildings_df = buildings_df.set_crs(self.data_crs, allow_override=True).to_crs(
             crs

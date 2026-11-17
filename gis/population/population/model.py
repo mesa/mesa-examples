@@ -22,7 +22,7 @@ class Person(mg.GeoAgent):
 
     def set_random_world_coord(self):
         world_coord_point = Point(
-            self.model.space.population_layer.transform * self.img_coord
+            self.model.space.population_layer.transform @ self.img_coord
         )
         random_world_coord_x = world_coord_point.x + np.random.uniform(
             -self.MOBILITY_RANGE_X, self.MOBILITY_RANGE_X
@@ -40,7 +40,7 @@ class Person(mg.GeoAgent):
         while neighborhood and not found:
             next_img_coord = random.choice(neighborhood)
             world_coord_point = Point(
-                self.model.space.population_layer.transform * next_img_coord
+                self.model.space.population_layer.transform @ next_img_coord
             )
             if world_coord_point.within(self.model.space.lake):
                 neighborhood.remove(next_img_coord)
@@ -79,7 +79,7 @@ class Population(mesa.Model):
             if popu_round > 0:
                 for _ in range(popu_round):
                     num_agents += 1
-                    point = Point(self.space.population_layer.transform * cell.rowcol)
+                    point = Point(self.space.population_layer.transform @ cell.rowcol)
                     if not point.within(self.space.lake):
                         person = Person(
                             model=self,

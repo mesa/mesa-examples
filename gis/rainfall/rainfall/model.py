@@ -37,7 +37,7 @@ class RaindropAgent(mg.GeoAgent):
             col_idx = x
             self._rowcol = row_idx, col_idx
             self.geometry = Point(
-                self.model.space.raster_layer.transform * self._rowcol
+                self.model.space.raster_layer.transform @ self._rowcol
             )
         else:
             self.geometry = None
