@@ -1,0 +1,4 @@
+mesa
+solara
+matplotlib
+altair
