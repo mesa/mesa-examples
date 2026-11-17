@@ -1,8 +1,8 @@
 import geopandas as gpd
 import numpy as np
 import pyproj
+from shapely import transform
 from shapely.geometry import LineString, MultiLineString
-from shapely.ops import transform
 
 FloatCoordinate = tuple[float, float]
 Coordinate = tuple[int, int]
@@ -97,7 +97,17 @@ class UnitTransformer:
         )
 
     def degree2meter(self, geom):
-        return transform(self._degree2meter.transform, geom)
+        return transform(
+            geom,
+            self._degree2meter.transform,
+            interleaved=False,
+            include_z=None,
+        )
 
     def meter2degree(self, geom):
-        return transform(self._meter2degree.transform, geom)
+        return transform(
+            geom,
+            self._meter2degree.transform,
+            interleaved=False,
+            include_z=None,
+        )
