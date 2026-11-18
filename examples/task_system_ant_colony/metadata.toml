@@ -1,0 +1,20 @@
+[model]
+name = "Ant Colony — Task System"
+description = """
+Proof-of-concept for the Mesa Task system (discussion #2526).
+Ants perform structured tasks (dig, transport, rest) over multiple steps.
+Cave-in events emit pheromone signals that interrupt nearby ants,
+demonstrating priority-based task switching, partial rewards, and resumable
+task state.
+"""
+authors = ["Your Name <your@email.com>"]
+mesa_version = ">=3.0"
+
+[metadata]
+domain     = ["biology", "complex-systems"]
+complexity = "intermediate"
+
+[metadata.features]
+spaces        = ["MultiGrid"]
+visualization = ["SolaraViz"]
+new_concepts  = ["task-system", "behavioral-framework", "interruption", "priority-queue"]
