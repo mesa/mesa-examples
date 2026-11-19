@@ -1,1 +1,2 @@
 mesa-geo~=0.9.0
+affine>=3.0
