@@ -18,10 +18,10 @@ The resulting dynamics reproduce several empirical regularities observed in real
 
 ## Installation
 
-Install the dependencies (including Mesa's pre-release for `mesa.experimental.meta_agents`) with `pip`:
+Install the dependencies with `pip` (this is installs Mesa form the git repository to ensure the latest meta-agents):
 
 ```bash
-pip install --pre "mesa[rec]>=4.0.0a0" fastapi uvicorn numpy pandas
+ pip install -U -e git+https://github.com/mesa/mesa@main#egg=mesa fastapi uvicorn
 ```
 
 ## How to Run
