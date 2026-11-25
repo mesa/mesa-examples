@@ -13,7 +13,7 @@ Customers arrive according to a Poisson process (rate λ) and join a single FIFO
 | `run_until` | Running a pure event-driven simulation to a target time |
 | Dynamic agent lifecycle | Customers created on arrival, `remove()`d after service |
 
-The model disables Mesa's default step schedule (`_default_schedule.stop()`) and is driven entirely by events.
+The model disables Mesa's default step schedule (`_default_schedule.cancel()`) and is driven entirely by events.
 
 ### Design: server-centric
 Servers are active agents. When a server completes service, it checks the queue and pulls the next customer itself — a natural ABM pattern, in contrast to the system-centric routing common in traditional DES.
