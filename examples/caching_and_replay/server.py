@@ -1,58 +1,92 @@
-"""This file was copied over from the original Schelling mesa example."""
+"""Schelling model visualization components.
 
-import mesa
+Standard visualization for the Schelling segregation model.
+"""
+
+import solara
+from mesa.visualization import make_plot_component, make_space_component
+from mesa.visualization.components import AgentPortrayalStyle
+from mesa.visualization.utils import update_counter
 from model import Schelling
 
 
+@solara.component
 def get_happy_agents(model):
-    """Display a text count of how many happy agents there are."""
-    return f"Happy agents: {model.happy}"
+    """Display count and percentage of happy agents."""
+    update_counter.get()
 
+    total_agents = len(model.agents)
+    happy_count = 0
+    current_step = 0
+    if hasattr(model, "datacollector") and model.datacollector.model_vars:
+        try:
+            data = model.datacollector.get_model_vars_dataframe()
+            if not data.empty:
+                current_step = len(data)
+                if current_step > 0 and "happy" in data.columns:
+                    happy_count = int(data["happy"].iloc[-1])
+        except (IndexError, KeyError):
+            pass
 
-def schelling_draw(agent):
-    """Portrayal Method for canvas"""
-    if agent is None:
-        return
-    portrayal = {"Shape": "circle", "r": 0.5, "Filled": "true", "Layer": 0}
+    if total_agents > 0:
+        happy_percentage = (happy_count / total_agents) * 100
 
-    if agent.type == 0:
-        portrayal["Color"] = ["#FF0000", "#FF9999"]
-        portrayal["stroke_color"] = "#00FF00"
+        solara.Markdown(
+            f"**Happy agents:** {happy_count} / {total_agents} "
+            f"({happy_percentage:.1f}%)"
+        )
     else:
-        portrayal["Color"] = ["#0000FF", "#9999FF"]
-        portrayal["stroke_color"] = "#000000"
-    return portrayal
+        solara.Markdown("**Happy agents:** 0 / 0")
 
 
-canvas_element = mesa.visualization.CanvasGrid(
-    portrayal_method=schelling_draw,
-    grid_width=20,
-    grid_height=20,
-    canvas_width=500,
-    canvas_height=500,
-)
-happy_chart = mesa.visualization.ChartModule([{"Label": "happy", "Color": "Black"}])
+def agent_portrayal(agent):
+    """Define agent visualization properties."""
+    if agent.type == 0:
+        return AgentPortrayalStyle(color="red", size=50)
+    return AgentPortrayalStyle(color="blue", size=50)
 
+
+# Model parameters for the Schelling model
 model_params = {
     "height": 20,
     "width": 20,
-    "density": mesa.visualization.Slider(
-        name="Agent density", value=0.8, min_value=0.1, max_value=1.0, step=0.1
-    ),
-    "minority_pc": mesa.visualization.Slider(
-        name="Fraction minority", value=0.2, min_value=0.00, max_value=1.0, step=0.05
-    ),
-    "homophily": mesa.visualization.Slider(
-        name="Homophily", value=3, min_value=0, max_value=8, step=1
-    ),
-    "radius": mesa.visualization.Slider(
-        name="Search Radius", value=1, min_value=1, max_value=5, step=1
-    ),
+    "density": {
+        "type": "SliderFloat",
+        "value": 0.8,
+        "label": "Agent density",
+        "min": 0.1,
+        "max": 1.0,
+        "step": 0.1,
+    },
+    "minority_pc": {
+        "type": "SliderFloat",
+        "value": 0.2,
+        "label": "Fraction minority",
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.05,
+    },
+    "homophily": {
+        "type": "SliderInt",
+        "value": 3,
+        "label": "Homophily",
+        "min": 0,
+        "max": 8,
+        "step": 1,
+    },
+    "radius": {
+        "type": "SliderInt",
+        "value": 1,
+        "label": "Search Radius",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+    },
 }
 
-server = mesa.visualization.ModularServer(
-    model_cls=Schelling,
-    visualization_elements=[canvas_element, get_happy_agents, happy_chart],
-    name="Schelling Segregation Model",
-    model_params=model_params,
-)
+# Initialize model
+model = Schelling()
+
+# Create visualization components
+space_component = make_space_component(agent_portrayal)
+happy_chart = make_plot_component("happy")
