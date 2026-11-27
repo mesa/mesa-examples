@@ -1,0 +1,2 @@
+mesa[viz]>=3.0
+mesa-llm>=0.1.0
