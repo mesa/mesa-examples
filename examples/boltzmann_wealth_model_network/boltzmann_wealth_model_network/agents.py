@@ -18,7 +18,7 @@ class MoneyAgent(CellAgent):
             model (Model): The model instance that contains the agent
         """
         super().__init__(model)
-        self.wealth = 1
+        self.wealth = self.random.randint(1, self.model.max_wealth)
 
     def give_money(self):
         neighbors = [agent for agent in self.cell.neighborhood.agents if agent != self]
