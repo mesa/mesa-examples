@@ -1,0 +1,7 @@
+mesa>3.0.0
+solara
+matplotlib
+pandas
+numpy
+networkx
+altair
