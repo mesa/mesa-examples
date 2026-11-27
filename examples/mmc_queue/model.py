@@ -53,7 +53,7 @@ class MMcQueue(Model):
         ]
 
         # Disable default step schedule — pure DES
-        self._default_schedule.stop()
+        self._default_schedule.cancel()
 
         # Schedule stochastic arrivals
         self.schedule_recurring(
