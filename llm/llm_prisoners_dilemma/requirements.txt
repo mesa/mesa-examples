@@ -1,0 +1,4 @@
+mesa>=3.2
+mesa-llm>=0.1.0
+solara>=1.50
+python-dotenv>=1.0.0
