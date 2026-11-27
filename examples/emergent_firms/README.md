@@ -18,10 +18,10 @@ The resulting dynamics reproduce several empirical regularities observed in real
 
 ## Installation
 
-Install the dependencies with `pip` (this is installs Mesa form the git repository to ensure the latest meta-agents):
+Install the dependencies with `pip` (this installs Mesa from the git repository to ensure the latest meta-agents):
 
 ```bash
- pip install -U -e git+https://github.com/mesa/mesa@main#egg=mesa fastapi uvicorn
+pip install -U -e git+https://github.com/mesa/mesa@main#egg=mesa fastapi uvicorn
 ```
 
 ## How to Run
@@ -29,7 +29,7 @@ Install the dependencies with `pip` (this is installs Mesa form the git reposito
 Launch the FastAPI visualization server:
 
 ```bash
-uvicorn app:app --reload
+uvicorn app:app
 ```
 
 Then open your browser to [http://127.0.0.1:8000/](http://127.0.0.1:8000/).
