@@ -10,6 +10,6 @@ description = "Endogenous Firm Formation model (Axtell 1999) — firms emerge fr
 
 dependencies = [
     "mesa[rec] @ git+https://github.com/mesa/mesa@main",
-    "fastapi>=0.115.0,<1.0.0",
-    "uvicorn>=0.34.0,<1.0.0",
+    "fastapi==0.115.0",
+    "uvicorn==0.34.0",
 ]
