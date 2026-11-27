@@ -1,0 +1,15 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "emergent-firms"
+version = "0.1.0"
+requires-python = ">=3.12"
+description = "Endogenous Firm Formation model (Axtell 1999) — firms emerge from decentralized worker decisions in a super-linear production economy."
+
+dependencies = [
+    "mesa[rec] @ git+https://github.com/mesa/mesa@main",
+    "fastapi==0.115.0",
+    "uvicorn==0.34.0",
+]
