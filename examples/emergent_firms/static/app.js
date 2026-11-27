@@ -12,7 +12,8 @@ let hoveredFirmId = null;       // hovered firm ID in Rank Clock, or null
 let rankClockData = null;       // cached /api/rank_clock payload (incrementally maintained)
 let rcFirmMap = new Map();      // firmId -> firm trajectory object in rankClockData.firms
 let rcPrevRank1Id = null;       // tracks Rank #1 ID for incremental turnover counting
-let lastAuxDomSyncMs = 0;       // throttles leaderboard/select DOM rebuilds during live Run
+let rcFilterRebuildPending = false; // dropdown rebuild deferred while it is open/focused
+let lastAuxDomSyncMs = 0;      // throttles leaderboard/select DOM rebuilds during live Run
 let selectedAgentId = null;
 let loadedAgentViewStep = -1;   // step at which selectedAgentId's chart is synced
 let loadedAgentViewId = null;
@@ -248,33 +249,39 @@ function populateRankClockFilter(firms) {
         pinnedFirmId = null;
     }
 
-    rcFirmFilter.innerHTML = '';
-    const allOpt = document.createElement('option');
-    allOpt.value = '';
-    allOpt.textContent = `All Top Firms (${firms.length})`;
-    rcFirmFilter.appendChild(allOpt);
-
-    const frag = document.createDocumentFragment();
+    const entries = [{ value: '', text: `All Top Firms (${firms.length})` }];
     const limit = Math.min(firms.length, 250);
     for (let i = 0; i < limit; i++) {
         const f = firms[i];
-        const opt = document.createElement('option');
-        opt.value = String(f.id);
         const rankTag = f.current_rank != null ? `#${f.current_rank}` : (f.alive ? 'exited' : 'dissolved');
-        opt.textContent = `Firm ${f.id} (${rankTag} · peak #${f.peak_rank})`;
-        frag.appendChild(opt);
+        entries.push({ value: String(f.id), text: `Firm ${f.id} (${rankTag} · peak #${f.peak_rank})` });
     }
     // Ensure pinned firm is selectable even if beyond top 250 historical entrants
     if (pinnedFirmId != null && !firms.slice(0, limit).some(f => f.id === pinnedFirmId)) {
         const pf = rcFirmMap.get(pinnedFirmId);
-        if (pf) {
+        if (pf) entries.push({ value: String(pf.id), text: `Firm ${pf.id} (peak #${pf.peak_rank})` });
+    }
+
+    // Reuse existing <option> nodes when the set of firms is unchanged and only
+    // labels moved (ranks change every step), so an open dropdown isn't torn down.
+    const existing = rcFirmFilter.options;
+    const sameFirms = existing.length === entries.length &&
+        entries.every((e, i) => existing[i].value === e.value);
+    if (sameFirms) {
+        for (let i = 0; i < entries.length; i++) {
+            if (existing[i].textContent !== entries[i].text) existing[i].textContent = entries[i].text;
+        }
+    } else {
+        rcFirmFilter.innerHTML = '';
+        const frag = document.createDocumentFragment();
+        for (const e of entries) {
             const opt = document.createElement('option');
-            opt.value = String(pf.id);
-            opt.textContent = `Firm ${pf.id} (peak #${pf.peak_rank})`;
+            opt.value = e.value;
+            opt.textContent = e.text;
             frag.appendChild(opt);
         }
+        rcFirmFilter.appendChild(frag);
     }
-    rcFirmFilter.appendChild(frag);
 
     rcFirmFilter.value = pinnedFirmId != null ? String(pinnedFirmId) : '';
     rcClearFocus.style.display = pinnedFirmId != null ? 'inline-block' : 'none';
@@ -391,7 +398,13 @@ function syncRankClockAuxDom(force = false) {
         return;
     }
     lastAuxDomSyncMs = now;
-    populateRankClockFilter(rankClockData.firms || []);
+    // Replacing <option>s while the native dropdown is open closes it, so defer
+    // the rebuild until the user has finished with it (see the blur handler).
+    if (document.activeElement === rcFirmFilter) {
+        rcFilterRebuildPending = true;
+    } else {
+        populateRankClockFilter(rankClockData.firms || []);
+    }
     renderRankClockLeaderboard(rankClockData);
 }
 
@@ -1241,6 +1254,13 @@ rcTopN.addEventListener('change', () => {
 });
 
 // Rank Clock Focus dropdown & Clear button
+rcFirmFilter.addEventListener('blur', () => {
+    if (rcFilterRebuildPending && rankClockData) {
+        rcFilterRebuildPending = false;
+        populateRankClockFilter(rankClockData.firms || []);
+    }
+});
+
 rcFirmFilter.addEventListener('change', () => {
     const val = rcFirmFilter.value;
     pinnedFirmId = val ? parseInt(val, 10) : null;
