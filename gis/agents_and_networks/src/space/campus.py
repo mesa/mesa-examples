@@ -1,6 +1,5 @@
 import random
 from collections import defaultdict
-from typing import DefaultDict
 
 import mesa_geo as mg
 from shapely.geometry import Point
@@ -15,9 +14,9 @@ class Campus(mg.GeoSpace):
     homes: tuple[Building]
     works: tuple[Building]
     other_buildings: tuple[Building]
-    home_counter: DefaultDict[FloatCoordinate, int]
+    home_counter: defaultdict[FloatCoordinate, int]
     _buildings: dict[int, Building]
-    _commuters_pos_map: DefaultDict[FloatCoordinate, set[Commuter]]
+    _commuters_pos_map: defaultdict[FloatCoordinate, set[Commuter]]
     _commuter_id_map: dict[int, Commuter]
 
     def __init__(self, crs: str) -> None:
